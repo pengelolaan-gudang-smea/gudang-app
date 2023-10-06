@@ -40,6 +40,14 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'admin_waka' => [
+            'driver' => 'session',
+            'provider' => 'admin_waka'
+        ],
+        'admin_gudang' => [
+            'driver' => 'session',
+            'provider' => 'admin_gudang'
+        ],
     ],
 
     /*
@@ -61,8 +69,16 @@ return [
 
     'providers' => [
         'users' => [
-            'driver' => 'eloquent',
             'model' => App\Models\User::class,
+            'driver' => 'eloquent',
+        ],
+        'admin_waka' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Waka::class,
+        ],
+        'admin_gudang' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Gudang::class,
         ],
 
         // 'users' => [
@@ -93,6 +109,18 @@ return [
     'passwords' => [
         'users' => [
             'provider' => 'users',
+            'table' => 'password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'admin_waka' => [
+            'provider' => 'admin_waka',
+            'table' => 'password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'admin_gudang' => [
+            'provider' => 'admin_gudang',
             'table' => 'password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,
