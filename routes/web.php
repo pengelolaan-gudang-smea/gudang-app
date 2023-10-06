@@ -2,7 +2,10 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PasswordController;
+use App\Http\Controllers\UserManagement;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
+use Spatie\Permission\Models\Role;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,8 +40,24 @@ Route::controller(PasswordController::class)->group(function () {
 
 
 // * Dashboard
-Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard.index');
+Route::middleware('auth')->prefix('/dashboard')->group(function () {
+    Route::get('', function () {
+        return view('dashboard.index', [
+            'title' => 'Home'
+        ]);
     })->name('dashboard');
+
+    Route::get('/profile/{user:username}', function (User $user) {
+        return view('dashboard.profile.index', [
+            'title' => 'Profile | ' . $user->username
+        ]);
+    })->name('dashboard.profile');
+    Route::middleware('can:edit akun')->group(function () {
+        Route::resource('/user', UserManagement::class);
+        Route::post('/hak-akses/{user:username}', [UserManagement::class, 'akses'])->name('user.akses');
+    });
 });
+
+Route::get('/test', function () {
+    dd('hello');
+})->middleware('can:edit akun');
