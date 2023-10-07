@@ -1,8 +1,9 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PasswordController;
-use App\Http\Controllers\UserManagement;
+use App\Http\Controllers\UserManagementController;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Models\Role;
@@ -41,11 +42,7 @@ Route::controller(PasswordController::class)->group(function () {
 
 // * Dashboard
 Route::middleware('auth')->prefix('/dashboard')->group(function () {
-    Route::get('', function () {
-        return view('dashboard.index', [
-            'title' => 'Home'
-        ]);
-    })->name('dashboard');
+    Route::get('', DashboardController::class)->name('dashboard');
 
     Route::get('/profile/{user:username}', function (User $user) {
         return view('dashboard.profile.index', [
@@ -53,8 +50,8 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
         ]);
     })->name('dashboard.profile');
     Route::middleware('can:edit akun')->group(function () {
-        Route::resource('/user', UserManagement::class);
-        Route::post('/hak-akses/{user:username}', [UserManagement::class, 'akses'])->name('user.akses');
+        Route::resource('/user', UserManagementController::class);
+        Route::post('/hak-akses/{user:username}', [UserManagementController::class, 'akses'])->name('user.akses');
     });
 });
 

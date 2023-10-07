@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
-class UserManagement extends Controller
+class UserManagementController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -116,12 +116,14 @@ class UserManagement extends Controller
     {
         $role = $request->input('roles');
         $role_old = $user->roles->first()->id;
-        // dd($role);
 
-        $validate = $request->validate([
-            'username' => 'required',
-            'email' => ['required', 'email'],
-        ]);
+        $validateRules = [
+            'username' => 'required|unique:users,username,' . $user->id,
+            'email' => 'required|email|unique:users,email,' . $user->id,
+        ];
+
+        $validate = $request->validate($validateRules);
+
         if ($request->has('password')) {
             $validateRules['password'] = ['required', 'min:8'];
             $validate['password'] = Hash::make($request->input('password'));
@@ -131,10 +133,12 @@ class UserManagement extends Controller
             $user->removeRole($role_old);
             $user->assignRole($role);
         }
+
         $user->update($validate);
 
-        return redirect()->route('user.index')->with('success', 'Berhasli merubah data ' . $user->username);
+        return redirect()->route('user.index')->with('success', 'Berhasil merubah data ' . $user->username);
     }
+
 
     /**
      * Remove the specified resource from storage.
