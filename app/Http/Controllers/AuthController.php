@@ -39,28 +39,4 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
         return redirect()->route('login');
     }
-
-    // * register
-
-    public function register()
-    {
-        return view('auth.register', [
-            'title' => 'Register'
-        ]);
-    }
-
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'username' => ['required'],
-            'email' => ['email', 'required', 'unique:users,email'],
-            'password' => ['required', 'min:8', 'confirmed'],
-        ]);
-
-        // Hash the password
-        $validated['password'] = Hash::make($validated['password']);
-
-        User::create($validated);
-        return redirect()->route('login')->with('success', 'Register berhasil, silahkan login');
-    }
 }

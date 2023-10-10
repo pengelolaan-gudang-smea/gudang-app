@@ -11,7 +11,7 @@ class PermissionSeeder extends Seeder
     /**
      * Run the database seeds.
      */
-    public function run() : void
+    public function run(): void
     {
         // Create roles and permissions
         Role::create([
@@ -25,12 +25,12 @@ class PermissionSeeder extends Seeder
         ]);
 
         Permission::create([
-            'name' => 'edit akun',
+            'name' => 'Edit akun',
             'guard_name' => 'web'
         ]);
 
         Permission::create([
-            'name' => 'mengajukan barang',
+            'name' => 'Mengajukan barang',
             'guard_name' => 'web'
         ]);
     }

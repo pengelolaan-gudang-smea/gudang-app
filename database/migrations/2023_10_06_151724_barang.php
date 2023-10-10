@@ -11,6 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::create('barang', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('slug');
+            $table->text('spek');
+            $table->double('harga');
+            $table->string('satuan');
+            $table->enum('status', ['Disetujui', 'Ditolak', 'Belum disetujui'])->default('Belum disetujui');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -18,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('barang');
     }
 };

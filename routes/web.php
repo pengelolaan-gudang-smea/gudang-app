@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\AnggaranController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BarangController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\UserManagementController;
@@ -25,9 +27,6 @@ Route::controller(AuthController::class)->group(function () {
     Route::get('/', 'index')->name('login');
     Route::post('/login', 'auth')->name('login.auth');
     Route::post('/logout', 'logout')->name('logout');
-    // * register
-    Route::get('/register', 'register')->name('register');
-    Route::post('/registered', 'store')->name('register.store');
 });
 
 // * forgot & reset password
@@ -49,10 +48,19 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
             'title' => 'Profile | ' . $user->username
         ]);
     })->name('dashboard.profile');
-    Route::middleware('can:edit akun')->group(function () {
+
+    //  * WAKA
+    Route::middleware('can:Edit akun')->group(function () {
         Route::resource('/user', UserManagementController::class);
         Route::post('/hak-akses/{user:username}', [UserManagementController::class, 'akses'])->name('user.akses');
     });
+
+    // * KKK
+    Route::resource('/pengajuan-barang', BarangController::class)->parameters(['pengajuan-barang' => 'barang'])->middleware('can:Mengajukan barang');
+    Route::get('/barang-disetujui', [BarangController::class, 'setuju'])->name('barang.setuju');
+
+    // * Admin Anggaran
+    Route::resource('/barang', AnggaranController::class)->parameters(['barang' => 'anggaran']);
 });
 
 Route::get('/test', function () {

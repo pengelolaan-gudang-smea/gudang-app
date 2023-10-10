@@ -34,7 +34,6 @@
                         <a href="{{ route('forgot.password') }}" class="my-3 d-block">Lupa password?</a>
                         <button type="submit" class="btn btn-primary d-block mx-auto">Submit</button>
                     </form>
-                    <p class="mt-3 text-center">Belum punya akun? <a href="{{ route('register') }}">Register </a></p>
                 </div>
             </div>
         </div>

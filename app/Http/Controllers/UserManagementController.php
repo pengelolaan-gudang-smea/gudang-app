@@ -41,10 +41,12 @@ class UserManagementController extends Controller
     public function store(Request $request)
     {
         $validate = $request->validate([
+            'name' => 'required',
             'username' => ['required', 'unique:users,username'],
             'email' => ['required', 'unique:users,email', 'email'],
             'password' => ['required', 'min:8'],
         ]);
+        // dd($validate);
         $role = $request->input('role');
         $akses = $request->input('akses');
 
@@ -118,6 +120,7 @@ class UserManagementController extends Controller
         $role_old = $user->roles->first()->id;
 
         $validateRules = [
+            'name' => 'required' . $user->id,
             'username' => 'required|unique:users,username,' . $user->id,
             'email' => 'required|email|unique:users,email,' . $user->id,
         ];

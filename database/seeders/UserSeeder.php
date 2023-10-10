@@ -15,22 +15,33 @@ class UserSeeder extends Seeder
     {
         // Create users
         $user1 = User::create([
+            'name' => 'roshit',
             'username' => 'roshit',
             'email' => 'auliarasyidalzahrawi@gmail.com',
             'password' => Hash::make('rosyid07'),
         ]);
 
         $user2 = User::create([
+            'name' => 'Neptune',
             'username' => 'Neptune',
             'email' => 'Neptune@gmail.com',
+            'password' => Hash::make('neptune02'),
+        ]);
+        $user3 = User::create([
+            'name' => 'Algo',
+            'username' => 'Algorithm',
+            'email' => 'Algorithm@gmail.com',
             'password' => Hash::make('neptune02'),
         ]);
 
         // Assign roles and permissions to users
         $user1->assignRole('WAKA');
-        $user1->givePermissionTo('edit akun');
+        $user1->givePermissionTo('Edit akun');
 
-        $user2->assignRole('WAKA');
-        $user2->givePermissionTo('edit akun');
+        $user2->assignRole('KKK');
+        $user2->givePermissionTo('Mengajukan barang');
+
+        $user3->assignRole('Adimin anggaran');
+        $user3->givePermissionTo('Edit barang');
     }
 }
