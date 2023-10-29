@@ -65,6 +65,19 @@
                                 </div>
                             </div>
                             <div class="row mb-3">
+                                <label class="col-sm-2 col-form-label" for="jurusan_id">Jurusan <span
+                                        class="text-danger">*</span></label>
+                                <div class="col-sm-10">
+                                    <select class="form-select" aria-label="Default select example" id="jurusan_id"
+                                        name="jurusan_id">
+                                        <option selected disabled>Pilih jurusan</option>
+                                        @foreach ($jurusan as $item)
+                                            <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
                                 <label class="col-sm-2 col-form-label" for="role">Role <span
                                         class="text-danger">*</span></label>
                                 <div class="col-sm-10">

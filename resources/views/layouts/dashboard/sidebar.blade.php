@@ -20,6 +20,13 @@
                     <span>User Management</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="{{ request()->routeIs('anggaran.index') ? 'nav-link' : 'nav-link collapsed' }}"
+                    href="{{ route('anggaran.index') }}">
+                    <i class="bi bi-coin"></i>
+                    <span>Anggaran</span>
+                </a>
+            </li>
         @endcan
         @can('Mengajukan barang')
             <li class="nav-item">
@@ -37,6 +44,8 @@
                 </a>
             </li>
         @endcan
+        @can('Edit barang')
+            
         <li class="nav-item">
             <a class="{{ request()->routeIs('barang.index') ? 'nav-link' : 'nav-link collapsed' }}"
                 href="{{ route('barang.index') }}">
@@ -44,6 +53,7 @@
                 <span>Barang Diajukan</span>
             </a>
         </li>
+        @endcan
         <li class="nav-heading">Pages</li>
 
         <li class="nav-item">

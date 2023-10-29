@@ -10,6 +10,8 @@
                         <!-- General Form Elements -->
                         <form action="{{ route('pengajuan-barang.store') }}" method="POST">
                             @csrf
+                            <input type="hidden" name="user_id" value="{{ Auth::user()->id }}">
+                            <input type="hidden" name="jurusan_id" value="{{ Auth::user()->jurusan_id }}">
                             <div class="row mb-3">
                                 <label for="name" class="col-sm-2 col-form-label">Nama <span
                                         class="text-danger">*</span></label>

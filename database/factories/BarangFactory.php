@@ -23,7 +23,9 @@ class BarangFactory extends Factory
             'slug' => Str::slug($name),
             'spek' => $this->faker->paragraph(2),
             'harga' => $this->faker->numerify,
-            'satuan' => $this->faker->name
+            'satuan' => $this->faker->numberBetween(1,2),
+            'user_id' => '2',
+            'jurusan_id' =>'1',
         ];
     }
 }

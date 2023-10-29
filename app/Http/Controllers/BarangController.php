@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Barang;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BarangController extends Controller
 {
@@ -13,9 +14,9 @@ class BarangController extends Controller
      */
     public function index()
     {
-        return view('dashboard.barang.barang', [
+        return view('dashboard.kkk.barang', [
             'title' => 'Pengajuan Barang',
-            'barang' => Barang::Search(request('search'))->get(),
+            'barang' => Barang::where('user_id',Auth::user()->id)->Search(request('search'))->get(),
         ]);
     }
 
@@ -24,7 +25,7 @@ class BarangController extends Controller
      */
     public function create()
     {
-        return view('dashboard.barang.create', [
+        return view('dashboard.kkk.create', [
             'title' => 'Ajukan Barang'
         ]);
     }
@@ -38,7 +39,9 @@ class BarangController extends Controller
             'name' => 'required',
             'spek' => 'required',
             'harga' => ['required', 'numeric'],
-            'satuan' => 'required'
+            'satuan' => 'required',
+            'user_id' => 'required',
+            'jurusan_id' => 'required',
         ]);
 
         $slug = $validate['slug'] = Str::slug($validate['name']);
@@ -66,7 +69,7 @@ class BarangController extends Controller
      */
     public function edit(Barang $barang)
     {
-        return view('dashboard.barang.edit', [
+        return view('dashboard.kkk.edit', [
             'title' => 'Edit Barang',
             'barang' => $barang
         ]);
@@ -108,7 +111,7 @@ class BarangController extends Controller
 
     public function setuju()
     {
-        return view('dashboard.barang.setuju', [
+        return view('dashboard.kkk.setuju', [
             'title' => 'Barang disetujui',
             'barang' => Barang::where('status', 'Disetujui')->get()
         ]);

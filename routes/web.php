@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminAngaranController;
 use App\Http\Controllers\AnggaranController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BarangController;
@@ -53,7 +54,8 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
     Route::middleware('can:Edit akun')->group(function () {
         Route::resource('/user', UserManagementController::class);
         Route::post('/hak-akses/{user:username}', [UserManagementController::class, 'akses'])->name('user.akses');
-    });
+        Route::resource('/anggaran',AnggaranController::class);
+        });
 
     // * KKK
     Route::resource('/pengajuan-barang', BarangController::class)->parameters(['pengajuan-barang' => 'barang'])->middleware('can:Mengajukan barang');
@@ -61,6 +63,7 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
 
     // * Admin Anggaran
     Route::resource('/barang', AnggaranController::class)->parameters(['barang' => 'anggaran']);
+    Route::resource('/barang/acc', AdminAngaranController::class);
 });
 
 Route::get('/test', function () {

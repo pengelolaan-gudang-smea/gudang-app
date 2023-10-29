@@ -19,6 +19,8 @@ return new class extends Migration
             $table->double('harga');
             $table->string('satuan');
             $table->enum('status', ['Disetujui', 'Ditolak', 'Belum disetujui'])->default('Belum disetujui');
+            $table->foreignId('user_id');
+            $table->foreignId('jurusan_id');
             $table->timestamps();
         });
     }

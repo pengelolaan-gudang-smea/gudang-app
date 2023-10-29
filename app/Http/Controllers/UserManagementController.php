@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Jurusan;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -15,7 +16,7 @@ class UserManagementController extends Controller
      */
     public function index()
     {
-        return view('dashboard.users.user', [
+        return view('dashboard.waka.users.user', [
             'title' => 'User Management',
             'user' =>  User::whereDoesntHave('roles', function ($query) {
                 $query->where('name', 'WAKA'); // Ganti 'WAKA' dengan nama peran yang ingin Anda kecualikan
@@ -28,10 +29,11 @@ class UserManagementController extends Controller
      */
     public function create()
     {
-        return view('dashboard.users.create', [
+        return view('dashboard.waka.users.create', [
             'title' => 'Tambah User',
             'hak' => Permission::all(),
             'roles' => Role::all(),
+            'jurusan'=>Jurusan::all()
         ]);
     }
 
@@ -45,6 +47,7 @@ class UserManagementController extends Controller
             'username' => ['required', 'unique:users,username'],
             'email' => ['required', 'unique:users,email', 'email'],
             'password' => ['required', 'min:8'],
+            'jurusan_id'=>'required'
         ]);
         // dd($validate);
         $role = $request->input('role');
@@ -102,7 +105,7 @@ class UserManagementController extends Controller
         // $id = $user->roles->first()->id;
         // dd($user->roles);
         $akses = $user->permissions()->get();
-        return view('dashboard.users.edit', [
+        return view('dashboard.waka.users.edit', [
             'title' => 'Edit ' . $user->username,
             'user' => $user,
             'roles' => Role::all(),

@@ -27,6 +27,7 @@ class User extends Authenticatable
         'username',
         'email',
         'password',
+        'jurusan_id',
     ];
 
     /**
@@ -52,5 +53,13 @@ class User extends Authenticatable
     public function getRouteKeyName()
     {
         return 'username';
+    }
+
+    public function jurusan(){
+        return $this->belongsTo(Jurusan::class);
+    }
+
+    public function barang(){
+        return $this->hasMany(Barang::class);
     }
 }

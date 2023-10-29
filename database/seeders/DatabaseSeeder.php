@@ -2,7 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Models\Anggaran;
 use App\Models\Barang;
+use App\Models\Jurusan;
+use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -17,5 +20,19 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
         ]);
         Barang::factory(5)->create();
+
+     $jurusan = [
+        'Rekayasa Perangkat Lunak',
+        'Teknik Komputer dan Jaringan',
+        'Multimedia'
+     ];
+     for ($i=0; $i < count($jurusan) ; $i++) { 
+        Jurusan::create([
+            'name' => $jurusan[$i],
+            'slug' => Str::slug($jurusan[$i]),
+        ]);
+     }
+
+     Anggaran::factory(5)->create();
     }
 }

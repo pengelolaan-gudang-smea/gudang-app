@@ -26,6 +26,7 @@ class UserSeeder extends Seeder
             'username' => 'Neptune',
             'email' => 'Neptune@gmail.com',
             'password' => Hash::make('neptune02'),
+            'jurusan_id'=>'1'
         ]);
         $user3 = User::create([
             'name' => 'Algo',
@@ -41,7 +42,7 @@ class UserSeeder extends Seeder
         $user2->assignRole('KKK');
         $user2->givePermissionTo('Mengajukan barang');
 
-        $user3->assignRole('Adimin anggaran');
+        $user3->assignRole('Admin anggaran');
         $user3->givePermissionTo('Edit barang');
     }
 }
