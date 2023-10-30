@@ -14,9 +14,11 @@ class BarangController extends Controller
      */
     public function index()
     {
+        $grand_total = Barang::where('user_id', Auth::user()->id)->sum('sub_total');
         return view('dashboard.kkk.barang', [
             'title' => 'Pengajuan Barang',
             'barang' => Barang::where('user_id',Auth::user()->id)->Search(request('search'))->get(),
+            'grand_total' => $grand_total
         ]);
     }
 
@@ -44,6 +46,8 @@ class BarangController extends Controller
             'jurusan_id' => 'required',
         ]);
 
+        $subtotal = $validate['harga'] * $validate['satuan'];
+
         $slug = $validate['slug'] = Str::slug($validate['name']);
         $counter = 2;
         while (Barang::where('slug', $slug)->exists()) {
@@ -51,6 +55,7 @@ class BarangController extends Controller
             $counter++;
         }
         $validate['slug'] = $slug;
+        $validate['sub_total'] = $subtotal;
 
         Barang::create($validate);
         return redirect()->route('pengajuan-barang.index')->with('success', 'Berhasil mengajukan barang');
@@ -59,9 +64,15 @@ class BarangController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $slug)
     {
-        //
+        $barang = Barang::where('slug', $slug)->first();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Berhasil',
+            'barang' => $barang
+        ]);
     }
 
     /**
@@ -86,6 +97,9 @@ class BarangController extends Controller
             'harga' => ['required', 'numeric'],
             'satuan' => 'required'
         ]);
+
+        $subtotal = $validate['harga'] * $validate['satuan'];
+
         if ($validate['name'] !== $barang->name) {
             $slug = $validate['slug'] = Str::slug($validate['name']);
             $counter = 2;
@@ -95,6 +109,8 @@ class BarangController extends Controller
             }
             $validate['slug'] = $slug;
         }
+        $validate['sub_total'] = $subtotal;
+
         $barang->update($validate);
         return redirect()->route('pengajuan-barang.index')->with('success', 'Berhasil mengubah data barang');
     }

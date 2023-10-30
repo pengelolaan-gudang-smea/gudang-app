@@ -26,7 +26,13 @@
                             <th scope="row">{{ $loop->iteration }}</th>
                             <td>{{ $item->username }}</td>
                             <td>{{ $item->email }}</td>
-                            <td>{{ $item->roles->pluck('name')->implode(', ') }}</td>
+                            <td>
+                                @if ($item->hasRole('KKK'))
+                                {{ $item->roles->pluck('name')->implode(', ') }} - {{ $item->jurusan->name }}
+                                @else
+                                {{ $item->roles->pluck('name')->implode(', ') }}
+                                @endif
+                            </td>
                             <td>
                                 <div class="d-flex gap-3">
                                     <div>

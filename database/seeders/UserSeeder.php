@@ -13,6 +13,12 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
+        $waka = User::create([
+            'name' => 'Wakil Kepala Sekolah',
+            'username' => 'waka',
+            'email' => 'waka@gmail.com',
+            'password' => Hash::make('waka123'),
+        ]);
         // Create users
         $user1 = User::create([
             'name' => 'roshit',
@@ -36,6 +42,9 @@ class UserSeeder extends Seeder
         ]);
 
         // Assign roles and permissions to users
+        $waka->assignRole('WAKA');
+        $waka->givePermissionTo('Edit akun');
+
         $user1->assignRole('WAKA');
         $user1->givePermissionTo('Edit akun');
 

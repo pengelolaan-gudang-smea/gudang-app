@@ -14,7 +14,7 @@
                                 <label for="anggaran" class="col-sm-2 col-form-label">Nominal Anggaran <span
                                         class="text-danger">*</span></label>
                                 <div class="col-sm-10">
-                                    <input type="text" id="anggaran"
+                                    <input type="number" id="anggaran"
                                         class="form-control @error('anggaran') is-invalid @enderror" name="anggaran" required>
                                     @error('anggaran')
                                         <div class="invalid-feedback">
@@ -39,8 +39,8 @@
                                 <label for="tahun" class="col-sm-2 col-form-label">Tahun <span
                                         class="text-danger">*</span></label>
                                 <div class="col-sm-10">
-                                    <input type="tahun" id="tahun"
-                                        class="form-control @error('tahun') is-invalid @enderror" name="tahun" required>
+                                    <input type="number" id="tahun"
+                                        class="form-control @error('tahun') is-invalid @enderror" name="tahun" required min="1999">
                                     @error('tahun')
                                         <div class="invalid-feedback">
                                             {{ $message }}
@@ -48,7 +48,7 @@
                                     @enderror
                                 </div>
                             </div>
-                          
+
 
                             <div class="row mb-3">
                                 <small class="text-secondary"><span class="text-danger">* </span>Field wajid diisi</small>

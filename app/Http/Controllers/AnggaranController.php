@@ -85,6 +85,6 @@ class AnggaranController extends Controller
     {
         $anggaran->delete();
 
-        return redirect()->route('anggaran.index');
+        return redirect()->route('anggaran.index')->with('success', 'Berhasil menghapus data anggaran');
     }
 }

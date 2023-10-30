@@ -17,6 +17,6 @@
     },
     "dependencies": {
         "datatables.net-dt": "^1.13.6",
-        "sweetalert2": "^11.7.32"
+        "sweetalert2": "^11.8.0"
     }
 }

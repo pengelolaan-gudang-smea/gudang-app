@@ -24,9 +24,14 @@ class DatabaseSeeder extends Seeder
      $jurusan = [
         'Rekayasa Perangkat Lunak',
         'Teknik Komputer dan Jaringan',
-        'Multimedia'
+        'Desain Komunikasi Visual',
+        'Akuntansi',
+        'Layanan Perbankan Syariah',
+        'Manajemen Perkantoran',
+        'Bisnis Ritel',
+        'Bisnis Daring',
      ];
-     for ($i=0; $i < count($jurusan) ; $i++) { 
+     for ($i=0; $i < count($jurusan) ; $i++) {
         Jurusan::create([
             'name' => $jurusan[$i],
             'slug' => Str::slug($jurusan[$i]),

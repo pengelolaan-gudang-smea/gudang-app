@@ -47,7 +47,7 @@ class UserManagementController extends Controller
             'username' => ['required', 'unique:users,username'],
             'email' => ['required', 'unique:users,email', 'email'],
             'password' => ['required', 'min:8'],
-            'jurusan_id'=>'required'
+            'jurusan_id'=>'nullable',
         ]);
         // dd($validate);
         $role = $request->input('role');
@@ -67,7 +67,7 @@ class UserManagementController extends Controller
         $role = $user->roles()->first();
         $akses = $user->permissions()->get();
 
-        return view('dashboard.users.akses', [
+        return view('dashboard.waka.users.akses', [
             'title' => 'Akses User',
             'user' => $user,
             'role' => $role,
@@ -110,6 +110,7 @@ class UserManagementController extends Controller
             'user' => $user,
             'roles' => Role::all(),
             'hak' => Permission::all(),
+            'jurusan'=>Jurusan::all(),
             'akses' => $akses
         ]);
     }
@@ -126,6 +127,7 @@ class UserManagementController extends Controller
             'name' => 'required' . $user->id,
             'username' => 'required|unique:users,username,' . $user->id,
             'email' => 'required|email|unique:users,email,' . $user->id,
+            'jurusan_id' => 'required',
         ];
 
         $validate = $request->validate($validateRules);
@@ -140,6 +142,7 @@ class UserManagementController extends Controller
             $user->assignRole($role);
         }
 
+        $user->jurusan_id = $request->input('jurusan_id');
         $user->update($validate);
 
         return redirect()->route('user.index')->with('success', 'Berhasil merubah data ' . $user->username);

@@ -3,6 +3,7 @@
 
     <ul class="sidebar-nav" id="sidebar-nav">
 
+        <li class="nav-heading">Dashboard</li>
         <li class="nav-item">
             <a class="{{ request()->routeIs('dashboard') ? 'nav-link' : 'nav-link collapsed' }}"
                 href="{{ route('dashboard') }}">
@@ -13,15 +14,16 @@
 
 
         @can('Edit akun')
+        <li class="nav-heading">Kelola User</li>
             <li class="nav-item">
-                <a class="{{ request()->routeIs('user.index') ? 'nav-link' : 'nav-link collapsed' }}"
+                <a class="{{ request()->routeIs('user*') ? 'nav-link' : 'nav-link collapsed' }}"
                     href="{{ route('user.index') }}">
                     <i class="bi bi-people-fill"></i>
                     <span>User Management</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="{{ request()->routeIs('anggaran.index') ? 'nav-link' : 'nav-link collapsed' }}"
+                <a class="{{ request()->routeIs('anggaran*') ? 'nav-link' : 'nav-link collapsed' }}"
                     href="{{ route('anggaran.index') }}">
                     <i class="bi bi-coin"></i>
                     <span>Anggaran</span>
@@ -29,8 +31,9 @@
             </li>
         @endcan
         @can('Mengajukan barang')
+        <li class="nav-heading">Kelola Barang</li>
             <li class="nav-item">
-                <a class="{{ request()->routeIs('pengajuan-barang.index') ? 'nav-link' : 'nav-link collapsed' }}"
+                <a class="{{ request()->routeIs('pengajuan-barang*') ? 'nav-link' : 'nav-link collapsed' }}"
                     href="{{ route('pengajuan-barang.index') }}">
                     <i class="bi bi-box-seam-fill"></i>
                     <span>Pengajuan Barang</span>
@@ -45,7 +48,7 @@
             </li>
         @endcan
         @can('Edit barang')
-            
+        <li class="nav-heading">Kelola Barang</li>
         <li class="nav-item">
             <a class="{{ request()->routeIs('barang.index') ? 'nav-link' : 'nav-link collapsed' }}"
                 href="{{ route('barang.index') }}">
@@ -63,42 +66,14 @@
             </a>
         </li><!-- End Profile Page Nav -->
 
+        @can('Edit akun')
         <li class="nav-item">
             <a class="nav-link collapsed" href="{{ route('user.index') }}">
                 <i class="bi bi-question-circle"></i>
                 <span>User</span>
             </a>
         </li><!-- End F.A.Q Page Nav -->
-
-
-        <li class="nav-item">
-            <a class="nav-link collapsed" href="pages-register.html">
-                <i class="bi bi-card-list"></i>
-                <span>Register</span>
-            </a>
-        </li><!-- End Register Page Nav -->
-
-        <li class="nav-item">
-            <a class="nav-link collapsed" href="pages-login.html">
-                <i class="bi bi-box-arrow-in-right"></i>
-                <span>Login</span>
-            </a>
-        </li><!-- End Login Page Nav -->
-
-        <li class="nav-item">
-            <a class="nav-link collapsed" href="pages-error-404.html">
-                <i class="bi bi-dash-circle"></i>
-                <span>Error 404</span>
-            </a>
-        </li><!-- End Error 404 Page Nav -->
-
-        <li class="nav-item">
-            <a class="nav-link collapsed" href="pages-blank.html">
-                <i class="bi bi-file-earmark"></i>
-                <span>Blank</span>
-            </a>
-        </li><!-- End Blank Page Nav -->
-
+        @endcan
     </ul>
 
 </aside><!-- End Sidebar-->
