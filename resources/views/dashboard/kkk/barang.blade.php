@@ -7,9 +7,12 @@
     @endif
     <div class="card">
         <div class="card-body">
-            <a href="{{ route('pengajuan-barang.create') }}" class="btn btn-primary my-3"> <i class="bi bi-box2-fill"></i>
+            <a href="{{ route('pengajuan-barang.create') }}" class="btn btn-primary my-3 {{ ($grand_total >= $limit) ? 'disabled': ''}}"> <i class="bi bi-box2-fill"></i>
                 Ajukan
                 barang</a>
+                @if ($grand_total == $limit)
+                <small class="text-danger">Limit telah tercapai</small>
+                @endif
             <!-- Default Table -->
             <div class="table-responsive">
                 <table class="table mt-2" id="barangsTable">
@@ -61,7 +64,8 @@
 
                     </tbody>
                 </table>
-                <p class="fw-bold mb-0">Total Keseluruhan : Rp {{ number_format($grand_total, 0, ',', '.') }},00</p>
+                <p class="fw-bold mb-0">Total Keseluruhan : Rp {{ number_format($grand_total, 0, ',', '.') }},00 dari Rp {{number_format($limit, 0, ',','.')  }}</p>
+                <p>Sisa Anggaran : Rp {{ number_format($sisa, 0, ',','.') }}</p>
             </div>
             <!-- End Default Table Example -->
         </div>

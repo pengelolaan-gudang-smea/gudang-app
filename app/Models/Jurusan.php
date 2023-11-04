@@ -23,4 +23,8 @@ class Jurusan extends Model
     public function user(){
         return $this->hasMany(User::class);
     }
+
+    public function limit(){
+        return $this->hasMany(Limit::class);
+    }
 }

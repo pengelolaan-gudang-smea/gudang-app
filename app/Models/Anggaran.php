@@ -11,5 +11,8 @@ class Anggaran extends Model
     protected $table = 'anggaran';
     protected $guarded = ['id'];
 
-  
+    public function limit()
+    {
+        return $this->hasMany(Limit::class);
+    }
 }

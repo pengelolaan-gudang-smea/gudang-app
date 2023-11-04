@@ -5,6 +5,7 @@ use App\Http\Controllers\AnggaranController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LimitController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\UserManagementController;
 use App\Models\User;
@@ -55,6 +56,7 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
         Route::resource('/user', UserManagementController::class);
         Route::post('/hak-akses/{user:username}', [UserManagementController::class, 'akses'])->name('user.akses');
         Route::resource('/anggaran',AnggaranController::class);
+        Route::resource('/limit-anggaran',LimitController::class)->parameters(['limit-anggaran'=>'limit']);
         });
 
     // * KKK
@@ -62,10 +64,11 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
     Route::get('/barang-disetujui', [BarangController::class, 'setuju'])->name('barang.setuju');
 
     // * Admin Anggaran
-    Route::resource('/barang', AnggaranController::class)->parameters(['barang' => 'anggaran']);
-    Route::resource('/barang/acc', AdminAngaranController::class);
+    Route::resource('/barang-acc', AdminAngaranController::class)->parameters(['barang-acc' => 'acc']);
 });
 
 Route::get('/test', function () {
-    dd('hello');
-})->middleware('can:edit akun');
+    return view('dashboard.admingaran.anggaran',[
+        'title'=>'hello'
+    ]);
+});

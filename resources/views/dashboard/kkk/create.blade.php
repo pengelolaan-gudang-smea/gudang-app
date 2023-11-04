@@ -15,7 +15,7 @@
                         <div class="row mb-3">
                             <label for="name" class="col-sm-2 col-form-label">Nama <span class="text-danger">*</span></label>
                             <div class="col-sm-10">
-                                <input type="text" id="name" placeholder="Masukan nama barang" class="form-control @error('name') is-invalid @enderror" name="name" required>
+                                <input type="text" id="name" placeholder="Masukan nama barang" class=" form-control @error('name') is-invalid @enderror" name="name" required>
                                 @error('name')
                                 <div class="invalid-feedback">
                                     {{ $message }}
@@ -32,6 +32,7 @@
                                     {{ $message }}
                                 </div>
                                 @enderror
+                                <small class="text-danger d-none" id="info-limit">Anggaran kurang</small>
                             </div>
                         </div>
                         <div class="row mb-3">
@@ -64,7 +65,7 @@
                         <div class="row mb-3">
                             <div class="col-sm-12 d-flex justify-content-end gap-2">
                                 <a href="{{ route('pengajuan-barang.index') }}" class="btn btn-secondary">Kembali</a>
-                                <button type="submit" class="btn btn-primary">Ajukan Barang</button>
+                                <button id='ajukan-barang' type="submit" class="btn btn-primary">Ajukan Barang</button>
                             </div>
                         </div>
                     </form>
@@ -73,4 +74,37 @@
         </div>
     </div>
 </section>
+
+<script>
+    const harga = document.querySelector('#harga')
+    const btn = document.querySelector('#ajukan-barang')
+    const info = document.querySelector('#info-limit')
+    const satuanInput = document.querySelector('#satuan')
+    let satuan;
+    let price; 
+    const limit ={{ $sisa }}
+    harga.addEventListener('input',function(){
+        price = harga.value;
+        if( price > limit){
+            btn.classList.add('disabled');
+            info.classList.remove('d-none')
+        }else{
+            btn.classList.remove('disabled');
+            info.classList.add('d-none')
+        }
+        
+        satuanInput.addEventListener('input',function(){
+            satuan = satuanInput.value * price
+            if( satuan > limit){
+            btn.classList.add('disabled');
+            info.classList.remove('d-none')
+        }else{
+            btn.classList.remove('disabled');
+            info.classList.add('d-none')
+        }
+        })
+    });
+
+
+</script>
 @endsection

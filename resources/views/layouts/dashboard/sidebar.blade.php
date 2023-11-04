@@ -29,6 +29,13 @@
                     <span>Anggaran</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="{{ request()->routeIs('limit-anggaran*') ? 'nav-link' : 'nav-link collapsed' }}"
+                    href="{{ route('limit-anggaran.index') }}">
+                    <i class="bi bi-coin"></i>
+                    <span>Limit Anggaran</span>
+                </a>
+            </li>
         @endcan
         @can('Mengajukan barang')
         <li class="nav-heading">Kelola Barang</li>
@@ -50,8 +57,8 @@
         @can('Edit barang')
         <li class="nav-heading">Kelola Barang</li>
         <li class="nav-item">
-            <a class="{{ request()->routeIs('barang.index') ? 'nav-link' : 'nav-link collapsed' }}"
-                href="{{ route('barang.index') }}">
+            <a class="{{ request()->routeIs('barang-acc.index') ? 'nav-link' : 'nav-link collapsed' }}"
+                href="{{ route('barang-acc.index') }}">
                 <i class="bi bi-box-seam-fill"></i>
                 <span>Barang Diajukan</span>
             </a>

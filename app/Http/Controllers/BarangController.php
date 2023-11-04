@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Barang;
+use App\Models\Limit;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,10 +16,14 @@ class BarangController extends Controller
     public function index()
     {
         $grand_total = Barang::where('user_id', Auth::user()->id)->sum('sub_total');
+        $limit = Limit::where('jurusan_id',Auth::user()->jurusan->id)->sum('limit');
+        $sisa = $limit - $grand_total;
         return view('dashboard.kkk.barang', [
             'title' => 'Pengajuan Barang',
             'barang' => Barang::where('user_id',Auth::user()->id)->Search(request('search'))->get(),
-            'grand_total' => $grand_total
+            'grand_total' => $grand_total,
+            'limit'=>$limit,
+            'sisa'=>$sisa
         ]);
     }
 
@@ -27,8 +32,14 @@ class BarangController extends Controller
      */
     public function create()
     {
+        $grand_total = Barang::where('user_id', Auth::user()->id)->sum('sub_total');
+        $limit = Limit::where('jurusan_id',Auth::user()->jurusan->id)->sum('limit');
+        $sisa = $limit - $grand_total;
         return view('dashboard.kkk.create', [
-            'title' => 'Ajukan Barang'
+            'title' => 'Ajukan Barang',
+            'grand_total' => $grand_total,
+            'limit'=>$limit,
+            'sisa'=>$sisa
         ]);
     }
 
