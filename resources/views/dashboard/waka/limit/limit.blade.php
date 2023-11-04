@@ -26,13 +26,13 @@
                             @foreach ($anggaran as $item)
                                 <tr>
                                     <th scope="row">{{ $loop->iteration }}</th>
-                                    <td>{{ 'Rp. ' . number_format($item->limit, 0, ',', '.') }}</td>
+                                    <td>{{ 'Rp ' . number_format($item->limit, 0, ',', '.') }}</td>
                                     <td>{{ $item->jurusan->name }}</td>
                                     <td>{{ $item->anggaran->jenis }}</td>
                                     <td>{{ $item->anggaran->tahun }}</td>
                                     <td>
                                         <div class="d-flex gap-3">
-                                           
+
                                             <div>
                                                 <a href="{{ route('limit-anggaran.edit', ['limit' => $item->id]) }}"
                                                     class="btn btn-sm bg-warning link-light">

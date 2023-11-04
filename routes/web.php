@@ -65,6 +65,8 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
 
     // * Admin Anggaran
     Route::resource('/barang-acc', AdminAngaranController::class)->parameters(['barang-acc' => 'acc']);
+    Route::post('/filter-jurusan', [AdminAngaranController::class, 'filterJurusan'])->name('filter-jurusan');
+    Route::post('/filter-barang', [AdminAngaranController::class, 'filterBarang'])->name('filter-barang');
 });
 
 Route::get('/test', function () {

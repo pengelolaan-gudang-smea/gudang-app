@@ -11,7 +11,7 @@
                         <form action="{{ route('limit-anggaran.update',['limit'=>$limit->id]) }}" method="POST">
                             @csrf
                             @method('PUT')
-                          
+
                             <div class="row mb-3">
                                 <label for="anggaran" class="col-sm-2 col-form-label">Nominal Limit Anggaran <span
                                         class="text-danger">*</span></label>
@@ -33,8 +33,8 @@
                                                 name="anggaran_id">
                                                 <option  disabled>Pilih anggaran</option>
                                                 @foreach ($anggaran as $item)
-                                                <option value="{{ $item->id }}" {{ ($item->id == old('anggaran_id',$limit->anggaran->id)) ? 'selected' : '' }}>{{ 'Rp. ' . number_format($item->anggaran, 0, ',', '.') }} - {{ $item->tahun }}</option>
-                                                    
+                                                <option value="{{ $item->id }}" {{ ($item->id == old('anggaran_id',$limit->anggaran->id)) ? 'selected' : '' }}>{{ 'Rp ' . number_format($item->anggaran, 0, ',', '.') }} - {{ $item->tahun }}</option>
+
                                                 @endforeach
                                             </select>
                                         </div>
@@ -49,12 +49,12 @@
                                                 <option  disabled>Pilih jurusan</option>
                                                 @foreach ($jurusan as $item)
                                                 <option value="{{ $item->id }}" {{ ($item->id == old('jurusan_id',$limit->jurusan->id)) ? 'selected' : ''}}>{{ $item->name}}</option>
-            
+
                                                 @endforeach
                                             </select>
                                         </div>
                             </div>
-                            
+
 
 
                             <div class="row mb-3">

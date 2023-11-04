@@ -32,7 +32,7 @@
                                     {{ $message }}
                                 </div>
                                 @enderror
-                                <small class="text-danger d-none" id="info-limit">Anggaran kurang</small>
+                                <small class="text-danger d-none" id="info-limit-1">Anggaran kurang</small>
                             </div>
                         </div>
                         <div class="row mb-3">
@@ -44,6 +44,7 @@
                                     {{ $message }}
                                 </div>
                                 @enderror
+                                <small class="text-danger d-none" id="info-limit-2">Anggaran kurang</small>
                             </div>
                         </div>
                         <div class="row mb-3">
@@ -78,29 +79,30 @@
 <script>
     const harga = document.querySelector('#harga')
     const btn = document.querySelector('#ajukan-barang')
-    const info = document.querySelector('#info-limit')
+    const info1 = document.querySelector('#info-limit-1')
+    const info2 = document.querySelector('#info-limit-2')
     const satuanInput = document.querySelector('#satuan')
     let satuan;
-    let price; 
+    let price;
     const limit ={{ $sisa }}
     harga.addEventListener('input',function(){
         price = harga.value;
         if( price > limit){
             btn.classList.add('disabled');
-            info.classList.remove('d-none')
+            info1.classList.remove('d-none')
         }else{
             btn.classList.remove('disabled');
-            info.classList.add('d-none')
+            info1.classList.add('d-none')
         }
-        
+
         satuanInput.addEventListener('input',function(){
             satuan = satuanInput.value * price
             if( satuan > limit){
             btn.classList.add('disabled');
-            info.classList.remove('d-none')
+            info2.classList.remove('d-none')
         }else{
             btn.classList.remove('disabled');
-            info.classList.add('d-none')
+            info2.classList.add('d-none')
         }
         })
     });

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Barang;
+use App\Models\Jurusan;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Yajra\DataTables\Facades\DataTables;
 
 class AdminAngaranController extends Controller
 {
@@ -97,5 +99,46 @@ class AdminAngaranController extends Controller
     {
         $acc->delete();
         return back();
+    }
+
+    public function filterJurusan(Request $request)
+    {
+        $tahun = Barang::where('jurusan_id', $request->jurusan)
+                        ->distinct()
+                        ->selectRaw('YEAR(created_at) as tahun')
+                        ->pluck('tahun')
+                        ->toArray();
+
+        return $tahun;
+    }
+
+    public function filterBarang(Request $request)
+    {
+        if ($request->ajax()) {
+            $data = Barang::where('jurusan_id', $request->jurusan)->whereYear('created_at', $request->tahun)->get();
+
+            $result = DataTables::of($data)
+                        ->addIndexColumn()
+                        ->addColumn('nama', function ($q) {
+                            return $q->name;
+                        })
+                        ->addColumn('harga', function ($q) {
+                            return 'Rp ' . number_format($q->harga, 0, ',', '.');
+                        })
+                        ->addColumn('satuan', function ($q) {
+                            return $q->satuan;
+                        })
+                        ->addColumn('sub_total', function ($q) {
+                            return 'Rp ' . number_format($q->sub_total, 0, ',', '.');
+                        })
+                        ->addColumn('status', function ($q) {
+                            return $q->status;
+                        })
+                        ->addColumn('action', function ($q) {
+                            return $q->slug;
+                        })
+                        ->make(true);
+            return $result;
+        }
     }
 }

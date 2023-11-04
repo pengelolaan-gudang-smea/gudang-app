@@ -7,31 +7,54 @@
         @endif
         <div class="card">
             <div class="card-body">
-                <a href="{{ route('pengajuan-barang.create') }}" class="btn btn-primary my-3"> <i class="bi bi-box2-fill"></i>
-                    Ajukan
-                    barang</a>
-                <!-- Default Table -->
-                <div class="table-responsive">
+                <div class="row d-flex justify-content-between mt-5 mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group row d-flex align-items-center">
+                            <label class="col-2">Jurusan</label>
+                            <label class="col-1 text-right">:</label>
+                            <div class="col-md-6">
+                                <select class="form-control" name="jurusan">
+                                    <option selected disabled>- Pilih Jurusan -</option>
+                                    @foreach (App\Models\Jurusan::get() as $item)
+                                        <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group row d-flex align-items-center justify-content-end">
+                            <label class="col-2">Tahun</label>
+                            <label class="col-1 ">:</label>
+                            <div class="col-md-6">
+                                <select class="form-control" name="tahun" disabled>
+                                    <option selected disabled>-Pilih Tahun-</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive" id="viewTable">
                     <table class="table mt-2" id="barangsTable">
                         <thead>
                             <tr>
-                                <th scope="col">#</th>
+                                <th scope="col" class="text-center">#</th>
                                 <th scope="col">Nama</th>
                                 <th scope="col">Harga (Satuan)</th>
-                                <th scope="col">Satuan</th>
-                                <th scope="col">SubTotal</th>
+                                <th scope="col">Kuantitas (Qty)</th>
+                                <th scope="col">Sub total</th>
                                 <th scope="col">Status</th>
                                 <th scope="col">Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($barang as $item)
+                            {{-- @foreach ($barang as $item)
                                 <tr>
                                     <th scope="row">{{ $loop->iteration }}</th>
                                     <td>{{ $item->name }}</td>
-                                    <td>{{ 'Rp. ' . number_format($item->harga, 0, ',', '.') }}</td>
+                                    <td>{{ 'Rp ' . number_format($item->harga, 0, ',', '.') }}</td>
                                     <td>{{ $item->satuan }}</td>
-                            <td class="sub-total">{{ 'Rp ' . number_format($item->sub_total, 0, ',', '.') }}</td>
+                                    <td class="sub-total">{{ 'Rp ' . number_format($item->sub_total, 0, ',', '.') }}</td>
 
                                     <td>{{ $item->status }}</td>
                                     <td>
@@ -42,7 +65,7 @@
                                                     @method('PUT')
                                                     @csrf
                                                     <input type="hidden" name="status" value="Disetujui">
-                                                    <button class="bi bi-check fw-bold btn btn-sm bg-success link-light"></button>
+                                                    <button class="bi bi-check fw-bold btn btn-sm bg-success link-light" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-title="Popover title"></button>
                                                 </form>
                                             </div>
                                             <div>
@@ -54,32 +77,10 @@
                                                     <button class="bi bi-x fw-bold btn btn-sm bg-danger link-light"></button>
                                                 </form>
                                             </div>
-                                            <div>
-                                                <a href="{{ route('barang-acc.edit', ['acc' => $item->slug]) }}"
-                                                    class="btn btn-sm bg-warning link-light">
-                                                    <i class="bi bi-pencil-square"></i>
-                                                </a>
-                                            </div>
-                                            <div>
-                                                <button type="button"
-                                                    class="btn btn-sm btn-danger link-light deleteBarangBtn"
-                                                    data-barang="{{ $item->name }}">
-                                                    <i class="bi bi-trash3"></i>
-                                                </button>
-                                                <form
-                                                    action="{{ route('pengajuan-barang.destroy', ['barang' => $item->slug]) }}"
-                                                    method="post" hidden class="deleteBarangForm"
-                                                    data-barang="{{ $item->name }}">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                </form>
-                                            </div>
-
                                         </div>
                                     </td>
                                 </tr>
-                            @endforeach
-
+                            @endforeach --}}
                         </tbody>
                     </table>
                 </div>
@@ -88,27 +89,152 @@
         </div>
         </div>
         <script>
-            let table = new DataTable('#barangsTable');
-
             $(document).ready(function() {
-                $('.deleteBarangBtn').click(function() {
-                    const barang = $(this).data('barang');
-
-                    Swal.fire({
-                        title: 'Anda yakin?',
-                        text: "Anda tidak bisa mengembalikan data ini!",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Ya, hapus!'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            const deleteBarangForm = $(`.deleteBarangForm[data-barang="${barang}"]`);
-                            deleteBarangForm.submit();
+                $('select[name=jurusan]').select2()
+                $('select[name=jurusan]').change(function() {
+                    let jurusan = $(this).val();
+                    $.ajax({
+                        url: '{{ route('filter-jurusan') }}',
+                        type: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            jurusan: jurusan
+                        },
+                        success: function (data) {
+                            const filterTahun = $('select[name=tahun]');
+                            filterTahun.html('');
+                            if (data.length > 0) {
+                                var options = '';
+                                options += '<option selected disabled>- Pilih Tahun -</option>';
+                                $.each(data, function (index, tahun) {
+                                    options += '<option value="'+ tahun +'">'+ tahun +'</option>';
+                                });
+                                filterTahun.append(options);
+                                filterTahun.attr('disabled', false);
+                                filterTahun.select2();
+                                filterTahun.change(function() {
+                                    const selectedTahun = filterTahun.val();
+                                    updateTabel(jurusan, selectedTahun);
+                                    // if (selectedTahun) {
+                                    //     $.ajax({
+                                    //         url: '{{ route('filter-barang') }}',
+                                    //         type: 'POST',
+                                    //         data: {
+                                    //             _token: '{{ csrf_token() }}',
+                                    //             jurusan: jurusan,
+                                    //             tahun: selectedTahun
+                                    //         },
+                                    //         success: function (barang) {
+                                    //             console.log(barang);
+                                    //             updateTabel(data);
+                                    //         }
+                                    //     });
+                                    // }
+                                });
+                            }
                         }
                     });
                 });
+
+                function updateTabel(jurusan, selectedTahun)
+                {
+                    $("#viewTable").html(``)
+                    $("#viewTable").html(`<table class="table mt-2" id="barangsTable">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col" class="text-center">#</th>
+                                                    <th scope="col">Nama</th>
+                                                    <th scope="col">Harga (Satuan)</th>
+                                                    <th scope="col">Kuantitas (Qty)</th>
+                                                    <th scope="col">Sub total</th>
+                                                    <th scope="col">Status</th>
+                                                    <th scope="col">Action</th>
+                                                </tr>
+                                            </thead>
+                                            </table>`);
+                    $('#barangsTable').DataTable({
+                        processing: true,
+                        serverSide: true,
+                        responsive: true,
+                        pageLength: 25,
+                        "paging": true,
+                        "order": [
+                            [0, "asc"]
+                        ],
+                        ajax: {
+                            "url": "{{ route('filter-barang') }}",
+                            "type": "POST",
+                            "data": {
+                                "_token": "{{ csrf_token() }}",
+                                "jurusan": jurusan,
+                                "tahun": selectedTahun
+                            },
+                        },
+                        columns: [
+                            {
+                                data: 'DT_RowIndex',
+                                orderable: false,
+                                searchable: false,
+                                width: "8%",
+                                className: "text-center"
+                            },
+                            {
+                                data: 'nama',
+                                className: "text-center"
+                            },
+                            {
+                                data: 'harga',
+                                className: "text-center"
+                            },
+                            {
+                                data: 'satuan',
+                                className: "text-center"
+                            },
+                            {
+                                data: 'sub_total',
+                                className: "text-center"
+                            },
+                            {
+                                data: 'status',
+                                className: "text-center"
+                            },
+                            {
+                                data: 'action',
+                                render: function (data, type, row) {
+                                    let slug = row.action;
+                                    let buttons = '<div class="d-flex gap-3">';
+                                    buttons += '<div>';
+                                    buttons += '<form action="{{ route('barang-acc.update', '') }}/' + slug + '" method="POST">';
+                                    buttons += '@method("PUT")';
+                                    buttons += '@csrf';
+                                    buttons += '<input type="hidden" name="status" value="Disetujui">';
+                                    buttons += '<button class="bi bi-check fw-bold btn btn-sm bg-success link-light" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-title="Popover title"></button>';
+                                    buttons += '</form>';
+                                    buttons += '</div>';
+                                    buttons += '<div>';
+                                    buttons += '<form action="{{ route('barang-acc.update', '') }}/' + slug + '" method="POST">';
+                                    buttons += '@csrf';
+                                    buttons += '@method("PUT")';
+                                    buttons += '<input type="hidden" name="status" value="Ditolak">';
+                                    buttons += '<button class="bi bi-x fw-bold btn btn-sm bg-danger link-light"></button>';
+                                    buttons += '</form>';
+                                    buttons += '</div>';
+                                    buttons += '</div>';
+
+                                    return buttons;
+                                }
+                            }
+                        ],
+                        "language": {
+                            "paginate": {
+                                "previous": 'Previous',
+                                "next": 'Next'
+                            }
+                        }
+                    });
+                }
+
+                let table = new DataTable('#barangsTable');
             });
         </script>
     </section>

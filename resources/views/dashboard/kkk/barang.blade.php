@@ -52,7 +52,9 @@
                                         <button type="button" class="btn btn-sm btn-danger link-light deleteBarangBtn" data-barang="{{ $item->name }}">
                                             <i class="bi bi-trash3"></i>
                                         </button>
-                                        <form action="{{ route('pengajuan-barang.destroy', ['barang' => $item->slug]) }}" method="post" hidden class="deleteBarangForm" data-barang="{{ $item->name }}">
+                                        <form action="{{ route('pengajuan-barang.destroy', ['barang' => $item->slug]) }}"
+                                            method="post" hidden class="deleteBarangForm"
+                                            data-barang="{{ $item->name }}">
                                             @csrf
                                             @method('DELETE')
                                         </form>
@@ -64,8 +66,8 @@
 
                     </tbody>
                 </table>
-                <p class="fw-bold mb-0">Total Keseluruhan : Rp {{ number_format($grand_total, 0, ',', '.') }},00 dari Rp {{number_format($limit, 0, ',','.')  }}</p>
-                <p>Sisa Anggaran : Rp {{ number_format($sisa, 0, ',','.') }}</p>
+                <p class="fw-bold mb-0">Total Keseluruhan : Rp {{ number_format($grand_total, 0, ',', '.') }},00 dari Rp {{number_format($limit, 0, ',','.')  }},00</p>
+                <p>Sisa Anggaran : Rp {{ number_format($sisa, 0, ',','.') }},00</p>
             </div>
             <!-- End Default Table Example -->
         </div>
@@ -152,7 +154,7 @@
 
             $('.deleteBarangBtn').click(function() {
                 const barang = $(this).data('barang');
-
+                console.log(barang);
                 Swal.fire({
                     title: 'Anda yakin?'
                     , text: "Anda tidak bisa mengembalikan data ini!"

@@ -132,7 +132,7 @@ class BarangController extends Controller
     public function destroy(Barang $barang)
     {
         $barang->delete();
-        return back();
+        return redirect()->back()->with('success','Behasil menghapus data barang');
     }
 
 
