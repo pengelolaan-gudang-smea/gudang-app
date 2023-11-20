@@ -64,6 +64,16 @@
             </a>
         </li>
         @endcan
+        @can('Barang gudang')
+        <li class="nav-heading">Kelola Barang</li>
+        <li class="nav-item">
+            <a class="{{ request()->routeIs('barang-gudang.*') ? 'nav-link' : 'nav-link collapsed' }}"
+                href="{{ route('barang-gudang.index') }}">
+                <i class="bi bi-box-seam-fill"></i>
+                <span>Barang Gudang</span>
+            </a>
+        </li>
+        @endcan
         <li class="nav-heading">Pages</li>
 
         <li class="nav-item">

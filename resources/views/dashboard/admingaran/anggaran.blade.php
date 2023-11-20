@@ -48,7 +48,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {{-- @foreach ($barang as $item)
+                            @foreach ($barang as $item)
                                 <tr>
                                     <th scope="row">{{ $loop->iteration }}</th>
                                     <td>{{ $item->name }}</td>
@@ -80,7 +80,7 @@
                                         </div>
                                     </td>
                                 </tr>
-                            @endforeach --}}
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
