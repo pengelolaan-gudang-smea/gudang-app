@@ -5,6 +5,7 @@ use App\Http\Controllers\AnggaranController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\GudangController;
 use App\Http\Controllers\LimitController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\UserManagementController;
@@ -67,6 +68,10 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
     Route::resource('/barang-acc', AdminAngaranController::class)->parameters(['barang-acc' => 'acc']);
     Route::post('/filter-jurusan', [AdminAngaranController::class, 'filterJurusan'])->name('filter-jurusan');
     Route::post('/filter-barang', [AdminAngaranController::class, 'filterBarang'])->name('filter-barang');
+
+    // * Admin Gudang
+    Route::resource('/barang-gudang',GudangController::class)->parameters(['barang-gudang'=>'gudang']);
+    
 });
 
 Route::get('/test', function () {
@@ -74,3 +79,4 @@ Route::get('/test', function () {
         'title'=>'hello'
     ]);
 });
+Route::get('/dashboard/waka/check-anggaran/{id}', [AnggaranController::class, 'checkAnggaran']);
