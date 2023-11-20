@@ -40,6 +40,12 @@ class UserSeeder extends Seeder
             'email' => 'Algorithm@gmail.com',
             'password' => Hash::make('neptune02'),
         ]);
+        $user4 = User::create([
+            'name' => 'Lostvayne',
+            'username' => 'Lost',
+            'email' => 'Lostym@gmail.com',
+            'password' => Hash::make('lost02'),
+        ]);
 
         // Assign roles and permissions to users
         $waka->assignRole('WAKA');
@@ -53,5 +59,8 @@ class UserSeeder extends Seeder
 
         $user3->assignRole('Admin anggaran');
         $user3->givePermissionTo('Edit barang');
+
+        $user4->assignRole('Admin gudang');
+        $user4->givePermissionTo('Barang gudang');
     }
 }

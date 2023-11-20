@@ -27,6 +27,10 @@ class PermissionSeeder extends Seeder
             'name' => 'Admin anggaran',
             'guard_name' => 'web'
         ]);
+        Role::create([
+            'name' => 'Admin gudang ',
+            'guard_name' => 'web'
+        ]);
 
         Permission::create([
             'name' => 'Edit akun',
@@ -39,6 +43,10 @@ class PermissionSeeder extends Seeder
         ]);
         Permission::create([
             'name' => 'Edit barang',
+            'guard_name' => 'web'
+        ]);
+        Permission::create([
+            'name' => 'Barang gudang',
             'guard_name' => 'web'
         ]);
     }
