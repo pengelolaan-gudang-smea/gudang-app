@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Barang;
+use App\Models\BarangGudang;
 use App\Models\Jurusan;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -17,7 +18,7 @@ class AdminAngaranController extends Controller
     {
         return view('dashboard.admingaran.anggaran', [
             'title' => 'Barang diajukan',
-            'barang' => Barang::Search(request('search'))->get()
+            'barang' => Barang::all()
         ]);
     }
 
@@ -50,9 +51,9 @@ class AdminAngaranController extends Controller
      */
     public function edit(Barang $acc)
     {
-        return view('dashboard.admingaran.edit',[
-            'title'=>'Edit Barang',
-            'barang'=>$acc
+        return view('dashboard.admingaran.edit', [
+            'title' => 'Edit Barang',
+            'barang' => $acc
         ]);
     }
 
@@ -61,10 +62,18 @@ class AdminAngaranController extends Controller
      */
     public function update(Request $request, Barang $acc)
     {
-        if($request->has('status')){
-        $status = $request->input('status');
-        $acc->update(['status'=>$status]);
-        return back()->with('success','Barang '.$status);
+        if ($request->has('status')) {
+            $status = $request->input('status');
+            $acc->update(['status' => $status]);
+            if ($status == 'Disetujui') {
+                BarangGudang::create([
+                    'name' => $acc->name,
+                    'slug' => $acc->slug,
+                    'spek' => $acc->spek,
+                    'satuan' => $acc->satuan
+                ]);
+            }
+            return back()->with('success', 'Barang ' . $status);
         }
 
         $validate = $request->validate([
@@ -88,8 +97,7 @@ class AdminAngaranController extends Controller
         $validate['sub_total'] = $subtotal;
 
         $acc->update($validate);
-        return redirect()->route('barang-acc.index')->with('success','Berhasil mengedit data');
-
+        return redirect()->route('barang-acc.index')->with('success', 'Berhasil mengedit data');
     }
 
     /**
@@ -104,10 +112,10 @@ class AdminAngaranController extends Controller
     public function filterJurusan(Request $request)
     {
         $tahun = Barang::where('jurusan_id', $request->jurusan)
-                        ->distinct()
-                        ->selectRaw('YEAR(created_at) as tahun')
-                        ->pluck('tahun')
-                        ->toArray();
+            ->distinct()
+            ->selectRaw('YEAR(created_at) as tahun')
+            ->pluck('tahun')
+            ->toArray();
 
         return $tahun;
     }
@@ -118,26 +126,26 @@ class AdminAngaranController extends Controller
             $data = Barang::where('jurusan_id', $request->jurusan)->whereYear('created_at', $request->tahun)->get();
 
             $result = DataTables::of($data)
-                        ->addIndexColumn()
-                        ->addColumn('nama', function ($q) {
-                            return $q->name;
-                        })
-                        ->addColumn('harga', function ($q) {
-                            return 'Rp ' . number_format($q->harga, 0, ',', '.');
-                        })
-                        ->addColumn('satuan', function ($q) {
-                            return $q->satuan;
-                        })
-                        ->addColumn('sub_total', function ($q) {
-                            return 'Rp ' . number_format($q->sub_total, 0, ',', '.');
-                        })
-                        ->addColumn('status', function ($q) {
-                            return $q->status;
-                        })
-                        ->addColumn('action', function ($q) {
-                            return $q->slug;
-                        })
-                        ->make(true);
+                ->addIndexColumn()
+                ->addColumn('nama', function ($q) {
+                    return $q->name;
+                })
+                ->addColumn('harga', function ($q) {
+                    return 'Rp ' . number_format($q->harga, 0, ',', '.');
+                })
+                ->addColumn('satuan', function ($q) {
+                    return $q->satuan;
+                })
+                ->addColumn('sub_total', function ($q) {
+                    return 'Rp ' . number_format($q->sub_total, 0, ',', '.');
+                })
+                ->addColumn('status', function ($q) {
+                    return $q->status;
+                })
+                ->addColumn('action', function ($q) {
+                    return $q->slug;
+                })
+                ->make(true);
             return $result;
         }
     }
