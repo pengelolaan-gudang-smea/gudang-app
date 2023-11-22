@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string('satuan');
             $table->string('keterangan')->nullable();
             $table->string('lokasi')->nullable();
+            $table->string('anggaran')->nullable();
+            $table->string('qr_code')->nullable();
             $table->timestamps();
         });
     }
