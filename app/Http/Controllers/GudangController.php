@@ -97,7 +97,6 @@ class GudangController extends Controller
     {
         $barang = BarangGudang::where('slug', $slug)->first();
         $data = [
-            'nama_barang' => $barang->name,
             'lokasi' => $request->input('lokasi'),
             'anggaran' => $request->input('anggaran') 
         ];
@@ -116,7 +115,8 @@ class GudangController extends Controller
         $path = storage_path('app/public/' . $filename);
         file_put_contents($path, $qrCode);
 
-        BarangGudang::where('slug', $slug)->update(['qr_code' => $filename]);
+        BarangGudang::where('slug', $slug)->update(['lokasi' => $data['lokasi'], 'anggaran'=>$data['anggaran'],
+        'qr_code' => $filename]);
 
         return redirect()->route('barang-gudang.index')->with('success', 'berhasil membuat qrcode');
     }
