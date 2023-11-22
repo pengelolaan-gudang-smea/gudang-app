@@ -92,12 +92,17 @@ class AnggaranController extends Controller
     public function checkAnggaran($id)
     {
         $limit = Limit::where('anggaran_id', $id)->sum('limit');
-        if ($limit <= 0) {
-            $limit = Anggaran::where('id', $id)->value('anggaran');
+        $anggaran = Anggaran::where('id',$id)->value('anggaran');
+        if ($limit > 0) {
+            $total = $anggaran - $limit;
         }else{
+            $total = Anggaran::where('id', $id)->value('anggaran');
+        }
 
+        if($total <= 0){
+            return response()->json(['status'=>'limit reach']);
         }
        
-        return response()->json($limit);
+        return response()->json($total);
     }
 }
