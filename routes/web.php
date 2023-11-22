@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GudangController;
 use App\Http\Controllers\LimitController;
 use App\Http\Controllers\PasswordController;
+use App\Http\Controllers\QrController;
 use App\Http\Controllers\UserManagementController;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
@@ -71,7 +72,8 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
 
     // * Admin Gudang
     Route::resource('/barang-gudang',GudangController::class)->parameters(['barang-gudang'=>'gudang']);
-    
+    Route::post('/barang-gudang/{slug}/qrcode',[GudangController::class,'Qr'])->name('qr.store');
+    Route::post('barang-gudang/qr-generate/{slug}',[GudangController::class,'generateQr']);
 });
 
 Route::get('/test', function () {
