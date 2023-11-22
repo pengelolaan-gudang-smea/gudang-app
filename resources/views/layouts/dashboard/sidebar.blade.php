@@ -73,6 +73,7 @@
                 <span>Barang Gudang</span>
             </a>
         </li>
+       
         @endcan
         <li class="nav-heading">Pages</li>
 

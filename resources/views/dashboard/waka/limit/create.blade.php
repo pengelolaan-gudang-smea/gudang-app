@@ -106,8 +106,17 @@
                     return response.json();
                 })
                 .then(data => {
-                    anggaranValue = parseFloat(data); // Simpan nilai anggaran dari respons
-                    calculateTotal();
+                    if (data.status === 'limit reach') {
+                const errorFeedback = document.querySelector('#error-limit');
+                errorFeedback.textContent = 'Limit telah tercapai';
+                simpanButton.disabled = true;
+            } else {
+                const errorFeedback = document.querySelector('#error-limit');
+                errorFeedback.textContent = '';
+                simpanButton.disabled = false;
+                anggaranValue = parseFloat(data); 
+                calculateTotal();
+            }
                 })
                 .catch(error => {
                     console.error('There has been a problem with your fetch operation:', error);
@@ -117,7 +126,7 @@
 
         function calculateTotal() {
             if (!isNaN(limitValue) && !isNaN(anggaranValue)) {
-                const total = anggaranValue - limitValue; // Hitung total
+                const total = anggaranValue - limitValue; 
                 console.log(total);
                 if (total < 0) {
                     const errorFeedback = document.querySelector('#error-limit');
