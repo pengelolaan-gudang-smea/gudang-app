@@ -39,9 +39,9 @@
                                             {{ $message }}
                                         </div>
                                     @enderror
-                                    <div class="text-danger" id="error-limit">
+                                    <small class="text-danger" id="error-limit">
 
-                                    </div>
+                                    </small>
                                 </div>
 
                             </div>
@@ -114,7 +114,7 @@
                 const errorFeedback = document.querySelector('#error-limit');
                 errorFeedback.textContent = '';
                 simpanButton.disabled = false;
-                anggaranValue = parseFloat(data); 
+                anggaranValue = parseFloat(data);
                 calculateTotal();
             }
                 })
@@ -126,7 +126,7 @@
 
         function calculateTotal() {
             if (!isNaN(limitValue) && !isNaN(anggaranValue)) {
-                const total = anggaranValue - limitValue; 
+                const total = anggaranValue - limitValue;
                 console.log(total);
                 if (total < 0) {
                     const errorFeedback = document.querySelector('#error-limit');

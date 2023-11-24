@@ -138,9 +138,13 @@ class BarangController extends Controller
 
     public function setuju()
     {
+        $userJurusan = Auth::user()->jurusan->slug;
+        $barang = Barang::where('status', 'Disetujui')->whereHas('jurusan', function($query) use ($userJurusan) {
+            $query->where('slug', $userJurusan);
+        })->get();
         return view('dashboard.kkk.setuju', [
             'title' => 'Barang disetujui',
-            'barang' => Barang::where('status', 'Disetujui')->get()
+            'barang' => $barang
         ]);
     }
 }

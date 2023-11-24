@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Anggaran;
+use Illuminate\Support\Str;
 use App\Models\BarangGudang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -38,7 +39,24 @@ class GudangController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validatedData = $request->validate([
+            'name' => 'required|string',
+            'satuan' => 'required|numeric',
+            'spek' => 'required|string',
+            'tahun' => 'required|numeric',
+        ]);
+
+        $slug = $validatedData['slug'] = Str::slug($validatedData['name']);
+        $counter = 2;
+        while (BarangGudang::where('slug', $slug)->exists()) {
+            $slug = Str::slug($validatedData['name']) . '-' . $counter;
+            $counter++;
+        }
+        $validatedData['slug'] = $slug;
+
+        BarangGudang::create($validatedData);
+
+        return redirect()->route('barang-gudang.index')->with('success', 'Berhasil menambah barang');
     }
 
     /**
@@ -97,49 +115,37 @@ class GudangController extends Controller
     {
         $barang = BarangGudang::where('slug', $slug)->first();
         $data = [
+            'uuid' => $barang->uuid,
+            'nama_barang' => $barang->name,
             'lokasi' => $request->input('lokasi'),
-            'anggaran' => $request->input('anggaran') 
+            'anggaran' => $request->input('anggaran')
         ];
 
-        $dataToEncode = json_encode($data); 
+        $dataToEncode = json_encode($data);
 
         // Generate QR code
         $qrCode = QrCode::format('png')->size(300)->generate($dataToEncode);
         if ($barang->qr_code) {
             Storage::delete($barang->qr_code);
-            $filename = 'qr_codes/' . time() . '_qr.png'; 
+            $filename = 'qr_codes/' . time() . '_qr.png';
             $path = storage_path('app/public/' . $filename);
             file_put_contents($path, $qrCode);
         }
-        $filename = 'qr_codes/' . time() . '_qr.png'; 
+        $filename = 'qr_codes/' . time() . '_qr.png';
         $path = storage_path('app/public/' . $filename);
         file_put_contents($path, $qrCode);
 
         BarangGudang::where('slug', $slug)->update(['lokasi' => $data['lokasi'], 'anggaran'=>$data['anggaran'],
         'qr_code' => $filename]);
 
-        return redirect()->route('barang-gudang.index')->with('success', 'berhasil membuat qrcode');
+        return redirect()->route('barang-gudang.index', ['qr_created' => true, 'qr_code' => $filename])->with('success', 'Berhasil membuat kode QR');
     }
 
-    public function generateQr(Request $request, $slug)
+    public function printQr($slug)
     {
         $barang = BarangGudang::where('slug', $slug)->first();
-        dd($barang);
-        $data = [
-            'nama_barang' => $barang->name,
-            'lokasi' => $request->input('lokasi'),
-            'anggaran' => $request->input('anggaran') 
-        ];
+        $qrCodeUrl = asset('storage/' . $barang->qr_code);
 
-        $dataToEncode = json_encode($data); 
-
-        $qrCode = QrCode::format('png')->size(100)->generate($dataToEncode);
-        $base64QrCode = 'data:image/png;base64,' . base64_encode($qrCode);
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Berhasil',
-            'qrcode' => $base64QrCode
-        ]);
+        return view('dashboard.gudang.print', compact('qrCodeUrl'));
     }
 }

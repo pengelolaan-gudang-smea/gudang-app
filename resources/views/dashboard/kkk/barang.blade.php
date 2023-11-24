@@ -34,7 +34,16 @@
                             <td>{{ $item->name }}</td>
                             <td class="harga">{{ 'Rp ' . number_format($item->harga, 0, ',', '.') }}</td>
                             <td class="satuan">{{ $item->satuan }}</td>
-                            <td>{{ $item->status }}</td>
+                            <td>
+                                @if($item->status == 'Disetujui')
+                                    <span class="badge bg-success">{{ $item->status }}</span>
+                                @elseif($item->status == 'Ditolak')
+                                    <span class="badge bg-danger">{{ $item->status }}</span>
+                                @elseif($item->status == 'Belum disetujui')
+                                    <span class="badge bg-warning text-white">{{ $item->status }}</span>
+                                @endif
+                            </td>
+
                             <td class="sub-total">{{ 'Rp ' . number_format($item->sub_total, 0, ',', '.') }}</td>
                             <td>
                                 <div class="d-flex gap-3">

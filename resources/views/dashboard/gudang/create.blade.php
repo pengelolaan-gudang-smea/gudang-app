@@ -43,6 +43,17 @@
                                 @enderror
                             </div>
                         </div>
+                        <div class="row mb-3">
+                            <label for="tahun" class="col-sm-2 col-form-label">Tahun <span class="text-danger">*</span></label>
+                            <div class="col-sm-10">
+                                <input type="number" id="tahun" placeholder="Masukan tahun" class="form-control @error('tahun') is-invalid @enderror" name="tahun" required>
+                                @error('tahun')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                                @enderror
+                            </div>
+                        </div>
 
                         <div class="row mb-3">
                             <small class="text-secondary"><span class="text-danger">* </span>Field wajid diisi</small>

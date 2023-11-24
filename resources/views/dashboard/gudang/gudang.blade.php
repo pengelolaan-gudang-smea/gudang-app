@@ -7,7 +7,7 @@
         @endif
         <div class="card">
             <div class="card-body">
-                <a href="{{ route('barang-gudang.create') }}" class="btn btn-primary my-3 "> <i class="bi bi-box2-fill"></i>
+                <a href="{{ route('barang-gudang.create') }}" class="btn btn-primary my-3 "><i class="bi bi-box2-fill"></i>
                     Tambah Barang Gudang</a>
                 <!-- Default Table -->
                 <div class="table-responsive">
@@ -212,8 +212,8 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <span type="button" class="btn btn-success" id="qrGenerate">Generate</span>
-                        <button type="button" class="btn btn-primary" id="simpanQr">Simpan </button>
+                        {{-- <span type="button" class="btn btn-success" id="qrGenerate">Generate</span> --}}
+                        <button type="button" class="btn btn-primary" id="simpanQr">Generate </button>
                     </div>
                 </div>
             </div>
@@ -227,7 +227,7 @@
                         <h1 class="modal-title fs-5" id="detailBarangModalLabel">Modal title</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body showBarang">
                         ...
                     </div>
                     <div class="modal-footer">
@@ -236,33 +236,74 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal fade" id="ModalQrSuccess" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">QR Code</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body d-flex justify-content-center">
+                        <img src="" alt="QR Code" id="qrCodeImage" class="img-fluid">
+                    </div>
+                    <div class="modal-footer">
+                        <a class="btn btn-primary" role="button" id="printQrButton"><i class="fa-solid fa-print"></i> Print</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <script>
             let table = new DataTable('#barangsTable');
 
             $(document).ready(function() {
+                const qrCreated = {!! json_encode(request('qr_created')) !!};
+                const qrCodePath = {!! json_encode(request('qr_code')) !!}
+
+                if (qrCreated) {
+                    $('#ModalQrSuccess').modal('show');
+                    var qrCodeUrl = "{{ asset('storage/') }}" + '/' + qrCodePath;
+                    $('#qrCodeImage').attr('src', qrCodeUrl);
+
+                    // Menambahkan event listener untuk memanggil fungsi printQr saat tombol "Print" ditekan
+                    $('#printQrButton').click(function(event) {
+                        event.preventDefault();
+                        printQr(qrCodeUrl);
+                    });
+                }
+
+                function printQr(qrCodeUrl) {
+                    var printWindow = window.open(qrCodeUrl, '_blank');
+
+                    // Menunggu gambar selesai dimuat sebelum mencetak
+                    printWindow.onload = function() {
+                        printWindow.print();
+                    };
+                }
+
                 $('.detailBarangBtn').click(function() {
                     const barangSlug = $(this).data('barang');
                     $.ajax({
                         type: 'GET',
                         url: '/dashboard/barang-gudang/' + barangSlug,
                         success: function(response) {
-                            console.log(response);
                             if (response.status == 'success') {
                                 $('#detailBarangModalLabel').text(
                                     `Detail Barang ${response.barang.name}`);
-                                $('.modal-body').empty();
+                                $('.showBarang').empty();
                                 const Qr = $(
-                                    `<img src="{{ asset('storage/${response.barang.qr_code}') }}" width="80">`
+                                    `<img src="{{ asset('storage/${response.barang.qr_code}') }}" width="100">`
                                 );
                                 const listGroup = $(`<ul class="list-group">
                                                     <li class="list-group-item"><small>Nama Barang :</small><br> ${response.barang.name}</li>
                                                     <li class="list-group-item"><small>Spek Teknis :</small><br> ${response.barang.spek}</li>
-                                                    <li class="list-group-item"><small>Diambil oleh :</small><br>${response.barang.keterangan}</li>
+                                                    <li class="list-group-item"><small>Diambil oleh :</small><br>${response.barang.keterangan ? response.barang.keterangan : '-'}</li>
                                                     <li class="list-group-item"><small>Kuantitas (Qty) :</small><br> ${response.barang.satuan}</li>
                                                     <li class="list-group-item"><small>Kode Qr :</small><br></li>
                                                 </ul>`);
                                 listGroup.find('li:contains("Kode Qr :")').append(Qr);
-                                $('.modal-body').append(listGroup);
+                                $('.showBarang').append(listGroup);
 
                                 // Tampilkan modal
                                 $('#detailBarangModal').modal('show');
@@ -270,7 +311,7 @@
                                 // Handle other cases
                             }
 
-                           
+
                         },
                     });
                 });
@@ -334,36 +375,6 @@
                 $('#simpanQr').on('click', function() {
                     $('#Qr').submit();
                 });
-                $('#qrGenerate').click(function() {
-                    const barangSlug = $(this).data('slug');
-                    const lokasi = $('#pengambilan').val(); // Mendapatkan nilai lokasi dari input
-                    const anggaran = $('#jenis-anggaran').val(); // Mendapatkan nilai anggaran dari input
-                    const token = '{{ csrf_token() }}';
-
-                    const dataToSend = {
-                        barang: barangSlug,
-                        lokasi: lokasi,
-                        anggaran: anggaran,
-                        _token: token,
-                    };
-
-                    $.ajax({
-                        type: 'post',
-                        url: '/dashboard/barang-gudang/qr-generate/' + barangSlug,
-                        data: dataToSend, 
-                        success: function(response) {
-                            console.log(response);
-                            if (response.status === 'success') {
-                                const qrImage = $('#qrcodebarang');
-                                qrImage.attr('src', response.qrcode);
-                            }
-                        }
-                    });
-                });
-
-
-
-
             });
 
             const harga = document.querySelectorAll('.harga');

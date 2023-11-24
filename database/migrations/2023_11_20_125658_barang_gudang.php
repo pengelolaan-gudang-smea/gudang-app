@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('barang_gudang', function (Blueprint $table) {
             $table->id();
+            $table->uuid();
             $table->string('name');
             $table->string('slug');
             $table->text('spek');
@@ -21,6 +22,7 @@ return new class extends Migration
             $table->string('lokasi')->nullable();
             $table->string('anggaran')->nullable();
             $table->string('qr_code')->nullable();
+            $table->string('tahun')->nullable();
             $table->timestamps();
         });
     }

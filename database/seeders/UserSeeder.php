@@ -13,7 +13,7 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        $waka = User::create([
+    $waka = User::create([
             'name' => 'Wakil Kepala Sekolah',
             'username' => 'waka',
             'email' => 'waka@gmail.com',
@@ -28,23 +28,30 @@ class UserSeeder extends Seeder
         ]);
 
         $user2 = User::create([
-            'name' => 'Neptune',
-            'username' => 'Neptune',
-            'email' => 'Neptune@gmail.com',
-            'password' => Hash::make('neptune02'),
+            'name' => 'pak haris',
+            'username' => 'rpl',
+            'email' => 'rpl@gmail.com',
+            'password' => Hash::make('rpl123'),
             'jurusan_id'=>'1'
         ]);
         $user3 = User::create([
-            'name' => 'Algo',
-            'username' => 'Algorithm',
-            'email' => 'Algorithm@gmail.com',
-            'password' => Hash::make('neptune02'),
+            'name' => 'Admin Anggaran 1',
+            'username' => 'adminanggaran',
+            'email' => 'adminanggaran@gmail.com',
+            'password' => Hash::make('rosyid07'),
         ]);
         $user4 = User::create([
-            'name' => 'Lostvayne',
-            'username' => 'Lost',
-            'email' => 'Lostym@gmail.com',
-            'password' => Hash::make('lost02'),
+            'name' => 'Admin Gudang',
+            'username' => 'admingudang',
+            'email' => 'admingudang@gmail.com',
+            'password' => Hash::make('rosyid07'),
+        ]);
+        $user5 = User::create([
+            'name' => 'bu dar',
+            'username' => 'tkj',
+            'email' => 'tkj@gmail.com',
+            'password' => Hash::make('tkj123'),
+            'jurusan_id'=>'2'
         ]);
 
         // Assign roles and permissions to users

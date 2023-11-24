@@ -45,7 +45,7 @@ Route::controller(PasswordController::class)->group(function () {
 
 // * Dashboard
 Route::middleware('auth')->prefix('/dashboard')->group(function () {
-    Route::get('', DashboardController::class)->name('dashboard');
+    Route::get('', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/profile/{user:username}', function (User $user) {
         return view('dashboard.profile.index', [
@@ -74,6 +74,7 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
     Route::resource('/barang-gudang',GudangController::class)->parameters(['barang-gudang'=>'gudang']);
     Route::post('/barang-gudang/{slug}/qrcode',[GudangController::class,'Qr'])->name('qr.store');
     Route::post('barang-gudang/qr-generate/{slug}',[GudangController::class,'generateQr']);
+    Route::get('/barang-gudang/print/{slug}', [GudangController::class, 'printQr'])->name('print-qr');
 });
 
 Route::get('/test', function () {
@@ -82,3 +83,4 @@ Route::get('/test', function () {
     ]);
 });
 Route::get('/dashboard/waka/check-anggaran/{id}', [AnggaranController::class, 'checkAnggaran']);
+
