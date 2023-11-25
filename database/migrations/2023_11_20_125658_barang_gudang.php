@@ -14,13 +14,14 @@ return new class extends Migration
         Schema::create('barang_gudang', function (Blueprint $table) {
             $table->id();
             $table->uuid();
+        $table->foreignId('barang_id')->nullable()->constrained('barang');
             $table->string('name');
             $table->string('slug');
-            $table->text('spek');
+            $table->string('spek');
             $table->string('satuan');
             $table->string('keterangan')->nullable();
             $table->string('lokasi')->nullable();
-            $table->string('anggaran')->nullable();
+            $table->foreignId('anggaran_id')->nullable()->constrained('anggaran');
             $table->string('qr_code')->nullable();
             $table->string('tahun')->nullable();
             $table->timestamps();

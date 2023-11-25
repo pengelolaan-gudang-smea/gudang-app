@@ -15,28 +15,30 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+
+        $jurusan = [
+            'Rekayasa Perangkat Lunak',
+            'Teknik Komputer dan Jaringan',
+            'Desain Komunikasi Visual',
+            'Akuntansi Keuangan Lembaga',
+            'Layanan Perbankan Syariah',
+            'Manajemen Perkantoran',
+            'Bisnis Ritel',
+            'Bisnis Daring',
+         ];
+         for ($i=0; $i < count($jurusan) ; $i++) {
+            Jurusan::create([
+                'name' => $jurusan[$i],
+                'slug' => Str::slug($jurusan[$i]),
+            ]);
+         }
         $this->call([
             PermissionSeeder::class,
             UserSeeder::class,
         ]);
         Barang::factory(5)->create();
 
-     $jurusan = [
-        'Rekayasa Perangkat Lunak',
-        'Teknik Komputer dan Jaringan',
-        'Desain Komunikasi Visual',
-        'Akuntansi Keuangan Lembaga',
-        'Layanan Perbankan Syariah',
-        'Manajemen Perkantoran',
-        'Bisnis Ritel',
-        'Bisnis Daring',
-     ];
-     for ($i=0; $i < count($jurusan) ; $i++) {
-        Jurusan::create([
-            'name' => $jurusan[$i],
-            'slug' => Str::slug($jurusan[$i]),
-        ]);
-     }
+    
 
      Anggaran::factory(5)->create();
     }

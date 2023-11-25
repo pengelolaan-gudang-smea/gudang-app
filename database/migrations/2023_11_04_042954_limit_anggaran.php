@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('limit_anggaran',function(Blueprint $table){
             $table->id();
             $table->double('limit');
-            $table->foreignId('jurusan_id');
-            $table->foreignId('anggaran_id');
+            $table->foreignId('jurusan_id')->constrained('jurusan');
+            $table->foreignId('anggaran_id')->constrained('anggaran');
             $table->timestamps();
         });
     }
