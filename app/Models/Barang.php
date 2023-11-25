@@ -34,6 +34,9 @@ class Barang extends Model
     public function barangUser($user){
        return $this->where('user_id',$user);
     }
+    public function gudang(){
+        return $this->hasMany(BarangGudang::class);
+    }
 }
 
 

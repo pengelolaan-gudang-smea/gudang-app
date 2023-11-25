@@ -12,7 +12,7 @@ class BarangGudang extends Model
     protected $table = 'barang_gudang';
     protected $guarded = ['id'];
 
-        /**
+    /**
      *  Setup model event hooks
      */
     public static function boot()
@@ -21,6 +21,17 @@ class BarangGudang extends Model
         self::creating(function ($model) {
             $model->uuid = (string) Uuid::generate(4);
         });
+    }
+    protected $with = ['barang'];
+
+    public function barang()
+    {
+        return $this->belongsTo(Barang::class);
+    }
+
+    public function anggaran()
+    {
+        return $this->belongsTo(Anggaran::class);
     }
 
     public function getRouteKeyName()
