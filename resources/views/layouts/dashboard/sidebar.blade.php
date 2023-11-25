@@ -23,6 +23,22 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="{{ request()->routeIs('user*') ? 'nav-link' : 'nav-link collapsed' }}"
+                    href="{{ route('user.index') }}">
+                    <i class="bx bxs-user-account"></i>
+                    <span>Rekap Login User</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="{{ request()->routeIs('user*') ? 'nav-link' : 'nav-link collapsed' }}"
+                    href="{{ route('user.index') }}">
+                    <i class="bi bi-activity"></i>
+                    <span>Rekap Aktivitas user</span>
+                </a>
+            </li>
+
+        <li class="nav-heading">Kelola Anggaran</li>
+            <li class="nav-item">
                 <a class="{{ request()->routeIs('anggaran*') ? 'nav-link' : 'nav-link collapsed' }}"
                     href="{{ route('anggaran.index') }}">
                     <i class="bi bi-coin"></i>
@@ -75,23 +91,16 @@
         </li>
 
         @endcan
-        <li class="nav-heading">Pages</li>
+        <li class="nav-heading">Lainnya</li>
 
         <li class="nav-item">
-            <a class="nav-link collapsed" href="users-profile.html">
+            <a class="{{ request()->routeIs('dashboard.profile') ? 'nav-link' : 'nav-link collapsed' }}" href="{{ route('dashboard.profile',['user'=>Auth::user()->username]) }}">
                 <i class="bi bi-person"></i>
                 <span>Profile</span>
             </a>
         </li><!-- End Profile Page Nav -->
 
-        @can('Edit akun')
-        <li class="nav-item">
-            <a class="nav-link collapsed" href="{{ route('user.index') }}">
-                <i class="bi bi-question-circle"></i>
-                <span>User</span>
-            </a>
-        </li><!-- End F.A.Q Page Nav -->
-        @endcan
+       
     </ul>
 
 </aside><!-- End Sidebar-->

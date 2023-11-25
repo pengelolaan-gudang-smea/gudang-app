@@ -198,7 +198,7 @@
                                         name="anggaran">
                                         <option selected disabled>Pilih anggaran</option>
                                         @foreach ($anggaran as $item)
-                                            <option value="{{ $item->jenis }} - {{ $item->tahun }}">
+                                            <option value="{{ $item->id}}">
                                                 {{ $item->jenis }} -
                                                 {{ $item->tahun }}</option>
                                         @endforeach

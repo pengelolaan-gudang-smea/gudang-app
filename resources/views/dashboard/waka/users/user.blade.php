@@ -15,6 +15,7 @@
                         <tr>
                             <th scope="col">#</th>
                             <th scope="col">Name</th>
+                            <th scope="col">Username</th>
                             <th scope="col">Email</th>
                             <th scope="col">Role</th>
                             <th scope="col">Action</th>
@@ -24,6 +25,7 @@
                         @foreach ($user as $item)
                         <tr>
                             <th scope="row">{{ $loop->iteration }}</th>
+                            <td>{{ $item->name }}</td>
                             <td>{{ $item->username }}</td>
                             <td>{{ $item->email }}</td>
                             <td>
