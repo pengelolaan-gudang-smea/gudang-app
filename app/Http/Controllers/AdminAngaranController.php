@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use App\Models\Barang;
-use App\Models\Jurusan;
-use Illuminate\Support\Str;
 use App\Models\BarangGudang;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
@@ -68,38 +66,19 @@ class AdminAngaranController extends Controller
             $acc->update(['status' => $status]);
             if ($status == 'Disetujui') {
                 BarangGudang::create([
-                    'name' => $acc->name,
-                    'slug' => $acc->slug,
-                    'spek' => $acc->spek,
-                    'satuan' => $acc->satuan,
-                    'tahun' => Carbon::now()->year,
+                    'name'=>$acc->name,
+                    'spek'=>$acc->spek,
+                    'slug'=>$acc->slug,
+                    'satuan'=>$acc->satuan,
+                   'barang_id'=>$acc->id,
+                   'tahun' => Carbon::now()->year,
                 ]);
+            }elseif($status == 'Ditolak'){
+                $barang = BarangGudang::where('barang_id',$acc->id)->first();
+                $barang->delete();
             }
             return back()->with('success', 'Barang ' . $status);
         }
-
-        $validate = $request->validate([
-            'name' => 'required',
-            'spek' => 'required',
-            'harga' => ['required', 'numeric'],
-            'satuan' => 'required'
-        ]);
-
-        $subtotal = $validate['harga'] * $validate['satuan'];
-
-        if ($validate['name'] !== $acc->name) {
-            $slug = $validate['slug'] = Str::slug($validate['name']);
-            $counter = 2;
-            while (Barang::where('slug', $slug)->exists()) {
-                $slug = Str::slug($validate['name']) . '-' . $counter;
-                $counter++;
-            }
-            $validate['slug'] = $slug;
-        }
-        $validate['sub_total'] = $subtotal;
-
-        $acc->update($validate);
-        return redirect()->route('barang-acc.index')->with('success', 'Berhasil mengedit data');
     }
 
     /**
@@ -107,8 +86,7 @@ class AdminAngaranController extends Controller
      */
     public function destroy(Barang $acc)
     {
-        $acc->delete();
-        return back();
+       
     }
 
     public function filterJurusan(Request $request)

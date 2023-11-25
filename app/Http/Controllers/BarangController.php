@@ -67,7 +67,6 @@ class BarangController extends Controller
         }
         $validate['slug'] = $slug;
         $validate['sub_total'] = $subtotal;
-
         Barang::create($validate);
         return redirect()->route('pengajuan-barang.index')->with('success', 'Berhasil mengajukan barang');
     }
@@ -123,8 +122,10 @@ class BarangController extends Controller
             $validate['slug'] = $slug;
         }
         $validate['sub_total'] = $subtotal;
+       
 
         $barang->update($validate);
+        
         return redirect()->route('pengajuan-barang.index')->with('success', 'Berhasil mengubah data barang');
     }
 
@@ -133,6 +134,7 @@ class BarangController extends Controller
      */
     public function destroy(Barang $barang)
     {
+
         $barang->delete();
         return redirect()->back()->with('success','Behasil menghapus data barang');
     }

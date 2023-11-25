@@ -109,7 +109,6 @@ class GudangController extends Controller
             ]);
 
             if ($validate['name'] !== $gudang->name) {
-                dd($validate['name'], $gudang->name);
                 $slug = Str::slug($validate['name']);
                 $counter = 2;
                 while (BarangGudang::where('slug', $slug)->exists()) {
@@ -123,7 +122,7 @@ class GudangController extends Controller
             $gudang->satuan = $validate['satuan'];
             $gudang->spek = $validate['spek'];
             $gudang->tahun = $validate['tahun'];
-            $gudang->update();
+            $gudang->save();
             return redirect()->route('barang-gudang.index')->with('success', 'Berhasil Update Data Barang');
         }
     }
@@ -143,7 +142,7 @@ class GudangController extends Controller
             'uuid' => $barang->uuid,
             'nama_barang' => $barang->name,
             'lokasi' => $request->input('lokasi'),
-            'anggaran' => $request->input('anggaran')
+            'anggaran_id' => $request->input('anggaran')
         ];
 
         $dataToEncode = json_encode($data);
@@ -160,7 +159,7 @@ class GudangController extends Controller
         $path = storage_path('app/public/' . $filename);
         file_put_contents($path, $qrCode);
 
-        BarangGudang::where('slug', $slug)->update(['lokasi' => $data['lokasi'], 'anggaran'=>$data['anggaran'],
+        BarangGudang::where('slug', $slug)->update(['lokasi' => $data['lokasi'], 'anggaran_id'=>$data['anggaran_id'],
         'qr_code' => $filename]);
 
         return redirect()->route('barang-gudang.index', ['qr_created' => true, 'qr_code' => $filename])->with('success', 'Berhasil membuat kode QR');
