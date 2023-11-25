@@ -25,7 +25,7 @@ class DatabaseSeeder extends Seeder
         'Rekayasa Perangkat Lunak',
         'Teknik Komputer dan Jaringan',
         'Desain Komunikasi Visual',
-        'Akuntansi',
+        'Akuntansi Keuangan Lembaga',
         'Layanan Perbankan Syariah',
         'Manajemen Perkantoran',
         'Bisnis Ritel',

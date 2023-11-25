@@ -26,7 +26,7 @@
                         <div class="row mb-3">
                             <label for="harga" class="col-sm-2 col-form-label">Harga (satuan)<span class="text-danger">*</span></label>
                             <div class="col-sm-10">
-                                <input type="number" id="harga" placeholder="Masukan harga barang/pcs" class="form-control @error('harga') is-invalid @enderror" name="harga" required>
+                                <input type="text" id="harga" placeholder="Masukan harga barang/pcs" class="form-control @error('harga') is-invalid @enderror" name="harga" required>
                                 @error('harga')
                                 <div class="invalid-feedback">
                                     {{ $message }}
@@ -77,36 +77,65 @@
 </section>
 
 <script>
-    const harga = document.querySelector('#harga')
-    const btn = document.querySelector('#ajukan-barang')
-    const info1 = document.querySelector('#info-limit-1')
-    const info2 = document.querySelector('#info-limit-2')
-    const satuanInput = document.querySelector('#satuan')
-    let satuan;
-    let price;
-    const limit ={{ $sisa }}
-    harga.addEventListener('input',function(){
-        price = harga.value;
-        if( price > limit){
-            btn.classList.add('disabled');
-            info1.classList.remove('d-none')
-        }else{
-            btn.classList.remove('disabled');
-            info1.classList.add('d-none')
-        }
+$(document).ready(function() {
+    let debounceTimer;
 
-        satuanInput.addEventListener('input',function(){
-            satuan = satuanInput.value * price
-            if( satuan > limit){
-            btn.classList.add('disabled');
-            info2.classList.remove('d-none')
-        }else{
-            btn.classList.remove('disabled');
-            info2.classList.add('d-none')
-        }
-        })
+    $('#harga').keyup(function() {
+        clearTimeout(debounceTimer);
+
+        // Tunggu sebentar sebelum memproses input
+        debounceTimer = setTimeout(function() {
+            let harga = $('#harga').val();
+            $('#harga').val(formatRupiahInput(harga));
+
+            const price = harga.replace(/\./g, ""); // Hilangkan titik untuk memproses sebagai angka
+            const priceFormatted = parseInt(price);
+
+            const btn = document.querySelector('#ajukan-barang');
+            const info1 = document.querySelector('#info-limit-1');
+            const info2 = document.querySelector('#info-limit-2');
+            const satuanInput = document.querySelector('#satuan');
+
+            const limit = {{ $sisa }};
+
+            if (priceFormatted > limit) {
+                btn.classList.add('disabled');
+                info1.classList.remove('d-none');
+            } else {
+                btn.classList.remove('disabled');
+                info1.classList.add('d-none');
+            }
+
+            satuanInput.addEventListener('input', function () {
+                satuan = satuanInput.value * priceFormatted;
+
+                if (satuan > limit) {
+                    btn.classList.add('disabled');
+                    info2.classList.remove('d-none');
+                } else {
+                    btn.classList.remove('disabled');
+                    info2.classList.add('d-none');
+                }
+            });
+        }, 300); // Tunggu 300ms sebelum memproses input
     });
+});
 
+    function formatRupiahInput(angka, prefix) {
+        var number_string = angka.replace(/[^,\d]/g, "").toString(),
+            split = number_string.split(","),
+            sisa = split[0].length % 3,
+            rupiah = split[0].substr(0, sisa),
+            ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+        if (ribuan) {
+            separator = sisa ? "." : "";
+            rupiah += separator + ribuan.join(".");
+        }
+
+        rupiah = split[1] !== undefined ? rupiah + "," + split[1] : rupiah;
+        return prefix === undefined ? rupiah : rupiah ? rupiah : 0;
+    }
 
 </script>
 @endsection

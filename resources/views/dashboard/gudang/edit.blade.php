@@ -52,6 +52,18 @@
                                     @enderror
                                 </div>
                             </div>
+                            <div class="row mb-3">
+                                <label for="tahun" class="col-sm-2 col-form-label">Tahun <span class="text-danger">*</span></label>
+                                <div class="col-sm-10">
+                                    <input type="number" id="tahun" placeholder="Masukan tahun" class="form-control @error('tahun') is-invalid @enderror" name="tahun"
+                                    value="{{ old('tahun', $barang->tahun) }}" required>
+                                    @error('tahun')
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
+                                    @enderror
+                                </div>
+                            </div>
 
                             <div class="row mb-3">
                                 <small class="text-secondary"><span class="text-danger">* </span>Field wajid diisi</small>
@@ -60,7 +72,7 @@
                             <div class="row mb-3">
                                 <div class="col-sm-12 d-flex justify-content-end gap-2">
                                     <a href="{{ route('barang-gudang.index') }}" class="btn btn-secondary">Kembali</a>
-                                    <button type="submit" class="btn btn-primary">AJukan Barang</button>
+                                    <button type="submit" class="btn btn-primary">Ajukan Barang</button>
                                 </div>
                             </div>
                         </form>

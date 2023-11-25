@@ -110,6 +110,10 @@
         $(document).ready(function() {
             toggleJurusanInput();
 
+            $('#role').select2({
+                theme: "bootstrap-5"
+            });
+
             $('#role').on('change', toggleJurusanInput);
             function toggleJurusanInput() {
                 const roleSelect = $('#role');

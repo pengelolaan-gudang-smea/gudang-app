@@ -14,7 +14,7 @@
                         <label class="col-1 text-right">:</label>
                         <div class="col-md-6">
                             <select class="form-control" name="jurusan">
-                                <option selected disabled>- Pilih Jurusan -</option>
+                                <option selected disabled>-- Pilih Jurusan --</option>
                                 @foreach (App\Models\Jurusan::get() as $item)
                                 <option value="{{ $item->id }}">{{ $item->name }}</option>
                                 @endforeach
@@ -73,7 +73,7 @@
                                             @method('PUT')
                                             @csrf
                                             <input type="hidden" name="status" value="Disetujui">
-                                            <button class="bi bi-check fw-bold btn btn-sm bg-success link-light" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-title="Popover title"></button>
+                                            <button class="bi bi-check fw-bold btn btn-sm bg-success link-light" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-title="Setujui"></button>
                                         </form>
                                     </div>
                                     @endif
@@ -84,7 +84,7 @@
                                             @csrf
                                             @method('PUT')
                                             <input type="hidden" name="status" value="Ditolak">
-                                            <button class="bi bi-x fw-bold btn btn-sm bg-danger link-light"></button>
+                                            <button class="bi bi-x fw-bold btn btn-sm bg-danger link-light" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-title="Tolak"></button>
                                         </form>
                                     </div>
                                     @endif
@@ -101,7 +101,10 @@
     </div>
     <script>
         $(document).ready(function() {
-            $('select[name=jurusan]').select2()
+            $('[data-bs-toggle="popover"]').popover();
+            $('select[name=jurusan]').select2({
+                theme: "bootstrap-5"
+            })
             $('select[name=jurusan]').change(function() {
                 let jurusan = $(this).val();
                 $.ajax({
@@ -116,13 +119,15 @@
                         filterTahun.html('');
                         if (data.length > 0) {
                             var options = '';
-                            options += '<option selected disabled>- Pilih Tahun -</option>';
+                            options += '<option selected disabled>-- Pilih Tahun --</option>';
                             $.each(data, function(index, tahun) {
                                 options += '<option value="' + tahun + '">' + tahun + '</option>';
                             });
                             filterTahun.append(options);
                             filterTahun.attr('disabled', false);
-                            filterTahun.select2();
+                            filterTahun.select2({
+                                theme: "bootstrap-5"
+                            });
                             filterTahun.change(function() {
                                 const selectedTahun = filterTahun.val();
                                 updateTabel(jurusan, selectedTahun);
@@ -214,7 +219,7 @@
                                 buttons += '@method("PUT")';
                                 buttons += '@csrf';
                                 buttons += '<input type="hidden" name="status" value="Disetujui">';
-                                buttons += '<button class="bi bi-check fw-bold btn btn-sm bg-success link-light" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-title="Popover title"></button>';
+                                buttons += '<button class="bi bi-check fw-bold btn btn-sm bg-success link-light" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-title="Setujui"></button>';
                                 buttons += '</form>';
                                 buttons += '</div>';
                                 buttons += '<div>';
@@ -222,7 +227,7 @@
                                 buttons += '@csrf';
                                 buttons += '@method("PUT")';
                                 buttons += '<input type="hidden" name="status" value="Ditolak">';
-                                buttons += '<button class="bi bi-x fw-bold btn btn-sm bg-danger link-light"></button>';
+                                buttons += '<button class="bi bi-x fw-bold btn btn-sm bg-danger link-light" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-title="Tolak"></button>';
                                 buttons += '</form>';
                                 buttons += '</div>';
                                 buttons += '</div>';

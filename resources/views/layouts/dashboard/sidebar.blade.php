@@ -32,7 +32,7 @@
             <li class="nav-item">
                 <a class="{{ request()->routeIs('limit-anggaran*') ? 'nav-link' : 'nav-link collapsed' }}"
                     href="{{ route('limit-anggaran.index') }}">
-                    <i class="bi bi-coin"></i>
+                    <i class="bi bi-exclamation-circle"></i>
                     <span>Limit Anggaran</span>
                 </a>
             </li>
@@ -73,7 +73,7 @@
                 <span>Barang Gudang</span>
             </a>
         </li>
-       
+
         @endcan
         <li class="nav-heading">Pages</li>
 

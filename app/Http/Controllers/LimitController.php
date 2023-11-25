@@ -37,12 +37,12 @@ class LimitController extends Controller
      */
     public function store(Request $request)
     {
-        $validate = $request->validate([
-            'limit'=> ['','numeric'],
-            'jurusan_id'=>'',
-            'anggaran_id'=>''
-        ]);
-        Limit::create($validate);
+        $limit = new Limit();
+        $limit->limit = str_replace('.', '', $request->limit);
+        $limit->jurusan_id = $request->jurusan_id;
+        $limit->anggaran_id = $request->anggaran_id;
+        $limit->save();
+
         return redirect()->route('limit-anggaran.index')->with('success','Behasil mengatur limit anggaran');
     }
 
@@ -72,13 +72,10 @@ class LimitController extends Controller
      */
     public function update(Request $request, Limit $limit)
     {
-        $validate = $request->validate([
-            'limit'=>['required','numeric'],
-            'anggaran_id'=>'required',
-            'jurusan_id'=>'required'
-        ]);
-
-        $limit->update($validate);
+        $limit->limit = str_replace('.', '', $request->limit);
+        $limit->anggaran_id = $request->anggaran_id;
+        $limit->jurusan_id = $request->jurusan_id;
+        $limit->update();
         return redirect()->route('limit-anggaran.index')->with('success','Berhasil merubah limit anggaran');
     }
 

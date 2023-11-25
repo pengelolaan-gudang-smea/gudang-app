@@ -25,6 +25,7 @@
     <link href="{{ asset('assets/vendor/remixicon/remixicon.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/vendor/simple-datatables/style.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('assets/css/select2/select2.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/select2/select2-bootstrap-5-theme.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/datatables/datatables.min.css') }}">
 
     <!-- Template Main CSS File -->
@@ -66,7 +67,7 @@
             &copy; Copyright <strong><span>RPL 2023</span></strong>. All Rights Reserved
         </div>
         <div class="credits">
-            Designed by <a href="https://instagram.com/softwaretwo_24">Skansaba.dev</a>
+            Designed by <a href="https://skansaba.dev" target="_blank">Skansaba.dev</a>
         </div>
     </footer><!-- End Footer -->
 

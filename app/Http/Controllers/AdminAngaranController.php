@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Barang;
-use App\Models\BarangGudang;
 use App\Models\Jurusan;
 use Illuminate\Support\Str;
+use App\Models\BarangGudang;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -70,7 +71,8 @@ class AdminAngaranController extends Controller
                     'name' => $acc->name,
                     'slug' => $acc->slug,
                     'spek' => $acc->spek,
-                    'satuan' => $acc->satuan
+                    'satuan' => $acc->satuan,
+                    'tahun' => Carbon::now()->year,
                 ]);
             }
             return back()->with('success', 'Barang ' . $status);

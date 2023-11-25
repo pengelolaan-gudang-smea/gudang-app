@@ -51,13 +51,13 @@ class BarangController extends Controller
         $validate = $request->validate([
             'name' => 'required',
             'spek' => 'required',
-            'harga' => ['required', 'numeric'],
+            'harga' => 'required',
             'satuan' => 'required',
             'user_id' => 'required',
             'jurusan_id' => 'required',
         ]);
-
-        $subtotal = $validate['harga'] * $validate['satuan'];
+        $harga = str_replace('.', '', $validate['harga']);
+        $subtotal = $harga * $validate['satuan'];
 
         $slug = $validate['slug'] = Str::slug($validate['name']);
         $counter = 2;
@@ -105,11 +105,13 @@ class BarangController extends Controller
         $validate = $request->validate([
             'name' => 'required',
             'spek' => 'required',
-            'harga' => ['required', 'numeric'],
+            'harga' => 'required',
             'satuan' => 'required'
         ]);
 
-        $subtotal = $validate['harga'] * $validate['satuan'];
+        $harga = str_replace('.', '', $validate['harga']);
+        $validate['harga'] = $harga;
+        $subtotal = $harga * $validate['satuan'];
 
         if ($validate['name'] !== $barang->name) {
             $slug = $validate['slug'] = Str::slug($validate['name']);

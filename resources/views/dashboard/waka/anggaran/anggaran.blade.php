@@ -25,7 +25,7 @@
                             @foreach ($anggaran as $item)
                                 <tr>
                                     <th scope="row">{{ $loop->iteration }}</th>
-                                    <td>{{ 'Rp. ' . number_format($item->anggaran, 0, ',', '.') }}</td>
+                                    <td>{{ 'Rp ' . number_format($item->anggaran, 0, ',', '.') }}</td>
                                     <td>{{ $item->jenis }}</td>
                                     <td>{{ $item->tahun }}</td>
                                     <td>

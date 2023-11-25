@@ -30,7 +30,7 @@
                                         <div class="col-sm-10">
                                             <select class="form-select" aria-label="Default select example" id="jenis"
                                                 name="jenis">
-                                                <option selected disabled>Pilih jenis anggaran</option>
+                                                <option selected disabled>-- Pilih jenis anggaran --</option>
                                                     <option value="BOS" {{ $anggaran->jenis == 'BOS' ? 'selected' : '' }}>BOS</option>
                                                     <option value="BOSDA" {{ $anggaran->jenis == 'BOSDA' ? 'selected' : '' }}>BOSDA</option>
                                             </select>
@@ -49,7 +49,7 @@
                                     @enderror
                                 </div>
                             </div>
-                          
+
 
                             <div class="row mb-3">
                                 <small class="text-secondary"><span class="text-danger">* </span>Field wajid diisi</small>
@@ -67,4 +67,33 @@
             </div>
         </div>
     </section>
+    <script>
+        $(document).ready(function() {
+            $('#anggaran').keyup(function() {
+                let anggaran = $('#anggaran').val();
+                $('#anggaran').val(formatRupiahInput(anggaran));
+            });
+
+            $('#jenis').select2({
+                theme: "bootstrap-5",
+            });
+        });
+
+        function formatRupiahInput(angka, prefix) {
+            var number_string = angka.replace(/[^,\d]/g, "").toString()
+                , split = number_string.split(",")
+                , sisa = split[0].length % 3
+                , rupiah = split[0].substr(0, sisa)
+                , ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+            // tambahkan titik jika yang di input sudah menjadi angka ribuan
+            if (ribuan) {
+                separator = sisa ? "." : "";
+                rupiah += separator + ribuan.join(".");
+            }
+
+            rupiah = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
+            return prefix == undefined ? rupiah : rupiah ? rupiah : 0;
+        }
+    </script>
 @endsection

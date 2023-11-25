@@ -36,12 +36,17 @@ class AnggaranController extends Controller
     public function store(Request $request)
     {
         $validate = $request->validate([
-            'anggaran' => ['required', 'numeric'],
+            'anggaran' => ['required'],
             'jenis' => 'required',
             'tahun' => 'required',
         ]);
 
-        Anggaran::create($validate);
+        $anggaran = new Anggaran();
+        $anggaran->anggaran = str_replace('.', '', $validate['anggaran']);
+        $anggaran->jenis = $validate['jenis'];
+        $anggaran->tahun = $validate['tahun'];
+        $anggaran->save();
+
         return redirect()->route('anggaran.index')->with('success', 'Berhasil menambahkan anggaran');
     }
 
@@ -70,13 +75,17 @@ class AnggaranController extends Controller
     public function update(Request $request, Anggaran $anggaran)
     {
         $validate = $request->validate([
-            'anggaran' => ['required', 'numeric'],
+            'anggaran' => ['required'],
             'jenis' => 'required',
             'tahun' => 'required',
         ]);
+        
+        $anggaran->anggaran = str_replace('.', '', $validate['anggaran']);
+        $anggaran->jenis = $validate['jenis'];
+        $anggaran->tahun = $validate['tahun'];
+        $anggaran->update();
 
-        $anggaran->update($validate);
-        return redirect()->route('anggaran.index')->with('success', 'Behasil mengubah data anggaran');
+        return redirect()->route('anggaran.index')->with('success', 'Berhasil mengubah data anggaran');
     }
 
     /**
@@ -102,7 +111,7 @@ class AnggaranController extends Controller
         if($total <= 0){
             return response()->json(['status'=>'limit reach']);
         }
-       
+
         return response()->json($total);
     }
 }

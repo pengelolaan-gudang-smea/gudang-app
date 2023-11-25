@@ -100,6 +100,31 @@ class GudangController extends Controller
             // dd('berhasil');
             $gudang->save();
             return redirect()->route('barang-gudang.index')->with('success', 'Berhasil Mengambil Barang');
+        } else {
+            $validate = $request->validate([
+                'name' => ['required', 'string', 'max:255'],
+                'satuan' => ['required', 'integer', 'min:0'],
+                'spek' => ['required', 'string'],
+                'tahun' => ['required'],
+            ]);
+
+            if ($validate['name'] !== $gudang->name) {
+                dd($validate['name'], $gudang->name);
+                $slug = Str::slug($validate['name']);
+                $counter = 2;
+                while (BarangGudang::where('slug', $slug)->exists()) {
+                    $slug = Str::slug($validate['name']) . '-' . $counter;
+                    $counter++;
+                }
+                $gudang->slug = $slug;
+            }
+
+            $gudang->name = $validate['name'];
+            $gudang->satuan = $validate['satuan'];
+            $gudang->spek = $validate['spek'];
+            $gudang->tahun = $validate['tahun'];
+            $gudang->update();
+            return redirect()->route('barang-gudang.index')->with('success', 'Berhasil Update Data Barang');
         }
     }
 

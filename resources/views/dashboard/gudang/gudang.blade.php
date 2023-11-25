@@ -38,14 +38,14 @@
                                                     <div>
                                                         <button type="button"
                                                             class="bi bi bi-box-arrow-right fw-bold btn btn-sm bg-danger link-light"
-                                                            data-bs-toggle="modal" data-bs-target="#ModalPengambilan"
+                                                            data-bs-toggle="modal" data-bs-trigger="click" data-bs-title="Pengambilan barang" data-bs-target="#ModalPengambilan"
                                                             data-slug={{ $item->slug }}>
                                                         </button>
                                                     </div>
                                                     <div>
                                                         <button type="button"
                                                             class="bi bi bi bi-qr-code fw-bold btn btn-sm bg-success link-light qr-barang-btn"
-                                                            data-bs-toggle="modal" data-bs-target="#ModalQr"
+                                                            data-bs-toggle="modal" data-bs-target="#ModalQr" data-bs-trigger="click" data-bs-title="Generate QR Code"
                                                             data-slug={{ $item->slug }}>
                                                         </button>
                                                     </div>
@@ -53,7 +53,7 @@
                                                     <div>
                                                         <button type="button"
                                                             class="bi bi-check fw-bold btn btn-sm bg-success link-light"
-                                                            data-bs-toggle="modal" data-bs-target="#ModalKeterangan"
+                                                            data-bs-toggle="modal" data-bs-target="#ModalKeterangan" data-bs-trigger="click" data-bs-title="Checklist"
                                                             data-slug={{ $item->slug }}>
                                                         </button>
                                                     </div>
@@ -62,19 +62,19 @@
 
                                             <div>
                                                 <button type="button" data-barang="{{ $item->slug }}"
-                                                    class="btn btn-sm bg-primary link-light detailBarangBtn">
+                                                    class="btn btn-sm bg-primary link-light detailBarangBtn" data-bs-trigger="click" data-bs-title="Detail">
                                                     <i class="bi bi-eye"></i>
                                                 </button>
                                             </div>
                                             <div>
                                                 <a href="{{ route('barang-gudang.edit', ['gudang' => $item->slug]) }}"
-                                                    class="btn btn-sm bg-warning link-light">
+                                                    class="btn btn-sm bg-warning link-light" data-bs-trigger="click" data-bs-title="Edit">
                                                     <i class="bi bi-pencil-square"></i>
                                                 </a>
                                             </div>
                                             <div>
                                                 <button type="button"
-                                                    class="btn btn-sm btn-danger link-light deleteBarangBtn"
+                                                    class="btn btn-sm btn-danger link-light deleteBarangBtn" data-bs-trigger="click" data-bs-title="Delete"
                                                     data-barang="{{ $item->name }}">
                                                     <i class="bi bi-trash3"></i>
                                                 </button>
@@ -258,6 +258,9 @@
             let table = new DataTable('#barangsTable');
 
             $(document).ready(function() {
+                $('[data-bs-trigger="click"]').popover({
+                    trigger: 'hover',
+                });
                 const qrCreated = {!! json_encode(request('qr_created')) !!};
                 const qrCodePath = {!! json_encode(request('qr_code')) !!}
 
