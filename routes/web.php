@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GudangController;
 use App\Http\Controllers\LimitController;
 use App\Http\Controllers\PasswordController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QrController;
 use App\Http\Controllers\UserManagementController;
 use App\Models\User;
@@ -47,11 +48,9 @@ Route::controller(PasswordController::class)->group(function () {
 Route::middleware('auth')->prefix('/dashboard')->group(function () {
     Route::get('', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::get('/profile/{user:username}', function (User $user) {
-        return view('dashboard.profile.index', [
-            'title' => 'Profile | ' . $user->username
-        ]);
-    })->name('dashboard.profile');
+    Route::get('/profile/{user:username}', [ProfileController::class,'index'])->name('dashboard.profile');
+    Route::put('/profile/{user:username}/update',[ProfileController::class,'update'])->name('profile.update');
+    Route::put('/profile/password/{user:username}',[ProfileController::class,'changePass'])->name('profile.updatePass');
 
     //  * WAKA
     Route::middleware('can:Edit akun')->group(function () {
