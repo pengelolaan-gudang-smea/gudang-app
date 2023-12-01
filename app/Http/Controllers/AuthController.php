@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\Rekap_Login;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -26,6 +27,7 @@ class AuthController extends Controller
         ]);
         if (Auth::attempt($validate)) {
             $request->session()->regenerate();
+            Rekap_Login::login(Auth::user()->id);
             return redirect()->route('dashboard');
         } else {
             return back()->with('error', 'Periksa username dan password');
@@ -34,6 +36,7 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        Rekap_Login::logout(Auth::user()->id);
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

@@ -23,15 +23,15 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="{{ request()->routeIs('user*') ? 'nav-link' : 'nav-link collapsed' }}"
-                    href="{{ route('user.index') }}">
+                <a class="{{ request()->routeIs('rekap.login') ? 'nav-link' : 'nav-link collapsed' }}"
+                    href="{{ route('rekap.login') }}">
                     <i class="bx bxs-user-account"></i>
                     <span>Rekap Login User</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="{{ request()->routeIs('user*') ? 'nav-link' : 'nav-link collapsed' }}"
-                    href="{{ route('user.index') }}">
+                <a class="{{ request()->routeIs('rekap.activity') ? 'nav-link' : 'nav-link collapsed' }}"
+                    href="{{ route('rekap.activity') }}">
                     <i class="bi bi-activity"></i>
                     <span>Rekap Aktivitas user</span>
                 </a>

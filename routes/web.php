@@ -10,6 +10,7 @@ use App\Http\Controllers\LimitController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QrController;
+use App\Http\Controllers\RekapController;
 use App\Http\Controllers\UserManagementController;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
@@ -58,6 +59,10 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
         Route::post('/hak-akses/{user:username}', [UserManagementController::class, 'akses'])->name('user.akses');
         Route::resource('/anggaran',AnggaranController::class);
         Route::resource('/limit-anggaran',LimitController::class)->parameters(['limit-anggaran'=>'limit']);
+        Route::controller(RekapController::class)->group(function(){
+            Route::get('/rekap-login','rekapLogin')->name('rekap.login');
+            Route::get('/rekap-aktivitas','rekapActivity')->name('rekap.activity');
+        });
         });
 
     // * KKK

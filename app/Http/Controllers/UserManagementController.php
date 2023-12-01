@@ -127,7 +127,6 @@ class UserManagementController extends Controller
             'name' => 'required' . $user->id,
             'username' => 'required|unique:users,username,' . $user->id,
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'jurusan_id' => 'required',
         ];
 
         $validate = $request->validate($validateRules);
@@ -141,8 +140,10 @@ class UserManagementController extends Controller
             $user->removeRole($role_old);
             $user->assignRole($role);
         }
+        if($request->jurusan_id){
+            $user->jurusan_id = $request->input('jurusan_id');
+        }
 
-        $user->jurusan_id = $request->input('jurusan_id');
         $user->update($validate);
 
         return redirect()->route('user.index')->with('success', 'Berhasil merubah data ' . $user->username);

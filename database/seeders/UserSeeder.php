@@ -46,13 +46,13 @@ class UserSeeder extends Seeder
             'email' => 'admingudang@gmail.com',
             'password' => Hash::make('rosyid07'),
         ]);
-        $user5 = User::create([
-            'name' => 'bu dar',
-            'username' => 'tkj',
-            'email' => 'tkj@gmail.com',
-            'password' => Hash::make('tkj123'),
-            'jurusan_id'=>'2'
-        ]);
+        // $user5 = User::create([
+        //     'name' => 'bu dar',
+        //     'username' => 'tkj',
+        //     'email' => 'tkj@gmail.com',
+        //     'password' => Hash::make('tkj123'),
+        //     'jurusan_id'=>'2'
+        // ]);
 
         // Assign roles and permissions to users
         $waka->assignRole('WAKA');
