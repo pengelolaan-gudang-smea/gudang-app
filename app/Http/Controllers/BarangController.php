@@ -57,6 +57,7 @@ class BarangController extends Controller
             'jurusan_id' => 'required',
         ]);
         $harga = str_replace('.', '', $validate['harga']);
+        $validate['harga'] = $harga;
         $subtotal = $harga * $validate['satuan'];
 
         $slug = $validate['slug'] = Str::slug($validate['name']);
@@ -122,10 +123,10 @@ class BarangController extends Controller
             $validate['slug'] = $slug;
         }
         $validate['sub_total'] = $subtotal;
-       
+
 
         $barang->update($validate);
-        
+
         return redirect()->route('pengajuan-barang.index')->with('success', 'Berhasil mengubah data barang');
     }
 

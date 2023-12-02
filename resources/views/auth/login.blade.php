@@ -2,10 +2,11 @@
 @section('content')
     <div class="row justify-content-center mt-5">
         <div class="col-md-4">
-         
-            <div class="text-center mb-2">
+
+            <div class="justify-content-center mb-2 d-flex gap-5 align-items-center">
+                <img src="{{ asset('assets/img/smk.png') }}" alt="Logo SMK N 1 Bantul" width="60">
+                <span class="fs-4 fw-bold">Sistem Gudang</span>
                 <img src="{{ asset('assets/img/logo.png') }}" alt="Logo Gudang" width="60">
-                <span class="fs-4">Sistem Gudang</span>
             </div>
             <div class="card mb-3">
                 @if (session()->has('success'))

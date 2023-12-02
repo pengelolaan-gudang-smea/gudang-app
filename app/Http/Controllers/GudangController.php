@@ -91,13 +91,11 @@ class GudangController extends Controller
     {
         if ($request->has('keterangan')) {
             $keterangan = $request->input('keterangan');
-            // dd('berhasil');
             $gudang->update(['keterangan' => $keterangan]);
             return redirect()->route('barang-gudang.index')->with('success', 'Berhasil  Menerima Barang');
         } else if ($request->has('pengambilan')) {
             $pengambilan = $request->input('pengambilan');
             $gudang->satuan -= $pengambilan;
-            // dd('berhasil');
             $gudang->save();
             return redirect()->route('barang-gudang.index')->with('success', 'Berhasil Mengambil Barang');
         } else {
@@ -144,7 +142,7 @@ class GudangController extends Controller
             'lokasi' => $request->input('lokasi'),
 
         ];
-        
+
         $anggaran  = Anggaran::where('id', $request->anggaran)->first();
         $data['anggaran'] = $anggaran->jenis."-".$anggaran->tahun;        // Generate QR code
         $dataToEncode = json_encode($data);

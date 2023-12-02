@@ -12,9 +12,9 @@
                             <th scope="col">Name</th>
                             <th scope="col">Username</th>
                             <th scope="col">Tanggal Login</th>
-                            <th scope="col">Login</th>
+                            <th scope="col">Jam Login</th>
                             <th scope="col">Tanggal Logout</th>
-                            <th scope="col">Logout</th>
+                            <th scope="col">Jam Logout</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -27,7 +27,6 @@
                             <td>{{ \Carbon\Carbon::parse($item->login)->format('H:i') }}</td>
                             <td>{{ $item->logout ? \Carbon\Carbon::parse($item->logout)->format('d-m-y') : '-'}}</td>
                             <td>{{ $item->logout ? \Carbon\Carbon::parse($item->logout)->format('H:i') : '-' }}</td>
-                           
                         </tr>
                         @endforeach
                     </tbody>
