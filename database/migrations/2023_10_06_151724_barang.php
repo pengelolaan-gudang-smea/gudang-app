@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('satuan');
             $table->string('sub_total')->nullable();
             $table->enum('status', ['Disetujui', 'Ditolak', 'Belum disetujui'])->default('Belum disetujui');
-            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('jurusan_id')->constrained('jurusan');
             $table->timestamps();
         });

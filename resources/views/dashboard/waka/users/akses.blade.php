@@ -51,7 +51,7 @@
                             <div class="row mb-3">
                                 <div class="col-sm-12 d-flex justify-content-end gap-2">
                                     <a href="{{ route('user.index') }}" class="btn btn-secondary">Kembali</a>
-                                    <button type="submit" class="btn btn-primary">Tambah User</button>
+                                    <button type="submit" class="btn btn-primary">Simpan Hak Akses User</button>
                                 </div>
                             </div>
 

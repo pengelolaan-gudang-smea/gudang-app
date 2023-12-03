@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->double('limit');
             $table->foreignId('jurusan_id')->constrained('jurusan');
-            $table->foreignId('anggaran_id')->constrained('anggaran');
+            $table->foreignId('anggaran_id')->constrained('anggaran')->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('satuan');
             $table->string('keterangan')->nullable();
             $table->string('lokasi')->nullable();
-            $table->foreignId('anggaran_id')->nullable()->constrained('anggaran');
+            $table->foreignId('anggaran_id')->nullable()->constrained('anggaran')->onDelete('set null');
             $table->string('qr_code')->nullable();
             $table->string('tahun')->nullable();
             $table->timestamps();

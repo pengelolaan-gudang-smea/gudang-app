@@ -11,10 +11,8 @@
                             <th scope="col">#</th>
                             <th scope="col">Name</th>
                             <th scope="col">Username</th>
-                            <th scope="col">Tanggal Login</th>
-                            <th scope="col">Jam Login</th>
-                            <th scope="col">Tanggal Logout</th>
-                            <th scope="col">Jam Logout</th>
+                            <th scope="col">Login</th>
+                            <th scope="col">Logout</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -23,10 +21,12 @@
                             <th scope="row">{{ $loop->iteration }}</th>
                             <td>{{ $item->user->name }}</td>
                             <td>{{ $item->user->username }}</td>
-                            <td>{{ \Carbon\Carbon::parse($item->login)->format('d-m-y') }}</td>
-                            <td>{{ \Carbon\Carbon::parse($item->login)->format('H:i') }}</td>
-                            <td>{{ $item->logout ? \Carbon\Carbon::parse($item->logout)->format('d-m-y') : '-'}}</td>
-                            <td>{{ $item->logout ? \Carbon\Carbon::parse($item->logout)->format('H:i') : '-' }}</td>
+                            <td>{{ \Carbon\Carbon::parse($item->login)->format('H:i') }}, {{ \Carbon\Carbon::parse($item->login)->format('d-m-y') }}</td>
+                            @if ($item->logout)
+                            <td>{{  \Carbon\Carbon::parse($item->logout)->format('H:i') }}, {{  \Carbon\Carbon::parse($item->logout)->format('d-m-y')  }}</td>
+                            @else
+                            <td>-</td>
+                            @endif
                         </tr>
                         @endforeach
                     </tbody>

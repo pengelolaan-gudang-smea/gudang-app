@@ -15,12 +15,12 @@ class BarangController extends Controller
      */
     public function index()
     {
-        $grand_total = Barang::where('user_id', Auth::user()->id)->sum('sub_total');
+        $grand_total = Barang::where('user_id', Auth::user()->id)->where('status','<>','DiTolak')->sum('sub_total');
         $limit = Limit::where('jurusan_id',Auth::user()->jurusan->id)->sum('limit');
         $sisa = $limit - $grand_total;
         return view('dashboard.kkk.barang', [
             'title' => 'Pengajuan Barang',
-            'barang' => Barang::where('user_id',Auth::user()->id)->Search(request('search'))->get(),
+            'barang' => Barang::where('user_id',Auth::user()->id)->get(),
             'grand_total' => $grand_total,
             'limit'=>$limit,
             'sisa'=>$sisa
@@ -68,6 +68,16 @@ class BarangController extends Controller
         }
         $validate['slug'] = $slug;
         $validate['sub_total'] = $subtotal;
+
+        activity()->performedOn(new Barang())->event('created')
+        ->withProperties(['attributes' => [
+            'name' => $validate['name'],
+            'harga' => $validate['harga'],
+            'satuan' => $validate['satuan'],
+            'spek' => $validate['spek'],
+        ]])
+        ->log('Mengajukan barang');
+
         Barang::create($validate);
         return redirect()->route('pengajuan-barang.index')->with('success', 'Berhasil mengajukan barang');
     }
@@ -124,6 +134,14 @@ class BarangController extends Controller
         }
         $validate['sub_total'] = $subtotal;
 
+        activity()->performedOn(new Barang())->event('edited')
+        ->withProperties(['old' => [
+            'name' => $barang->name,
+            'harga' => $barang->harga,
+            'satuan' => $barang->satuan,
+            'spek' => $barang->spek,
+        ]])
+        ->log('Mengubah data barang');
 
         $barang->update($validate);
 
@@ -135,6 +153,14 @@ class BarangController extends Controller
      */
     public function destroy(Barang $barang)
     {
+        activity()->performedOn(new Barang())->event('deleted')
+        ->withProperties(['old' => [
+            'name' => $barang->name,
+            'harga' => $barang->harga,
+            'satuan' => $barang->satuan,
+            'spek' => $barang->spek,
+        ]])
+        ->log('Menghapus  barang');
 
         $barang->delete();
         return redirect()->back()->with('success','Behasil menghapus data barang');

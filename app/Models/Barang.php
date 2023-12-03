@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Barang extends Model
 {
@@ -11,12 +13,15 @@ class Barang extends Model
     protected $table = 'barang';
     protected $guarded = ['id'];
 
-    public function scopeSearch($query, $search)
-    {
-        $query->when($search ?? false, function ($query, $search) {
-            return $query->where('name', 'like', '%' . $search . '%');
-        });
-    }
+    // public function getActivitylogOptions() :LogOptions
+    // {
+    //  return LogOptions::defaults()
+    //  ->setDescriptionForEvent(fn(string $eventName)=>"{$eventName} Barang")
+    //  ->logOnlyDirty();
+    //  // ->useLogName(Auth::user()->username);
+    // }
+
+   
 
     public function getRouteKeyName()
     {

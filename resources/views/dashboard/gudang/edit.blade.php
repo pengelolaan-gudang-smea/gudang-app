@@ -72,7 +72,7 @@
                             <div class="row mb-3">
                                 <div class="col-sm-12 d-flex justify-content-end gap-2">
                                     <a href="{{ route('barang-gudang.index') }}" class="btn btn-secondary">Kembali</a>
-                                    <button type="submit" class="btn btn-primary">Ajukan Barang</button>
+                                    <button type="submit" class="btn btn-primary">Edit Barang</button>
                                 </div>
                             </div>
                         </form>

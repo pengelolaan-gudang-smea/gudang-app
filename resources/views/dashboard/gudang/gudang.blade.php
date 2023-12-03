@@ -34,7 +34,7 @@
                                     <td>
                                         <div class="d-flex gap-3">
                                             @if ($item->satuan != 0)
-                                                @if ($item->keterangan)
+                                                @if ($item->keterangan || !$item->barang_id )
                                                     <div>
                                                         <button type="button"
                                                             class="bi bi bi-box-arrow-right fw-bold btn btn-sm bg-danger link-light"
@@ -146,7 +146,7 @@
                             <label for="pengambilan" class="col-sm-2 col-form-label">Pengambilan Barang<span
                                     class="text-danger">*</span></label>
                             <div class="col-sm-10">
-                                <input type="number" id="pengambilan" placeholder="Masukan jumlah barang "
+                                <input type="number" id="pengambilan" placeholder="Masukan jumlah barang yang diambil"
                                     class="form-control @error('pengambilan') is-invalid @enderror" name="pengambilan"
                                     required>
                                 @error('pengambilan')

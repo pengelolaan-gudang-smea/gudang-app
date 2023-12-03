@@ -63,7 +63,6 @@ class AdminAngaranController extends Controller
     {
         if ($request->has('status')) {
             $status = $request->input('status');
-            $acc->update(['status' => $status]);
             if ($status == 'Disetujui') {
                 BarangGudang::create([
                     'name'=>$acc->name,
@@ -73,10 +72,33 @@ class AdminAngaranController extends Controller
                    'barang_id'=>$acc->id,
                    'tahun' => Carbon::now()->year,
                 ]);
+                activity()->performedOn(new Barang())->event('accepted')
+                ->withProperties(['attributes' => [
+                    'name' => $acc->name,
+                    'harga' => $acc->harga,
+                    'satuan' => $acc->satuan,
+                    'spek' => $acc->spek,
+                ]])
+                ->log('Menyetujui barang yang diajukan oleh '.$acc->user->username);
+
             }elseif($status == 'Ditolak'){
+                activity()->performedOn(new Barang())->event('rejected')
+                ->withProperties(['attributes' => [
+                    'name' => $acc->name,
+                    'harga' => $acc->harga,
+                    'satuan' => $acc->satuan,
+                    'spek' => $acc->spek,
+                ]])
+                ->log('Menolak barang yang diajukan oleh '.$acc->user->username);
+
                 $barang = BarangGudang::where('barang_id',$acc->id)->first();
-                $barang->delete();
+                if($barang){
+                    $barang->delete();
+                }
             }
+
+            $acc->update(['status' => $status]);
+
             return back()->with('success', 'Barang ' . $status);
         }
     }

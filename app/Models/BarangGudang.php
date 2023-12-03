@@ -22,6 +22,8 @@ class BarangGudang extends Model
             $model->uuid = (string) Uuid::generate(4);
         });
     }
+
+
     protected $with = ['barang'];
 
     public function barang()

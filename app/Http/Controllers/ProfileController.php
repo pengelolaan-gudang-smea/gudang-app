@@ -18,9 +18,19 @@ class ProfileController extends Controller
     public function update(Request $request, User $user)
     {
         $validate = $request->validate([
-            'username' => 'required',
-            'email' => 'required',
+            'name'=>['required'],
+            'username' => ['required','unique:users,username,'. $user->id],
+            'email' => ['required','email','unique:users,email,'. $user->id],
         ]);
+        activity()->performedOn(new User())->event('edited')
+        ->withProperties([
+            'old' => [
+                'name' => $user->name,
+                'username' => $user->username,
+                'email' => $user->email,
+            ]
+        ])
+        ->log('Mengubah profile ');
         $user->update($validate);
         return redirect()->route('dashboard.profile',['user'=>Auth::user()->username])->with('success', 'Berhasil mengubah profile');
     }

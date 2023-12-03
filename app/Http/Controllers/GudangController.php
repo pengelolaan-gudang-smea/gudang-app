@@ -54,6 +54,15 @@ class GudangController extends Controller
         }
         $validatedData['slug'] = $slug;
 
+        activity()->performedOn(new BarangGudang())->event('created')
+            ->withProperties(['attributes' => [
+                'name' => $validatedData['name'],
+                'satuan' => $validatedData['satuan'],
+                'spek' => $validatedData['spek'],
+                'tahun' => $validatedData['tahun'],
+            ]])
+            ->log('Menambahkan barang gudang');
+
         BarangGudang::create($validatedData);
 
         return redirect()->route('barang-gudang.index')->with('success', 'Berhasil menambah barang');
@@ -92,11 +101,18 @@ class GudangController extends Controller
         if ($request->has('keterangan')) {
             $keterangan = $request->input('keterangan');
             $gudang->update(['keterangan' => $keterangan]);
+            activity()->performedOn(new BarangGudang())->event('edited')
+                ->withProperties(['attributes' => [
+                    'keterangan' => $gudang->keterangan,
+                ]])
+                ->log('Barang diterima oleh ' . $gudang->keterangan);
             return redirect()->route('barang-gudang.index')->with('success', 'Berhasil  Menerima Barang');
         } else if ($request->has('pengambilan')) {
             $pengambilan = $request->input('pengambilan');
             $gudang->satuan -= $pengambilan;
             $gudang->save();
+            activity()->performedOn(new BarangGudang())->event('edited')
+                ->log('Barang diambil oleh petugas lapangan  ');
             return redirect()->route('barang-gudang.index')->with('success', 'Berhasil Mengambil Barang');
         } else {
             $validate = $request->validate([
@@ -120,6 +136,14 @@ class GudangController extends Controller
             $gudang->satuan = $validate['satuan'];
             $gudang->spek = $validate['spek'];
             $gudang->tahun = $validate['tahun'];
+            activity()->performedOn(new BarangGudang())->event('edited')
+                ->withProperties(['old' => [
+                    'name' => $gudang->name,
+                    'satuan' => $gudang->satuan,
+                    'spek' => $gudang->spek,
+                    'tahun' => $gudang->tahun,
+                ]])
+                ->log('Mengubah data barang gudang');
             $gudang->save();
             return redirect()->route('barang-gudang.index')->with('success', 'Berhasil Update Data Barang');
         }
@@ -128,9 +152,19 @@ class GudangController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(BarangGudang $gudang)
     {
-        //
+        activity()->performedOn(new BarangGudang())->event('deleted')
+        ->withProperties(['old' => [
+            'name' => $gudang->name,
+            'satuan' => $gudang->satuan,
+            'spek' => $gudang->spek,
+            'tahun' => $gudang->tahun,
+        ]])
+        ->log('Mengubah data barang gudang');
+
+        $gudang->delete();
+        return back()->with('success','Berhasil menghapus barang gudang');
     }
 
     public function Qr(Request $request, $slug)
@@ -144,7 +178,7 @@ class GudangController extends Controller
         ];
 
         $anggaran  = Anggaran::where('id', $request->anggaran)->first();
-        $data['anggaran'] = $anggaran->jenis."-".$anggaran->tahun;        // Generate QR code
+        $data['anggaran'] = $anggaran->jenis . "-" . $anggaran->tahun;        // Generate QR code
         $dataToEncode = json_encode($data);
 
         $qrCode = QrCode::format('png')->size(300)->generate($dataToEncode);
@@ -162,6 +196,9 @@ class GudangController extends Controller
             'lokasi' => $data['lokasi'], 'anggaran_id' => $request->anggaran,
             'qr_code' => $filename
         ]);
+
+        activity()->performedOn(new BarangGudang())->event('created')
+            ->log('Menambahkan kode QR ');
 
         return redirect()->route('barang-gudang.index', ['qr_created' => true, 'qr_code' => $filename])->with('success', 'Berhasil membuat kode QR');
     }

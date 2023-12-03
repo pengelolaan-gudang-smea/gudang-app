@@ -19,7 +19,7 @@ class UserManagementController extends Controller
         return view('dashboard.waka.users.user', [
             'title' => 'User Management',
             'user' =>  User::whereDoesntHave('roles', function ($query) {
-                $query->where('name', 'WAKA'); // Ganti 'WAKA' dengan nama peran yang ingin Anda kecualikan
+                $query->where('name', 'WAKA');
             })->get()
         ]);
     }
@@ -33,7 +33,7 @@ class UserManagementController extends Controller
             'title' => 'Tambah User',
             'hak' => Permission::all(),
             'roles' => Role::all(),
-            'jurusan'=>Jurusan::all()
+            'jurusan' => Jurusan::all()
         ]);
     }
 
@@ -47,11 +47,20 @@ class UserManagementController extends Controller
             'username' => ['required', 'unique:users,username'],
             'email' => ['required', 'unique:users,email', 'email'],
             'password' => ['required', 'min:8'],
-            'jurusan_id'=>'nullable',
+            'jurusan_id' => 'nullable',
         ]);
         // dd($validate);
         $role = $request->input('role');
         $akses = $request->input('akses');
+
+
+        activity()->performedOn(new User())->event('created')
+            ->withProperties(['attributes' => [
+                'name' => $validate['name'],
+                'username' => $validate['username'],
+                'email' => $validate['email'],
+            ]])
+            ->log('Menambahkan user');
 
         $user = User::create($validate);
         $user->assignRole($role);
@@ -90,6 +99,20 @@ class UserManagementController extends Controller
             $user->revokePermissionTo($permission);
         }
 
+        $hakAkses = [];
+        $aksesUser = $user->permissions()->get();
+
+        foreach ($aksesUser as $akses) {
+            $hakAkses[] = $akses->name;
+        }
+        // dd($hakAkses);
+        activity()->performedOn(new User())->event('edited')
+            ->withProperties([
+                'old' => [
+                    "hak akses" => $hakAkses
+                ]
+            ])
+            ->log('Mengubah hak akses user');
         // Berikan hak akses yang dicentang
         $user->givePermissionTo($permissionsToAssign);
 
@@ -110,7 +133,7 @@ class UserManagementController extends Controller
             'user' => $user,
             'roles' => Role::all(),
             'hak' => Permission::all(),
-            'jurusan'=>Jurusan::all(),
+            'jurusan' => Jurusan::all(),
             'akses' => $akses
         ]);
     }
@@ -140,9 +163,19 @@ class UserManagementController extends Controller
             $user->removeRole($role_old);
             $user->assignRole($role);
         }
-        if($request->jurusan_id){
+        if ($request->jurusan_id) {
             $user->jurusan_id = $request->input('jurusan_id');
         }
+
+        activity()->performedOn(new User())->event('edited')
+            ->withProperties([
+                'old' => [
+                    'name' => $user->name,
+                    'username' => $user->username,
+                    'email' => $user->email,
+                ]
+            ])
+            ->log('Mengubah data user');
 
         $user->update($validate);
 
@@ -160,6 +193,15 @@ class UserManagementController extends Controller
         $user->permissions()->detach();
 
         $user->removeRole($role);
+        activity()->performedOn(new User())->event('deleted')
+            ->withProperties([
+                'old' => [
+                    'name' => $user->name,
+                    'username' => $user->username,
+                    'email' => $user->email,
+                ]
+            ])
+            ->log('Menghapus user');
 
         $user->delete();
 
