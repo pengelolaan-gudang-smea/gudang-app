@@ -30,7 +30,6 @@
                                     <td>{{ $item->tahun }}</td>
                                     <td>
                                         <div class="d-flex gap-3">
-
                                             <div>
                                                 <a href="{{ route('anggaran.edit', ['anggaran' => $item->id]) }}"
                                                     class="btn btn-sm bg-warning link-light">

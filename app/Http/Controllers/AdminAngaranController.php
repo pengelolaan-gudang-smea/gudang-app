@@ -40,9 +40,16 @@ class AdminAngaranController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $slug)
     {
-        //
+        $barang = Barang::where('slug', $slug)->first();
+        $barang->created_at_formatted = Carbon::parse($barang->created_at)->format('j F Y');
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Berhasil',
+            'barang' => $barang
+        ]);
     }
 
     /**
@@ -108,7 +115,7 @@ class AdminAngaranController extends Controller
      */
     public function destroy(Barang $acc)
     {
-       
+
     }
 
     public function filterJurusan(Request $request)

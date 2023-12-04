@@ -88,3 +88,5 @@ Route::get('/test', function () {
 });
 Route::get('/dashboard/waka/check-anggaran/{id}', [AnggaranController::class, 'checkAnggaran']);
 
+Route::get('/dashboard/graphic', [DashboardController::class, 'chartBarang'])->name('chart-barang');
+

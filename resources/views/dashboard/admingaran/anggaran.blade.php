@@ -67,6 +67,11 @@
                             </td>
                             <td>
                                 <div class="d-flex gap-3">
+                                    <div>
+                                        <button type="button" data-barang="{{ $item->slug }}" class="btn btn-sm bg-primary link-light detailBarangBtn" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-title="Detail">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
                                     @if($item->status != 'Disetujui')
                                     <div>
                                         <form action="{{ route('barang-acc.update', ['acc' => $item->slug]) }}" method="POST">
@@ -94,6 +99,22 @@
                         @endforeach
                     </tbody>
                 </table>
+                <div class="modal fade" id="detailBarangModal" tabindex="-1" aria-labelledby="detailBarangModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="detailBarangModalLabel">Modal title</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                ...
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <!-- End Default Table Example -->
         </div>
@@ -133,6 +154,66 @@
                                 updateTabel(jurusan, selectedTahun);
                             });
                         }
+                    }
+                });
+            });
+
+            $('.detailBarangBtn').click(function() {
+                const barangId = $(this).data('barang');
+                $.ajax({
+                    type: 'GET',
+                    url: '/dashboard/barang-acc/' + barangId,
+                    success: function(response) {
+                        if (response.status == 'success') {
+                            $('#detailBarangModalLabel').text(`Detail Barang ${response.barang.name}`);
+                            $('.modal-body').empty();
+                            // Menggunakan formatRupiah untuk harga dan sub_total
+                            const formattedHarga = formatRupiah(response.barang.harga);
+                            const formattedSubTotal = formatRupiah(response.barang.sub_total);
+                            const statusBadgeClass = getStatusBadgeClass(response.barang.status);
+
+                            const badgeElement = $(`<span class="badge ${statusBadgeClass}">${response.barang.status}</span>`);
+
+                            const listGroup = $(`<ul class="list-group">
+                                                    <li class="list-group-item"><small>Nama Barang :</small><br> ${response.barang.name}</li>
+                                                    <li class="list-group-item"><small>Waktu Pengajuan :</small><br> ${response.barang.created_at_formatted}</li>
+                                                    <li class="list-group-item"><small>Spek Teknis :</small><br> ${response.barang.spek}</li>
+                                                    <li class="list-group-item"><small>Harga Satuan :</small><br>Rp ${response.barang.harga}</li>
+                                                    <li class="list-group-item"><small>Kuantitas (Qty) :</small><br> ${response.barang.satuan}</li>
+                                                    <li class="list-group-item"><small>Status :</small><br></li>
+                                                    <li class="list-group-item"><small>Sub Total :</small><br>Rp ${response.barang.sub_total}</li>
+                                                </ul>`);
+
+                            listGroup.find('li:contains("Status :")').append(badgeElement);
+                            listGroup.find('li:contains("Harga Satuan :")').html(`<small>Harga Satuan :</small><br>${formattedHarga}`);
+                            listGroup.find('li:contains("Sub Total :")').html(`<small>Sub Total :</small><br>${formattedSubTotal}`);
+
+                            $('.modal-body').append(listGroup);
+
+                            $('#detailBarangModal').modal('show');
+                        } else {
+                            // Handle other cases
+                        }
+
+                        function formatRupiah(angka) {
+                            return new Intl.NumberFormat('id-ID', {
+                                style: 'currency'
+                                , currency: 'IDR'
+                            }).format(angka);
+                        }
+
+                        function getStatusBadgeClass(status) {
+                            if (status === 'Belum disetujui') {
+                                return 'bg-warning text-dark';
+                            } else if (status === 'Disetujui') {
+                                return 'bg-success';
+                            } else if (status === 'Ditolak') {
+                                return 'bg-danger';
+                            }
+                        }
+                    },
+                    error: function(e) {
+                        console.error(e);
                     }
                 });
             });

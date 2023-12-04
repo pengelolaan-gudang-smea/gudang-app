@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Barang;
+use Carbon\Carbon;
 use App\Models\Limit;
+use App\Models\Barang;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -69,7 +70,9 @@ class BarangController extends Controller
         $validate['slug'] = $slug;
         $validate['sub_total'] = $subtotal;
 
-        activity()->performedOn(new Barang())->event('created')
+        activity()
+        ->causedBy(Auth::user())
+        ->performedOn(new Barang())->event('created')
         ->withProperties(['attributes' => [
             'name' => $validate['name'],
             'harga' => $validate['harga'],
@@ -88,6 +91,7 @@ class BarangController extends Controller
     public function show(string $slug)
     {
         $barang = Barang::where('slug', $slug)->first();
+        $barang->created_at_formatted = Carbon::parse($barang->created_at)->format('j F Y');
 
         return response()->json([
             'status' => 'success',
@@ -160,7 +164,7 @@ class BarangController extends Controller
             'satuan' => $barang->satuan,
             'spek' => $barang->spek,
         ]])
-        ->log('Menghapus  barang');
+        ->log('Menghapus barang');
 
         $barang->delete();
         return redirect()->back()->with('success','Behasil menghapus data barang');

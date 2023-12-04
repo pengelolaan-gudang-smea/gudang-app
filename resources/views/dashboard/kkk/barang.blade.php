@@ -48,17 +48,17 @@
                             <td>
                                 <div class="d-flex gap-3">
                                     <div>
-                                        <button type="button" data-barang="{{ $item->slug }}" class="btn btn-sm bg-primary link-light detailBarangBtn">
+                                        <button type="button" data-barang="{{ $item->slug }}" class="btn btn-sm bg-primary link-light detailBarangBtn" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-title="Detail">
                                             <i class="bi bi-eye"></i>
                                         </button>
                                     </div>
                                     <div>
-                                        <a href="{{ route('pengajuan-barang.edit', ['barang' => $item->slug]) }}" class="btn btn-sm bg-warning link-light">
+                                        <a href="{{ route('pengajuan-barang.edit', ['barang' => $item->slug]) }}" class="btn btn-sm bg-warning link-light" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-title="Edit">
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
                                     </div>
                                     <div>
-                                        <button type="button" class="btn btn-sm btn-danger link-light deleteBarangBtn" data-barang="{{ $item->name }}">
+                                        <button type="button" class="btn btn-sm btn-danger link-light deleteBarangBtn" data-barang="{{ $item->name }}" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-title="Hapus">
                                             <i class="bi bi-trash3"></i>
                                         </button>
                                         <form action="{{ route('pengajuan-barang.destroy', ['barang' => $item->slug]) }}"
@@ -100,7 +100,7 @@
     </div>
     <script>
         let table = new DataTable('#barangsTable');
-
+        $('[data-bs-toggle="popover"]').popover();
         $(document).ready(function() {
             $('.detailBarangBtn').click(function() {
                 const barangId = $(this).data('barang');
@@ -120,6 +120,7 @@
 
                             const listGroup = $(`<ul class="list-group">
                                                     <li class="list-group-item"><small>Nama Barang :</small><br> ${response.barang.name}</li>
+                                                    <li class="list-group-item"><small>Waktu Pengajuan :</small><br> ${response.barang.created_at_formatted}</li>
                                                     <li class="list-group-item"><small>Spek Teknis :</small><br> ${response.barang.spek}</li>
                                                     <li class="list-group-item"><small>Harga Satuan :</small><br>Rp ${response.barang.harga}</li>
                                                     <li class="list-group-item"><small>Kuantitas (Qty) :</small><br> ${response.barang.satuan}</li>
@@ -133,7 +134,6 @@
 
                             $('.modal-body').append(listGroup);
 
-                            // Tampilkan modal
                             $('#detailBarangModal').modal('show');
                         } else {
                             // Handle other cases
@@ -147,7 +147,6 @@
                         }
 
                         function getStatusBadgeClass(status) {
-                            // Tentukan kelas badge berdasarkan status
                             if (status === 'Belum disetujui') {
                                 return 'bg-warning text-dark';
                             } else if (status === 'Disetujui') {

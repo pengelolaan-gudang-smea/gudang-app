@@ -21,9 +21,9 @@
                             <th scope="row">{{ $loop->iteration }}</th>
                             <td>{{ $item->user->name }}</td>
                             <td>{{ $item->user->username }}</td>
-                            <td>{{ \Carbon\Carbon::parse($item->login)->format('H:i') }}, {{ \Carbon\Carbon::parse($item->login)->format('d-m-y') }}</td>
+                            <td>{{ \Carbon\Carbon::parse($item->login)->format('H:i') }} WIB, {{ \Carbon\Carbon::parse($item->login)->format('j M Y') }}</td>
                             @if ($item->logout)
-                            <td>{{  \Carbon\Carbon::parse($item->logout)->format('H:i') }}, {{  \Carbon\Carbon::parse($item->logout)->format('d-m-y')  }}</td>
+                            <td>{{  \Carbon\Carbon::parse($item->logout)->format('H:i') }} WIB, {{  \Carbon\Carbon::parse($item->logout)->format('j M Y')  }}</td>
                             @else
                             <td>-</td>
                             @endif

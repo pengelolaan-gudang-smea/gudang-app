@@ -9,7 +9,7 @@
                     <thead>
                         <tr>
                             <th scope="col">#</th>
-                            <th scope="col">Username</th>
+                            <th scope="col">Nama</th>
                             <th scope="col">Aktivitas</th>
                             <th scope="col">Waktu</th>
                         </tr>
@@ -20,8 +20,8 @@
                             <th scope="row">{{ $loop->iteration }}</th>
                             <td>{{ $item->log_name }}</td>
                             <td>{{ $item->description }}</td>
-                            <td>{{ $item->created_at->format('d-m-Y')  }}</td>
-                           
+                            <td>{{ $item->created_at->format('d F y, H:i') }} WIB</td>
+
                         </tr>
                         @endforeach
                     </tbody>
