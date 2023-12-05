@@ -62,6 +62,7 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
         Route::controller(RekapController::class)->group(function(){
             Route::get('/rekap-login','rekapLogin')->name('rekap.login');
             Route::get('/rekap-aktivitas','rekapActivity')->name('rekap.activity');
+            Route::get('/filter', 'filterDate')->name('filter.date');
         });
         });
 

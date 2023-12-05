@@ -16,6 +16,18 @@ class RekapController extends Controller
         ]);
     }
 
+    public function filterDate(Request $req)
+    {
+        $title = 'Rekap Login';
+        $start_date = $req->start_date;
+        $end_date = $req->end_date;
+
+        $login = RekapLogin::whereDate('created_at', '>=', $start_date)
+                            ->whereDate('created_at', '<=', $end_date)
+                            ->get();
+        return view('dashboard.waka.rekap.rekap_login', compact('login', 'title'));
+    }
+
     public function rekapActivity(){
        $activity = Activity::latest()->get();
         return view('dashboard.waka.rekap.rekap_activity',[
