@@ -114,38 +114,6 @@ class GudangController extends Controller
             activity()->performedOn(new BarangGudang())->event('edited')
                 ->log('Barang diambil oleh petugas lapangan  ');
             return redirect()->route('barang-gudang.index')->with('success', 'Berhasil Mengambil Barang');
-        } else {
-            $validate = $request->validate([
-                'name' => ['required', 'string', 'max:255'],
-                'satuan' => ['required', 'integer', 'min:0'],
-                'spek' => ['required', 'string'],
-                'tahun' => ['required'],
-            ]);
-
-            if ($validate['name'] !== $gudang->name) {
-                $slug = Str::slug($validate['name']);
-                $counter = 2;
-                while (BarangGudang::where('slug', $slug)->exists()) {
-                    $slug = Str::slug($validate['name']) . '-' . $counter;
-                    $counter++;
-                }
-                $gudang->slug = $slug;
-            }
-
-            $gudang->name = $validate['name'];
-            $gudang->satuan = $validate['satuan'];
-            $gudang->spek = $validate['spek'];
-            $gudang->tahun = $validate['tahun'];
-            activity()->performedOn(new BarangGudang())->event('edited')
-                ->withProperties(['old' => [
-                    'name' => $gudang->name,
-                    'satuan' => $gudang->satuan,
-                    'spek' => $gudang->spek,
-                    'tahun' => $gudang->tahun,
-                ]])
-                ->log('Mengubah data barang gudang');
-            $gudang->save();
-            return redirect()->route('barang-gudang.index')->with('success', 'Berhasil Update Data Barang');
         }
     }
 

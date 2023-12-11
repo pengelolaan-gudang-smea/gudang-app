@@ -32,7 +32,7 @@ class RekapController extends Controller
        $activity = Activity::latest()->get();
         return view('dashboard.waka.rekap.rekap_activity',[
             'title'=>'Rekap Aktivitas',
-            'activity'=>Activity::latest()->get()
+            'activity'=>$activity
         ]);
     }
 }
