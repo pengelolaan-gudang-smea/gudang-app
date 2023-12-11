@@ -66,12 +66,7 @@
                                                     <i class="bi bi-eye"></i>
                                                 </button>
                                             </div>
-                                            <div>
-                                                <a href="{{ route('barang-gudang.edit', ['gudang' => $item->slug]) }}"
-                                                    class="btn btn-sm bg-warning link-light" data-bs-trigger="click" data-bs-title="Edit">
-                                                    <i class="bi bi-pencil-square"></i>
-                                                </a>
-                                            </div>
+                                           
                                             <div>
                                                 <button type="button"
                                                     class="btn btn-sm btn-danger link-light deleteBarangBtn" data-bs-trigger="click" data-bs-title="Delete"

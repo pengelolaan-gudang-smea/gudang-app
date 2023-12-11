@@ -76,7 +76,7 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
     Route::post('/filter-barang', [AdminAngaranController::class, 'filterBarang'])->name('filter-barang');
 
     // * Admin Gudang
-    Route::resource('/barang-gudang',GudangController::class)->parameters(['barang-gudang'=>'gudang']);
+    Route::resource('/barang-gudang',GudangController::class)->parameters(['barang-gudang'=>'gudang'])->except('edit');
     Route::post('/barang-gudang/{slug}/qrcode',[GudangController::class,'Qr'])->name('qr.store');
     Route::post('barang-gudang/qr-generate/{slug}',[GudangController::class,'generateQr']);
     Route::get('/barang-gudang/print/{slug}', [GudangController::class, 'printQr'])->name('print-qr');

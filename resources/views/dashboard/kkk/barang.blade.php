@@ -100,7 +100,7 @@
     </div>
     <script>
         let table = new DataTable('#barangsTable');
-        $('[data-bs-toggle="popover"]').popover();
+        //$('[data-bs-toggle="popover"]').popover();
         $(document).ready(function() {
             $('.detailBarangBtn').click(function() {
                 const barangId = $(this).data('barang');

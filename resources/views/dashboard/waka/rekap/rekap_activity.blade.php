@@ -18,7 +18,7 @@
                         @foreach ($activity as $item)
                         <tr>
                             <th scope="row">{{ $loop->iteration }}</th>
-                            <td>{{ $item->log_name }}</td>
+                            <td>{{ $item->causer->name}}</td>
                             <td>{{ $item->description }}</td>
                             <td>{{ $item->created_at->format('d F y, H:i') }} WIB</td>
 
