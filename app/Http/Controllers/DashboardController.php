@@ -65,7 +65,7 @@ class DashboardController extends Controller
             case 'Admin anggaran':
                 $data = $this->getDataForAdminAnggaran($startDate, $endDate);
                 break;
-            case 'Admin gudang ':
+            case 'Admin gudang':
                 $data = $this->getDataForAdminGudang($startDate, $endDate);
 
                 break;

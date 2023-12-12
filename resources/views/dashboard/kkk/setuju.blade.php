@@ -17,6 +17,7 @@
                             <th scope="col">Nama Barang</th>
                             <th scope="col">Harga (Satuan)</th>
                             <th scope="col">Satuan (Qty)</th>
+                            <th scope="col">Waktu Pengajuan</th>
                             <th scope="col">Status</th>
                         </tr>
                     </thead>
@@ -27,6 +28,7 @@
                             <td>{{ $item->name }}</td>
                             <td>{{ 'Rp ' . number_format($item->harga, 0, ',', '.') }}</td>
                             <td>{{ $item->satuan }}</td>
+                            <td>{{ $item->created_at->format('d M Y') }}</td>
                             <td>
                                 @if($item->status == 'Disetujui')
                                 <span class="badge bg-success">{{ $item->status }}</span>

@@ -58,11 +58,11 @@
 
                             <td>
                                 @if($item->status == 'Disetujui')
-                                <span class="badge text-success">{{ $item->status }}</span>
+                                <span class="badge bg-success">{{ $item->status }}</span>
                                 @elseif($item->status == 'Ditolak')
-                                <span class="badge text-danger">{{ $item->status }}</span>
+                                <span class="badge bg-danger">{{ $item->status }}</span>
                                 @elseif($item->status == 'Belum disetujui')
-                                <span class="badge text-warning">{{ $item->status }}</span>
+                                <span class="badge bg-warning text-white">{{ $item->status }}</span>
                                 @endif
                             </td>
                             <td>

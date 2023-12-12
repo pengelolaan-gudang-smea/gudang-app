@@ -146,7 +146,7 @@ class GudangController extends Controller
         ];
 
         $anggaran  = Anggaran::where('id', $request->anggaran)->first();
-        $data['anggaran'] = $anggaran->jenis . "-" . $anggaran->tahun;        // Generate QR code
+        $data['anggaran'] = $anggaran->jenis . "-" . $anggaran->tahun;
         $dataToEncode = json_encode($data);
 
         $qrCode = QrCode::format('png')->size(300)->generate($dataToEncode);
@@ -168,7 +168,7 @@ class GudangController extends Controller
         activity()->performedOn(new BarangGudang())->event('created')
             ->log('Menambahkan kode QR ');
 
-        return redirect()->route('barang-gudang.index', ['qr_created' => true, 'qr_code' => $filename])->with('success', 'Berhasil membuat kode QR');
+        return redirect()->route('barang-gudang.index', ['qr_created' => true, 'qr_code' => $filename]);
     }
 
     public function printQr($slug)

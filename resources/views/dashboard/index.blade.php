@@ -2,7 +2,7 @@
 @section('content')
 <div class="col-lg-12">
     @can('Edit akun')
-        
+
     <div class="row">
         {{-- Users Card --}}
         <div class="col-xxl-4 col-md-6">
@@ -179,7 +179,7 @@
             </div>
         </div>
 
-       
+
 
         {{-- Graphic Chart --}}
         <div class="col-12">
@@ -237,7 +237,7 @@
             </div>
         </div>
 
-       
+
 
         {{-- Graphic Chart --}}
         <div class="col-12">
@@ -277,10 +277,6 @@
                     name: 'Total ',
                     data: data.map(item => item.total_barang)
                 }],
-                title: {
-                    text: 'Total Barang Diajukan / Minggu',
-                    align: 'center'
-                },
                 stroke: {
                     curve: 'smooth'
                 },

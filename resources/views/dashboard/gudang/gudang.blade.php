@@ -28,9 +28,11 @@
                                     <th scope="row">{{ $loop->iteration }}</th>
                                     <td>{{ $item->name }}</td>
                                     <td class="satuan">{{ $item->satuan }}</td>
-                                    <td class="keterangan">{!! $item->keterangan ? '<i class="bi bi-check text-success fs-2"></i>' : '-' !!}</td>
-                                    <td class="keterangan"><img src="{{ asset('storage/' . $item->qr_code) }}"
-                                            alt="" width="50"></td>
+                                    <td class="keterangan">{!! $item->keterangan ? '<i class="bi bi-check text-success fs-2 m-0"></i>' : '-' !!}</td>
+                                    <td class="keterangan">
+                                            <img src="{{ asset('storage/' . $item->qr_code) }}"
+                                            alt="" width="50">
+                                    </td>
                                     <td>
                                         <div class="d-flex gap-3">
                                             @if ($item->satuan != 0)
@@ -42,14 +44,8 @@
                                                             data-slug={{ $item->slug }}>
                                                         </button>
                                                     </div>
-                                                    <div>
-                                                        <button type="button"
-                                                            class="bi bi bi bi-qr-code fw-bold btn btn-sm bg-success link-light qr-barang-btn"
-                                                            data-bs-toggle="modal" data-bs-target="#ModalQr" data-bs-trigger="click" data-bs-title="Generate QR Code"
-                                                            data-slug={{ $item->slug }}>
-                                                        </button>
-                                                    </div>
                                                 @else
+                                                @if($item->qr_code)
                                                     <div>
                                                         <button type="button"
                                                             class="bi bi-check fw-bold btn btn-sm bg-success link-light"
@@ -57,16 +53,24 @@
                                                             data-slug={{ $item->slug }}>
                                                         </button>
                                                     </div>
+                                                @else
+                                                <div>
+                                                    <button type="button"
+                                                        class="bi bi bi bi-qr-code fw-bold btn btn-sm bg-success link-light qr-barang-btn"
+                                                        data-bs-toggle="modal" data-bs-target="#ModalQr" data-bs-trigger="click" data-bs-title="Generate QR Code"
+                                                        data-slug={{ $item->slug }}>
+                                                    </button>
+                                                </div>
+                                                @endif
                                                 @endif
                                             @endif
-
                                             <div>
                                                 <button type="button" data-barang="{{ $item->slug }}"
                                                     class="btn btn-sm bg-primary link-light detailBarangBtn" data-bs-trigger="click" data-bs-title="Detail">
                                                     <i class="bi bi-eye"></i>
                                                 </button>
                                             </div>
-                                           
+
                                             <div>
                                                 <button type="button"
                                                     class="btn btn-sm btn-danger link-light deleteBarangBtn" data-bs-trigger="click" data-bs-title="Delete"
@@ -88,14 +92,13 @@
 
                         </tbody>
                     </table>
-
                 </div>
                 <!-- End Default Table Example -->
             </div>
         </div>
         </div>
 
-        <div class="modal fade" id="ModalKeterangan" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal fade" id="ModalKeterangan" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -207,7 +210,6 @@
                         </form>
                     </div>
                     <div class="modal-footer">
-                        {{-- <span type="button" class="btn btn-success" id="qrGenerate">Generate</span> --}}
                         <button type="button" class="btn btn-primary" id="simpanQr">Generate </button>
                     </div>
                 </div>
@@ -232,7 +234,7 @@
             </div>
         </div>
 
-        <div class="modal fade" id="ModalQrSuccess" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal fade" id="ModalQrSuccess" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -243,7 +245,7 @@
                         <img src="" alt="QR Code" id="qrCodeImage" class="img-fluid">
                     </div>
                     <div class="modal-footer">
-                        <a class="btn btn-primary" role="button" id="printQrButton"><i class="fa-solid fa-print"></i> Print</a>
+                        <a class="btn btn-primary" role="button" id="printQrButton"><i class="bi bi-printer-fill"></i> Print</a>
                     </div>
                 </div>
             </div>
@@ -264,7 +266,6 @@
                     var qrCodeUrl = "{{ asset('storage/') }}" + '/' + qrCodePath;
                     $('#qrCodeImage').attr('src', qrCodeUrl);
 
-                    // Menambahkan event listener untuk memanggil fungsi printQr saat tombol "Print" ditekan
                     $('#printQrButton').click(function(event) {
                         event.preventDefault();
                         printQr(qrCodeUrl);
@@ -274,7 +275,6 @@
                 function printQr(qrCodeUrl) {
                     var printWindow = window.open(qrCodeUrl, '_blank');
 
-                    // Menunggu gambar selesai dimuat sebelum mencetak
                     printWindow.onload = function() {
                         printWindow.print();
                     };
@@ -287,11 +287,13 @@
                         url: '/dashboard/barang-gudang/' + barangSlug,
                         success: function(response) {
                             if (response.status == 'success') {
+                                let qrCodePath = response.barang.qr_code;
                                 $('#detailBarangModalLabel').text(
                                     `Detail Barang ${response.barang.name}`);
                                 $('.showBarang').empty();
                                 const Qr = $(
-                                    `<img src="{{ asset('storage/${response.barang.qr_code}') }}" width="100">`
+                                    `<img src="{{ asset('storage/${response.barang.qr_code}') }}" width="100">
+                                    <button class="btn btn-sm bg-warning text-light" type="button" id="buttonPrintQr"><i class="bi bi-printer-fill"></i></button>`
                                 );
                                 const listGroup = $(`<ul class="list-group">
                                                     <li class="list-group-item"><small>Nama Barang :</small><br> ${response.barang.name}</li>
@@ -305,6 +307,17 @@
 
                                 // Tampilkan modal
                                 $('#detailBarangModal').modal('show');
+                                $('#buttonPrintQr').click(function() {
+                                    if (qrCodePath) {
+                                        const printWindow = window.open("{{ asset('storage/') }}" + '/' + qrCodePath, '_blank');
+
+                                        printWindow.onload = function() {
+                                            printWindow.print();
+                                        };
+                                    } else {
+                                        console.error('Path gambar QR tidak tersedia.');
+                                    }
+                                });
                             } else {
                                 // Handle other cases
                             }
