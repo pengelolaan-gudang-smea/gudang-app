@@ -14,8 +14,15 @@ class BarangController extends Controller
     /**
      * Display a listing of the resource.
      */
+    // public function __construct()
+    // {
+    //      if (!Auth::user()->jurusan_id) {
+    //         return back();
+    //     }
+    // }
     public function index()
     {
+       
         $grand_total = Barang::where('user_id', Auth::user()->id)->where('status','<>','DiTolak')->sum('sub_total');
         $limit = Limit::where('jurusan_id',Auth::user()->jurusan->id)->sum('limit');
         $sisa = $limit - $grand_total;

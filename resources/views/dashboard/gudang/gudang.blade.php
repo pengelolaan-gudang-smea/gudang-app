@@ -30,50 +30,56 @@
                                     <td class="satuan">{{ $item->satuan }}</td>
                                     <td class="keterangan">{!! $item->keterangan ? '<i class="bi bi-check text-success fs-2 m-0"></i>' : '-' !!}</td>
                                     <td class="keterangan">
-                                            <img src="{{ asset('storage/' . $item->qr_code) }}"
-                                            alt="" width="50">
+                                        <img src="{{ asset('storage/' . $item->qr_code) }}" alt="" width="50">
                                     </td>
                                     <td>
                                         <div class="d-flex gap-3">
                                             @if ($item->satuan != 0)
-                                                @if ($item->keterangan || !$item->barang_id )
+                                                @if ($item->keterangan)
                                                     <div>
                                                         <button type="button"
-                                                            class="bi bi bi-box-arrow-right fw-bold btn btn-sm bg-danger link-light"
-                                                            data-bs-toggle="modal" data-bs-trigger="click" data-bs-title="Pengambilan barang" data-bs-target="#ModalPengambilan"
-                                                            data-slug={{ $item->slug }}>
+                                                            class="bi bi-box-arrow-right fw-bold btn btn-sm bg-danger link-light"
+                                                            data-bs-toggle="modal" data-bs-trigger="click"
+                                                            data-bs-title="Pengambilan barang"
+                                                            data-bs-target="#ModalPengambilan"
+                                                            data-slug="{{ $item->slug }}" data-qty="{{ $item->satuan }}">
                                                         </button>
+
                                                     </div>
                                                 @else
-                                                @if($item->qr_code)
-                                                    <div>
-                                                        <button type="button"
-                                                            class="bi bi-check fw-bold btn btn-sm bg-success link-light"
-                                                            data-bs-toggle="modal" data-bs-target="#ModalKeterangan" data-bs-trigger="click" data-bs-title="Checklist"
-                                                            data-slug={{ $item->slug }}>
-                                                        </button>
-                                                    </div>
-                                                @else
-                                                <div>
-                                                    <button type="button"
-                                                        class="bi bi bi bi-qr-code fw-bold btn btn-sm bg-success link-light qr-barang-btn"
-                                                        data-bs-toggle="modal" data-bs-target="#ModalQr" data-bs-trigger="click" data-bs-title="Generate QR Code"
-                                                        data-slug={{ $item->slug }}>
-                                                    </button>
-                                                </div>
-                                                @endif
+                                                    @if ($item->qr_code)
+                                                        <div>
+                                                            <button type="button"
+                                                                class="bi bi-check fw-bold btn btn-sm bg-success link-light"
+                                                                data-bs-toggle="modal" data-bs-target="#ModalKeterangan"
+                                                                data-bs-trigger="click" data-bs-title="Checklist"
+                                                                data-slug={{ $item->slug }}>
+                                                            </button>
+                                                        </div>
+                                                    @else
+                                                        <div>
+                                                            <button type="button"
+                                                                class="bi bi bi bi-qr-code fw-bold btn btn-sm bg-success link-light qr-barang-btn"
+                                                                data-bs-toggle="modal" data-bs-target="#ModalQr"
+                                                                data-bs-trigger="click" data-bs-title="Generate QR Code"
+                                                                data-slug={{ $item->slug }}>
+                                                            </button>
+                                                        </div>
+                                                    @endif
                                                 @endif
                                             @endif
                                             <div>
                                                 <button type="button" data-barang="{{ $item->slug }}"
-                                                    class="btn btn-sm bg-primary link-light detailBarangBtn" data-bs-trigger="click" data-bs-title="Detail">
+                                                    class="btn btn-sm bg-primary link-light detailBarangBtn"
+                                                    data-bs-trigger="click" data-bs-title="Detail">
                                                     <i class="bi bi-eye"></i>
                                                 </button>
                                             </div>
 
                                             <div>
                                                 <button type="button"
-                                                    class="btn btn-sm btn-danger link-light deleteBarangBtn" data-bs-trigger="click" data-bs-title="Delete"
+                                                    class="btn btn-sm btn-danger link-light deleteBarangBtn"
+                                                    data-bs-trigger="click" data-bs-title="Delete"
                                                     data-barang="{{ $item->name }}">
                                                     <i class="bi bi-trash3"></i>
                                                 </button>
@@ -98,7 +104,8 @@
         </div>
         </div>
 
-        <div class="modal fade" id="ModalKeterangan" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal fade" id="ModalKeterangan" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"
+            data-bs-backdrop="static">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -146,7 +153,7 @@
                             <div class="col-sm-10">
                                 <input type="number" id="pengambilan" placeholder="Masukan jumlah barang yang diambil"
                                     class="form-control @error('pengambilan') is-invalid @enderror" name="pengambilan"
-                                    required>
+                                    required min="0">
                                 @error('pengambilan')
                                     <div class="invalid-feedback">
                                         {{ $message }}
@@ -196,7 +203,7 @@
                                         name="anggaran">
                                         <option selected disabled>Pilih anggaran</option>
                                         @foreach ($anggaran as $item)
-                                            <option value="{{ $item->id}}">
+                                            <option value="{{ $item->id }}">
                                                 {{ $item->jenis }} -
                                                 {{ $item->tahun }}</option>
                                         @endforeach
@@ -234,7 +241,8 @@
             </div>
         </div>
 
-        <div class="modal fade" id="ModalQrSuccess" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal fade" id="ModalQrSuccess" tabindex="-1" aria-labelledby="exampleModalLabel"
+            aria-hidden="true" data-bs-backdrop="static">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -245,7 +253,8 @@
                         <img src="" alt="QR Code" id="qrCodeImage" class="img-fluid">
                     </div>
                     <div class="modal-footer">
-                        <a class="btn btn-primary" role="button" id="printQrButton"><i class="bi bi-printer-fill"></i> Print</a>
+                        <a class="btn btn-primary" role="button" id="printQrButton"><i class="bi bi-printer-fill"></i>
+                            Print</a>
                     </div>
                 </div>
             </div>
@@ -309,7 +318,9 @@
                                 $('#detailBarangModal').modal('show');
                                 $('#buttonPrintQr').click(function() {
                                     if (qrCodePath) {
-                                        const printWindow = window.open("{{ asset('storage/') }}" + '/' + qrCodePath, '_blank');
+                                        const printWindow = window.open(
+                                            "{{ asset('storage/') }}" + '/' +
+                                            qrCodePath, '_blank');
 
                                         printWindow.onload = function() {
                                             printWindow.print();
@@ -362,10 +373,22 @@
                 $('#ModalPengambilan').on('show.bs.modal', function(event) {
                     const button = $(event.relatedTarget);
                     const slug = button.data('slug');
+                    const qty = button.data('qty');
                     const form = $(this).find('form#pengambilanForm');
                     const actionUrl = `/dashboard/barang-gudang/${slug}`;
+                    $('#pengambilan').attr('max', qty);
 
                     form.attr('action', actionUrl);
+
+                    $('#pengambilan').on('input', function() {
+                        const nilaiSatuan = parseFloat($(this).attr('max'));
+                        const nilaiInput = parseFloat($(this).val());
+
+                        if (nilaiInput > nilaiSatuan) {
+                            $(this).val(nilaiSatuan);
+                        }
+                    });
+
                 });
 
                 $('#submitPengambilan').on('click', function() {

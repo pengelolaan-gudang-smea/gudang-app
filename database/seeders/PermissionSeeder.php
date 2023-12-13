@@ -42,7 +42,7 @@ class PermissionSeeder extends Seeder
             'guard_name' => 'web'
         ]);
         Permission::create([
-            'name' => 'Edit barang',
+            'name' => 'Menyetujui barang',
             'guard_name' => 'web'
         ]);
         Permission::create([

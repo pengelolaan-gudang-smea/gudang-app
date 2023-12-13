@@ -67,26 +67,27 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
         });
 
     // * KKK
-    Route::resource('/pengajuan-barang', BarangController::class)->parameters(['pengajuan-barang' => 'barang'])->middleware('can:Mengajukan barang');
-    Route::get('/barang-disetujui', [BarangController::class, 'setuju'])->name('barang.setuju');
+    Route::middleware('checkJurusan','can:Mengajukan barang')->group(function(){
+        Route::resource('/pengajuan-barang', BarangController::class)->parameters(['pengajuan-barang' => 'barang']);
+        Route::get('/barang-disetujui', [BarangController::class, 'setuju'])->name('barang.setuju');
+    });
 
     // * Admin Anggaran
-    Route::resource('/barang-acc', AdminAngaranController::class)->parameters(['barang-acc' => 'acc']);
-    Route::post('/filter-jurusan', [AdminAngaranController::class, 'filterJurusan'])->name('filter-jurusan');
-    Route::post('/filter-barang', [AdminAngaranController::class, 'filterBarang'])->name('filter-barang');
+    Route::middleware('can:Menyetujui barang')->group(function(){
+        Route::resource('/barang-acc', AdminAngaranController::class)->parameters(['barang-acc' => 'acc'])->except('create','store','destroy');
+        Route::post('/filter-jurusan', [AdminAngaranController::class, 'filterJurusan'])->name('filter-jurusan');
+        Route::post('/filter-barang', [AdminAngaranController::class, 'filterBarang'])->name('filter-barang');
+    });
 
     // * Admin Gudang
-    Route::resource('/barang-gudang',GudangController::class)->parameters(['barang-gudang'=>'gudang'])->except('edit');
-    Route::post('/barang-gudang/{slug}/qrcode',[GudangController::class,'Qr'])->name('qr.store');
-    Route::post('barang-gudang/qr-generate/{slug}',[GudangController::class,'generateQr']);
-    Route::get('/barang-gudang/print/{slug}', [GudangController::class, 'printQr'])->name('print-qr');
+    Route::middleware('can:Barang gudang')->group(function(){
+        Route::resource('/barang-gudang',GudangController::class)->parameters(['barang-gudang'=>'gudang'])->except('edit');
+        Route::post('/barang-gudang/{slug}/qrcode',[GudangController::class,'Qr'])->name('qr.store');
+        Route::post('barang-gudang/qr-generate/{slug}',[GudangController::class,'generateQr']);
+        Route::get('/barang-gudang/print/{slug}', [GudangController::class, 'printQr'])->name('print-qr');
+    });
 });
 
-Route::get('/test', function () {
-    return view('dashboard.admingaran.anggaran',[
-        'title'=>'hello'
-    ]);
-});
 Route::get('/dashboard/waka/check-anggaran/{id}', [AnggaranController::class, 'checkAnggaran']);
 
 Route::get('/dashboard/graphic', [DashboardController::class, 'chartBarang'])->name('chart-barang');

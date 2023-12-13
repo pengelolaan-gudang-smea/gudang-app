@@ -59,8 +59,8 @@
                             <td>
                                 @if($item->status == 'Disetujui')
                                 <span class="badge bg-success">{{ $item->status }}</span>
-                                @elseif($item->status == 'Ditolak')
-                                <span class="badge bg-danger">{{ $item->status }}</span>
+                                @elseif($item->status != 'Disetujui' && $item->status != 'Belum disetujui' )
+                                <span class="badge bg-danger">Ditolak</span>
                                 @elseif($item->status == 'Belum disetujui')
                                 <span class="badge bg-warning text-white">{{ $item->status }}</span>
                                 @endif
@@ -82,15 +82,10 @@
                                         </form>
                                     </div>
                                     @endif
-
-                                    @if($item->status != 'Ditolak')
+                                    
+                                    @if($item->status == 'Disetujui' || $item->status == 'Belum disetujui' )
                                     <div>
-                                        <form action="{{ route('barang-acc.update', ['acc' => $item->slug]) }}" method="POST" class="">
-                                            @csrf
-                                            @method('PUT')
-                                            <input type="hidden" name="status" value="Ditolak">
-                                            <button class="bi bi-x fw-bold btn btn-sm bg-danger link-light" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-title="Tolak"></button>
-                                        </form>
+                                            <button class="bi bi-x fw-bold btn btn-sm bg-danger link-light penolakan" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-title="Tolak" data-bs-target="#ModalPenolakan" data-slug="{{ $item->slug }}"></button>
                                     </div>
                                     @endif
                                 </div>
@@ -117,6 +112,33 @@
                 </div>
             </div>
             <!-- End Default Table Example -->
+            <div class="modal fade" id="ModalPenolakan" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel">Status</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="penolakanForm" method="post">
+                                @csrf
+                                @method('PUT')
+                                <label for="penolakan" class="col-sm-2 col-form-label">Penolakan<span
+                                        class="text-danger">*</span></label>
+                                <div class="col-sm-10">
+                                    <input type="text" id="penolakan" placeholder="Masukan alasan penolakan barang"
+                                        class="form-control" name="status"
+                                        required>
+                                   
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" id="submitPenolakan">Simpan</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     </div>
@@ -207,7 +229,7 @@
                                 return 'bg-warning text-dark';
                             } else if (status === 'Disetujui') {
                                 return 'bg-success';
-                            } else if (status === 'Ditolak') {
+                            } else   {
                                 return 'bg-danger';
                             }
                         }
@@ -217,6 +239,30 @@
                     }
                 });
             });
+
+            $('.penolakan').click(function(){
+            const slug = $(this).data('slug');
+            const form = $('#ModalPenolakan').find('form#penolakanForm');
+            const actionUrl = `/dashboard/barang-acc/${slug}`;
+
+            form.attr('action', actionUrl);
+            form.find('#penolakan').val(''); // Bersihkan nilai input sebelum menampilkan modal
+            $('#ModalPenolakan').modal('show');
+        });
+
+            // $('#ModalPenolakan').on('show.bs.modal', function(event) {
+            //         const button = $(event.relatedTarget);
+            //         const slug = button.data('slug');
+            //         const form = $(this).find('form#penolakanForm');
+            //         const actionUrl = `/dashboard/barang-acc/${slug}`;
+            //         form.attr('action', actionUrl);
+            //         console.log(form);
+            //     });
+
+                $('#submitPenolakan').on('click', function() {
+                    // Lakukan sesuatu jika tombol 'Simpan' diklik
+                    $('#penolakanForm').submit(); // Submit form
+                });
 
             function updateTabel(jurusan, selectedTahun) {
                 $("#viewTable").html(``)

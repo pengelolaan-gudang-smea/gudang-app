@@ -65,7 +65,7 @@ class UserSeeder extends Seeder
         $user2->givePermissionTo('Mengajukan barang');
 
         $user3->assignRole('Admin anggaran');
-        $user3->givePermissionTo('Edit barang');
+        $user3->givePermissionTo('Menyetujui barang');
 
         $user4->assignRole('Admin gudang');
         $user4->givePermissionTo('Barang gudang');

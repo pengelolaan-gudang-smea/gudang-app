@@ -138,7 +138,7 @@
     </div>
     @endcan
 
-    @can('Edit barang')
+    @can('Menyetujui barang')
     <div class="row">
         {{-- barang Card --}}
         <div class="col-xxl-4 col-md-6">
