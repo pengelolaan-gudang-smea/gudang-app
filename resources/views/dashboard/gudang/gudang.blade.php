@@ -36,7 +36,7 @@
                                     <td>
                                         <div class="d-flex gap-3">
                                             @if ($item->satuan != 0)
-                                                @if ($item->keterangan || !$item->barang_id )
+                                                @if ($item->keterangan || !$item->barang_id)
                                                     <div>
                                                         <button type="button"
                                                             class="bi bi bi-box-arrow-right fw-bold btn btn-sm bg-danger link-light"
