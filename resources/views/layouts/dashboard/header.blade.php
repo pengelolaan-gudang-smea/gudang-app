@@ -16,6 +16,9 @@
             <li class="nav-item dropdown pe-3">
 
                 <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+                    @if (!auth()->user()->jurusan_id && auth()->user()->hasPermissionTo('Mengajukan barang'))
+                    <i class="bi bi-exclamation-circle text-danger"></i>
+                    @endif
                     <span class="d-none d-md-block dropdown-toggle ps-2">{{ Auth::user()->username }}</span>
                 </a><!-- End Profile Iamge Icon -->
 
@@ -25,6 +28,9 @@
                         <p class="mb-0">{{ Auth::user()->getRoleNames()->implode(', ') }}</p>
                         @if(Auth::user()->getRoleNames()->implode(', ') == 'KKK')
                         <p class="mb-3">{{ Auth::user()->jurusan->name }}</p>
+                        @endif
+                        @if (!auth()->user()->jurusan_id && auth()->user()->hasPermissionTo('Mengajukan barang'))
+                            <p class="badge bg-danger">Tidak ada jurusan yang di miliki</p>
                         @endif
                     </li>
                     <li>

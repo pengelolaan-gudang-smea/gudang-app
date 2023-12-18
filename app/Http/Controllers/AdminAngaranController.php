@@ -72,41 +72,44 @@ class AdminAngaranController extends Controller
             $status = $request->input('status');
             if ($status == 'Disetujui') {
                 BarangGudang::create([
-                    'name'=>$acc->name,
-                    'spek'=>$acc->spek,
-                    'slug'=>$acc->slug,
-                    'satuan'=>$acc->satuan,
-                   'barang_id'=>$acc->id,
-                   'tahun' => Carbon::now()->year,
+                    'name' => $acc->name,
+                    'spek' => $acc->spek,
+                    'slug' => $acc->slug,
+                    'satuan' => $acc->satuan,
+                    'barang_id' => $acc->id,
+                    'tahun' => Carbon::now()->year,
                 ]);
                 activity()->performedOn(new Barang())->event('accepted')
-                ->withProperties(['attributes' => [
-                    'name' => $acc->name,
-                    'harga' => $acc->harga,
-                    'satuan' => $acc->satuan,
-                    'spek' => $acc->spek,
-                ]])
-                ->log('Menyetujui barang yang diajukan oleh '.$acc->user->username);
-
-            }elseif($status == 'Ditolak'){
+                    ->withProperties(['attributes' => [
+                        'name' => $acc->name,
+                        'harga' => $acc->harga,
+                        'satuan' => $acc->satuan,
+                        'spek' => $acc->spek,
+                    ]])
+                    ->log('Menyetujui barang yang diajukan oleh ' . $acc->user->username);
+            } elseif ($status != 'Disetujui') {
                 activity()->performedOn(new Barang())->event('rejected')
-                ->withProperties(['attributes' => [
-                    'name' => $acc->name,
-                    'harga' => $acc->harga,
-                    'satuan' => $acc->satuan,
-                    'spek' => $acc->spek,
-                ]])
-                ->log('Menolak barang yang diajukan oleh '.$acc->user->username);
+                    ->withProperties(['attributes' => [
+                        'name' => $acc->name,
+                        'harga' => $acc->harga,
+                        'satuan' => $acc->satuan,
+                        'spek' => $acc->spek,
+                    ]])
+                    ->log('Menolak barang yang diajukan oleh ' . $acc->user->username);
 
-                $barang = BarangGudang::where('barang_id',$acc->id)->first();
-                if($barang){
+                $barang = BarangGudang::where('barang_id', $acc->id)->first();
+                if ($barang) {
                     $barang->delete();
                 }
             }
 
             $acc->update(['status' => $status]);
-
-            return back()->with('success', 'Barang ' . $status);
+            if ($status !== 'Disetujui') {
+                $message = 'Ditolak';
+            }else{
+                $message = 'Disetujui';
+            }
+            return back()->with('success', 'Barang ' . $message);
         }
     }
 
@@ -115,7 +118,6 @@ class AdminAngaranController extends Controller
      */
     public function destroy(Barang $acc)
     {
-
     }
 
     public function filterJurusan(Request $request)

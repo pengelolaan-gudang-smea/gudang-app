@@ -70,7 +70,7 @@
                 </a>
             </li>
         @endcan
-        @can('Edit barang')
+        @can('Menyetujui barang')
         <li class="nav-heading">Kelola Barang</li>
         <li class="nav-item">
             <a class="{{ request()->routeIs('barang-acc.index') ? 'nav-link' : 'nav-link collapsed' }}"

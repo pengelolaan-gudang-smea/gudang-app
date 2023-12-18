@@ -37,8 +37,8 @@
                             <td>
                                 @if($item->status == 'Disetujui')
                                     <span class="badge bg-success">{{ $item->status }}</span>
-                                @elseif($item->status == 'Ditolak')
-                                    <span class="badge bg-danger">{{ $item->status }}</span>
+                                @elseif($item->status != 'Disetujui' && $item->status != 'Belum disetujui')
+                                    <span class="badge bg-danger">Ditolak</span>
                                 @elseif($item->status == 'Belum disetujui')
                                     <span class="badge bg-warning text-white">{{ $item->status }}</span>
                                 @endif
@@ -151,7 +151,7 @@
                                 return 'bg-warning text-dark';
                             } else if (status === 'Disetujui') {
                                 return 'bg-success';
-                            } else if (status === 'Ditolak') {
+                            } else  {
                                 return 'bg-danger';
                             }
                         }
