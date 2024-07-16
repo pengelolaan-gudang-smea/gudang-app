@@ -4,7 +4,9 @@ namespace Database\Seeders;
 
 use App\Models\Anggaran;
 use App\Models\Barang;
+use App\Models\Jenis_barang;
 use App\Models\Jurusan;
+use App\Models\Limit;
 use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 
@@ -35,11 +37,23 @@ class DatabaseSeeder extends Seeder
         $this->call([
             PermissionSeeder::class,
             UserSeeder::class,
+            JenisAnggaranSeeder::class,
         ]);
-        Barang::factory(5)->create();
+        // Barang::factory(5)->create();
+        Anggaran::create([
+            'anggaran' => 10000000,
+            'jenis_anggaran' => 'APBD',
+            'tahun' => 2024
+        ]);
+        Limit::create(
+            [
+                'anggaran_id' => 1,
+                'limit' => 8000000,
+                'jurusan_id' => 1
+            ]
+        );
 
     
 
-     Anggaran::factory(5)->create();
     }
 }

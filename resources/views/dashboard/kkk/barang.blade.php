@@ -33,7 +33,7 @@
                             <th scope="row">{{ $loop->iteration }}</th>
                             <td>{{ $item->name }}</td>
                             <td class="harga">{{ 'Rp ' . number_format($item->harga, 0, ',', '.') }}</td>
-                            <td class="satuan">{{ $item->satuan }}</td>
+                            <td class="satuan">{{ $item->stock }}</td>
                             <td>
                                 @if($item->status == 'Disetujui')
                                     <span class="badge bg-success">{{ $item->status }}</span>
@@ -83,7 +83,7 @@
     </div>
     </div>
     <div class="modal fade" id="detailBarangModal" tabindex="-1" aria-labelledby="detailBarangModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="detailBarangModalLabel">Modal title</h1>
@@ -118,12 +118,23 @@
 
                             const badgeElement = $(`<span class="badge ${statusBadgeClass}">${response.barang.status}</span>`);
 
+                            let tujuanBarang = ''
+                            if(response.barang.tujuan !== null){
+                                 tujuanBarang = response.barang.tujuan
+                            }else{
+                                 tujuanBarang = '-'
+                            }
+
                             const listGroup = $(`<ul class="list-group">
                                                     <li class="list-group-item"><small>Nama Barang :</small><br> ${response.barang.name}</li>
                                                     <li class="list-group-item"><small>Waktu Pengajuan :</small><br> ${response.barang.created_at_formatted}</li>
+                                                    <li class="list-group-item"><small>Bulan yang di inginkan  :</small><br> ${response.barang.expired_formatted}</li>
+                                                    <li class="list-group-item"><small>Tujuan Barang  :</small><br> ${tujuanBarang}</li>
+                                                    <li class="list-group-item"><small>Jenis Barang  :</small><br> ${response.barang.jenis_barang}</li>
                                                     <li class="list-group-item"><small>Spek Teknis :</small><br> ${response.barang.spek}</li>
                                                     <li class="list-group-item"><small>Harga Satuan :</small><br>Rp ${response.barang.harga}</li>
-                                                    <li class="list-group-item"><small>Kuantitas (Qty) :</small><br> ${response.barang.satuan}</li>
+                                                    <li class="list-group-item"><small>Kuantitas (Qty) :</small><br> ${response.barang.stock}</li>
+                                                    <li class="list-group-item"><small>Satuan  :</small><br> ${response.barang.satuan}</li>
                                                     <li class="list-group-item"><small>Status :</small><br></li>
                                                     <li class="list-group-item"><small>Sub Total :</small><br>Rp ${response.barang.sub_total}</li>
                                                 </ul>`);

@@ -48,10 +48,10 @@
                         <div class="col-12">
                             <button class="btn btn-primary w-100" type="submit">Login</button>
                         </div>
-                        <div class="col-12">
+                        {{-- <div class="col-12">
                             <p class="small mb-0">Lupa password? <a href="{{ route('forgot.password') }}">reset password</a>
                             </p>
-                        </div>
+                        </div> --}}
                     </form>
 
                 </div>

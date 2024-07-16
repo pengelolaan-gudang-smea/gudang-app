@@ -31,8 +31,8 @@
                                             <select class="form-select" aria-label="Default select example" id="jenis"
                                                 name="jenis">
                                                 <option selected disabled>-- Pilih jenis anggaran --</option>
-                                                    <option value="BOS" {{ $anggaran->jenis == 'BOS' ? 'selected' : '' }}>BOS</option>
-                                                    <option value="BOSDA" {{ $anggaran->jenis == 'BOSDA' ? 'selected' : '' }}>BOSDA</option>
+                                                    <option value="APBD" >APBD</option>
+                                                    <option value="BOS">BOS</option>
                                             </select>
                                         </div>
                             </div>

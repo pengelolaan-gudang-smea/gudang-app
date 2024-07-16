@@ -89,6 +89,13 @@
                 <span>Barang Gudang</span>
             </a>
         </li>
+        <li class="nav-item">
+            <a class="{{ request()->routeIs('barang.keluar') ? 'nav-link' : 'nav-link collapsed' }}"
+                href="{{ route('barang.keluar') }}">
+                <i class="bi bi-box-seam-fill"></i>
+                <span>Barang Keluar</span>
+            </a>
+        </li>
 
         @endcan
         <li class="nav-heading">Lainnya</li>

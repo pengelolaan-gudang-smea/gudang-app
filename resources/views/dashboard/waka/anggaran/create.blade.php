@@ -24,10 +24,10 @@
                         <div class="row mb-3">
                             <label for="Jenis" class="col-sm-2 col-form-label">Jenis <span class="text-danger">*</span></label>
                             <div class="col-sm-10">
-                                <select class="form-select" aria-label="Default select example" id="jenis" name="jenis">
+                                <select class="form-select" aria-label="Default select example" id="jenis" name="jenis_anggaran">
                                     <option selected disabled>-- Pilih jenis anggaran --</option>
+                                    <option value="APBD">APBD</option>
                                     <option value="BOS">BOS</option>
-                                    <option value="BOSDA">BOSDA</option>
                                 </select>
                             </div>
                         </div>

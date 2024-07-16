@@ -2,11 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\BarangImport;
 use App\Models\Anggaran;
+use App\Models\Barang_keluar;
 use Illuminate\Support\Str;
 use App\Models\BarangGudang;
+use App\Models\Jenis_anggaran;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class GudangController extends Controller
@@ -30,7 +35,8 @@ class GudangController extends Controller
     public function create()
     {
         return view('dashboard.gudang.create', [
-            'title' => 'Tambah Barang Gudang'
+            'title' => 'Tambah Barang Gudang',
+            'jenis_anggaran'=>Jenis_anggaran::all()
         ]);
     }
 
@@ -41,10 +47,19 @@ class GudangController extends Controller
     {
         $validatedData = $request->validate([
             'name' => 'required|string',
-            'satuan' => 'required|numeric',
-            'spek' => 'required|string',
+            'stock' => 'required|required',
+            'satuan' => 'required',
+            'tujuan' => 'nullable',
             'tahun' => 'required|numeric',
+            'tgl_faktur' => 'required|date',
+            'jenis_barang' => 'required',
+            'lokasi' => 'required',
+            'penerima' => 'required',
+            'tgl_masuk' => 'required|date',
+            'jenis_anggaran_id' => 'required',
+            'spek' => 'required|string',
         ]);
+        // dd($validatedData);
 
         $slug = $validatedData['slug'] = Str::slug($validatedData['name']);
         $counter = 2;
@@ -98,19 +113,27 @@ class GudangController extends Controller
      */
     public function update(Request $request, BarangGudang $gudang)
     {
-        if ($request->has('keterangan')) {
-            $keterangan = $request->input('keterangan');
-            $gudang->update(['keterangan' => $keterangan]);
+        if ($request->has('penerima')) {
+            $penerima = $request->input('penerima');
+            $gudang->update(['penerima' => $penerima, 'tgl_faktur' => Carbon::now('Asia/Jakarta')]);
             activity()->performedOn(new BarangGudang())->event('edited')
                 ->withProperties(['attributes' => [
-                    'keterangan' => $gudang->keterangan,
+                'penerima' => $gudang->penerima,
                 ]])
-                ->log('Barang diterima oleh ' . $gudang->keterangan);
+                ->log('Barang diterima oleh ' . $gudang->penerima);
             return redirect()->route('barang-gudang.index')->with('success', 'Berhasil  Menerima Barang');
         } else if ($request->has('pengambilan')) {
             $pengambilan = $request->input('pengambilan');
-            $gudang->satuan -= $pengambilan;
+            $gudang->stock -= $pengambilan;
             $gudang->save();
+            Barang_keluar::create([
+                'nama_barang' => $gudang->name,
+                'nama_pengambil' => $request->input('nama_pengambil'),
+                'tujuan' => $request->input('tujuan'),
+                'jumlah_pengambilan' => $request->input('pengambilan'),
+                'tgl_pengambilan' => Carbon::now('Asia/Jakarta'),
+                'qrCode'=>$gudang->qr_code
+            ]);
             activity()->performedOn(new BarangGudang())->event('edited')
                 ->log('Barang diambil oleh petugas lapangan  ');
             return redirect()->route('barang-gudang.index')->with('success', 'Berhasil Mengambil Barang');
@@ -135,6 +158,12 @@ class GudangController extends Controller
         return back()->with('success','Berhasil menghapus barang gudang');
     }
 
+    public function barangMasuk(Request $request)
+    {
+        dd($request->all());
+    }
+
+
     public function Qr(Request $request, $slug)
     {
         $barang = BarangGudang::where('slug', $slug)->first();
@@ -142,11 +171,16 @@ class GudangController extends Controller
             'uuid' => $barang->uuid,
             'nama_barang' => $barang->name,
             'lokasi' => $request->input('lokasi'),
+            'jenis_barang'=>$barang->jenis_barang,
+            'jurusan'=>$barang->jurusan->name
 
         ];
 
-        $anggaran  = Anggaran::where('id', $request->anggaran)->first();
-        $data['anggaran'] = $anggaran->jenis . "-" . $anggaran->tahun;
+        // dd($barang);
+        $anggaran  = Anggaran::where('id', $barang->jenis_anggaran_id)->first();
+        // dd($anggaran);
+        $data['anggaran'] = $anggaran->jenis_anggaran . "-" . $anggaran->tahun;
+        // dd($data);
         $dataToEncode = json_encode($data);
 
         $qrCode = QrCode::format('png')->size(300)->generate($dataToEncode);
@@ -161,7 +195,7 @@ class GudangController extends Controller
         file_put_contents($path, $qrCode);
 
         BarangGudang::where('slug', $slug)->update([
-            'lokasi' => $data['lokasi'], 'anggaran_id' => $request->anggaran,
+            'lokasi' => $data['lokasi'],
             'qr_code' => $filename
         ]);
 
@@ -177,5 +211,19 @@ class GudangController extends Controller
         $qrCodeUrl = asset('storage/' . $barang->qr_code);
 
         return view('dashboard.gudang.print', compact('qrCodeUrl'));
+    }
+
+
+    public function importBarangGudang(Request $request)
+    {
+        // dd($request->file('import-excel'));
+        $request->validate([
+            'import-excel' => 'mimes:xlsx'
+        ]);
+        $excel = $request->file('import-excel');
+        $fileName = $excel->getClientOriginalName();
+        $filePath = $excel->storeAs('import-excel', $fileName);
+        // dd(Storage::path($filePath));
+        Excel::import(new BarangImport, Storage::path($filePath));
     }
 }

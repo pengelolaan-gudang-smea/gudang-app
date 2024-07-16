@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Anggaran;
 use App\Models\Barang;
+use App\Models\Jenis_anggaran;
+use App\Models\Jurusan;
 use App\Models\Limit;
 use Illuminate\Http\Request;
 
@@ -26,7 +28,8 @@ class AnggaranController extends Controller
     public function create()
     {
         return view('dashboard.waka.anggaran.create', [
-            'title' => 'Tambah Anggaran'
+            'title' => 'Tambah Anggaran',
+            'jenis_anggaran' => Jenis_anggaran::all()
         ]);
     }
 
@@ -37,13 +40,12 @@ class AnggaranController extends Controller
     {
         $validate = $request->validate([
             'anggaran' => ['required'],
-            'jenis' => 'required',
+            'jenis_anggaran' => 'required',
             'tahun' => 'required',
         ]);
-
         $anggaran = new Anggaran();
         $anggaran->anggaran = str_replace('.', '', $validate['anggaran']);
-        $anggaran->jenis = $validate['jenis'];
+        $anggaran->jenis_anggaran = $validate['jenis_anggaran'];
         $anggaran->tahun = $validate['tahun'];
         $anggaran->save();
 
@@ -79,7 +81,7 @@ class AnggaranController extends Controller
             'jenis' => 'required',
             'tahun' => 'required',
         ]);
-        
+
         $anggaran->anggaran = str_replace('.', '', $validate['anggaran']);
         $anggaran->jenis = $validate['jenis'];
         $anggaran->tahun = $validate['tahun'];

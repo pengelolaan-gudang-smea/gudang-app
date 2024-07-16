@@ -261,7 +261,7 @@
             .then(response => response.json())
             .then(data => {
                 drawChart(data);
-                console.log(data);
+                // console.log(data);
             })
             .catch(error => console.error(error));
 

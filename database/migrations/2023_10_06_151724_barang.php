@@ -15,11 +15,18 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('slug');
+            $table->string('no_inventaris');
             $table->text('spek');
             $table->double('harga');
+            $table->integer('stock');
             $table->string('satuan');
             $table->string('sub_total')->nullable();
             $table->string('status')->default('Belum disetujui');
+            $table->string('keterangan')->nullable();
+            $table->date('expired')->nullable();
+            $table->string('tujuan')->nullable();
+            $table->enum('jenis_barang', ['Aset', 'Persediaan']);
+            $table->foreignId('jenis_anggaran_id')->nullable()->constrained(table: 'jenis_anggaran');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('jurusan_id')->constrained('jurusan');
             $table->timestamps();

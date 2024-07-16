@@ -13,15 +13,15 @@ class Barang extends Model
     protected $table = 'barang';
     protected $guarded = ['id'];
 
-    // public function getActivitylogOptions() :LogOptions
-    // {
-    //  return LogOptions::defaults()
-    //  ->setDescriptionForEvent(fn(string $eventName)=>"{$eventName} Barang")
-    //  ->logOnlyDirty();
-    //  // ->useLogName(Auth::user()->username);
-    // }
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($barang) {
+            $barang->no_inventaris = 'BRG-' . date('Ym') . '-' . str_pad(static::count() + 1, 4, '0', STR_PAD_LEFT);
+        });
+    }
 
-   
+
 
     public function getRouteKeyName()
     {
@@ -42,6 +42,11 @@ class Barang extends Model
     public function gudang(){
         return $this->hasMany(BarangGudang::class);
     }
+    public function jenis_anggaran()
+    {
+        return $this->belongsTo(Jenis_anggaran::class);
+    }
+
 }
 
 

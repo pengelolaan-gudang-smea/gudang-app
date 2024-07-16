@@ -37,14 +37,26 @@ class LimitController extends Controller
      */
     public function store(Request $request)
     {
+        if ($request->jurusan_id === 'all') {
+            $jurusans = Jurusan::all();
+
+            foreach ($jurusans as $jurusan) {
+                $limit = new Limit();
+                $limit->limit = str_replace('.', '', $request->limit);
+                $limit->jurusan_id = $jurusan->id;
+                $limit->anggaran_id = $request->anggaran_id;
+                $limit->save();
+            }
+        } else {
         $limit = new Limit();
         $limit->limit = str_replace('.', '', $request->limit);
         $limit->jurusan_id = $request->jurusan_id;
         $limit->anggaran_id = $request->anggaran_id;
-        $limit->save();
-
-        return redirect()->route('limit-anggaran.index')->with('success','Behasil mengatur limit anggaran');
+            $limit->save();
+        }
+        return redirect()->route('limit-anggaran.index')->with('success', 'Behasil mengatur limit anggaran');
     }
+
 
     /**
      * Display the specified resource.

@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\BarangAccExport;
 use Carbon\Carbon;
 use App\Models\Barang;
 use App\Models\BarangGudang;
+use App\Models\Jenis_anggaran;
+use App\Models\Jenis_barang;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class AdminAngaranController extends Controller
@@ -17,7 +21,8 @@ class AdminAngaranController extends Controller
     {
         return view('dashboard.admingaran.anggaran', [
             'title' => 'Barang diajukan',
-            'barang' => Barang::all()
+            'barang' => Barang::all(),
+            'jenis_anggaran' => Jenis_anggaran::all()
         ]);
     }
 
@@ -42,8 +47,10 @@ class AdminAngaranController extends Controller
      */
     public function show(string $slug)
     {
+
         $barang = Barang::where('slug', $slug)->first();
         $barang->created_at_formatted = Carbon::parse($barang->created_at)->format('j F Y');
+        $barang->expired_formatted = Carbon::parse($barang->expired)->format('F Y');
 
         return response()->json([
             'status' => 'success',
@@ -68,49 +75,104 @@ class AdminAngaranController extends Controller
      */
     public function update(Request $request, Barang $acc)
     {
-        if ($request->has('status')) {
-            $status = $request->input('status');
-            if ($status == 'Disetujui') {
+        if ($request->has('persetujuan')) {
+
+            // ? Update Barang jika di setujui
+            $validated = $request->validate([
+                'persetujuan' => 'required',
+                'jenis_anggaran' => 'required'
+            ]);
+
+            $validated['persetujuan'] = $request->input('persetujuan');
+            $validated['jenis_anggaran'] = $request->input('jenis_anggaran');
+            $acc->update([
+                'status' => 'Disetujui',
+                'keterangan' => $validated['persetujuan'],
+                'jenis_anggaran_id' => $validated['jenis_anggaran']
+            ]);
+            $message = 'Disetujui';
+            // dd($acc);
+
+            // ? Masukan Barang yang sudah disetujui ke Barang_Gudang
+            $barangGudang = BarangGudang::where('name', $acc->name)->where('jenis_barang', $acc->jenis_barang)->get();
+            if ($barangGudang->isNotEmpty()) {
+                foreach ($barangGudang as $barang_gudang) {
+                    $barang_gudang->increment('stock', $request->input('persetujuan'));
+                }
+            } else {
                 BarangGudang::create([
                     'name' => $acc->name,
                     'spek' => $acc->spek,
+                    'no_inventaris' => $acc->no_inventaris,
                     'slug' => $acc->slug,
-                    'satuan' => $acc->satuan,
+                    'stock' => $request->input('persetujuan'),
                     'barang_id' => $acc->id,
                     'tahun' => Carbon::now()->year,
+                    'satuan' => $acc->satuan,
+                    'tujuan' => $acc->tujuan,
+                    'jenis_barang' => $acc->jenis_barang,
+                    'jenis_anggaran_id' => $acc->jenis_anggaran_id,
                 ]);
-                activity()->performedOn(new Barang())->event('accepted')
-                    ->withProperties(['attributes' => [
-                        'name' => $acc->name,
-                        'harga' => $acc->harga,
-                        'satuan' => $acc->satuan,
-                        'spek' => $acc->spek,
-                    ]])
-                    ->log('Menyetujui barang yang diajukan oleh ' . $acc->user->username);
-            } elseif ($status != 'Disetujui') {
-                activity()->performedOn(new Barang())->event('rejected')
-                    ->withProperties(['attributes' => [
-                        'name' => $acc->name,
-                        'harga' => $acc->harga,
-                        'satuan' => $acc->satuan,
-                        'spek' => $acc->spek,
-                    ]])
-                    ->log('Menolak barang yang diajukan oleh ' . $acc->user->username);
-
-                $barang = BarangGudang::where('barang_id', $acc->id)->first();
-                if ($barang) {
-                    $barang->delete();
-                }
             }
 
-            $acc->update(['status' => $status]);
-            if ($status !== 'Disetujui') {
-                $message = 'Ditolak';
-            }else{
-                $message = 'Disetujui';
+            // ? Set Activity
+            activity()->performedOn(new Barang())->event('accepted')
+            ->withProperties(['attributes' => [
+                'name' => $acc->name,
+                'harga' => $acc->harga,
+                'satuan' => $acc->satuan,
+                'spek' => $acc->spek,
+            ]])
+                ->log('Menyetujui barang yang diajukan oleh ' . $acc->user->username);
+        } elseif ($request->has('penolakan')) {
+
+            // ? Set Activity
+            activity()->performedOn(new Barang())->event('rejected')
+            ->withProperties(['attributes' => [
+                'name' => $acc->name,
+                'harga' => $acc->harga,
+                'satuan' => $acc->satuan,
+                'spek' => $acc->spek,
+            ]])->log('Menolak barang yang diajukan oleh ' . $acc->user->username);
+
+            // ? UPdate Barang jika status ditolak
+            $acc->update([
+                'status' => 'Ditolak',
+                'keterangan' => $request->input('penolakan')
+            ]);
+            $message = 'Ditolak';
+
+            // ? Kurangi stock barang gudang sesuai jumlah yang di setujui
+            $barang = BarangGudang::where('barang_id', $acc->id)->first();
+            $barangGudang = BarangGudang::where('name', $acc->name)->where('jenis_barang', $acc->jenis_barang)->get();
+            foreach ($barangGudang as $barang_gudang) {
+                $barang_gudang->decrement('stock', $acc->stock);
             }
-            return back()->with('success', 'Barang ' . $message);
+            if ($barang) {
+                $barang->delete();
+            }
         }
+
+        return back()->with('success', 'Barang ' . $message);
+    }
+
+
+    public function EditBarangPersetujuan(Request $request, $slug)
+    {
+        // dd('masuk');
+        $barang_update = Barang::where('slug', $slug)->first();
+        $barang_gudang = BarangGudang::where('slug', $slug)->first();
+
+        $barang_update->update([
+            'keterangan' => $request->input('jumlahBarang'),
+            'jenis_anggaran_' => $request->input('jenis_anggaran'),
+        ]);
+
+        $barang_gudang->update([
+            'stock' => $request->input('jumlahBarang'),
+            'jenis_anggaran' => $request->input('jenis_anggaran'),
+        ]);
+        return back()->with('success', 'Berhasil mengedit barang');
     }
 
     /**
@@ -144,8 +206,8 @@ class AdminAngaranController extends Controller
                 ->addColumn('harga', function ($q) {
                     return 'Rp ' . number_format($q->harga, 0, ',', '.');
                 })
-                ->addColumn('satuan', function ($q) {
-                    return $q->satuan;
+                ->addColumn('stock', function ($q) {
+                    return $q->stock;
                 })
                 ->addColumn('sub_total', function ($q) {
                     return 'Rp ' . number_format($q->sub_total, 0, ',', '.');
@@ -159,5 +221,12 @@ class AdminAngaranController extends Controller
                 ->make(true);
             return $result;
         }
+    }
+
+
+    public function export()
+    {
+        // dd('halo');
+        return Excel::download(new BarangAccExport, 'Barang-acc.xlsx');
     }
 }

@@ -23,14 +23,27 @@
                             </div>
                         </div>
                         <div class="row mb-3">
-                            <label for="harga" class="col-sm-2 col-form-label">Harga (satuan)<span class="text-danger">*</span></label>
+                            <label for="harga" class="col-sm-2 col-form-label">Harga <span class="text-danger">*</span></label>
                             <div class="col-sm-10">
-                                <input type="text" id="harga" class="form-control @error('harga') is-invalid @enderror" name="harga" value="{{ old('harga', $barang->harga) }}" required>
+                                <input type="text" id="harga" placeholder="Masukan harga barang/pcs" class="form-control @error('harga') is-invalid @enderror" name="harga" required value="{{ old('harga',$barang->harga) }}">
                                 @error('harga')
                                 <div class="invalid-feedback">
                                     {{ $message }}
                                 </div>
                                 @enderror
+                                <small class="text-danger d-none" id="info-limit-1">Anggaran kurang</small>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="stock" class="col-sm-2 col-form-label">Kuantitas (Qty) <span class="text-danger">*</span></label>
+                            <div class="col-sm-10">
+                                <input type="number" id="stock" placeholder="Masukan kuantitas barang" class="form-control @error('stock') is-invalid @enderror" name="stock" required value="{{ old('stock',$barang->stock) }}">
+                                @error('stock')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                                @enderror
+                                <small class="text-danger d-none" id="info-limit-2">Anggaran kurang</small>
                             </div>
                         </div>
                         <div class="row mb-3">
@@ -38,6 +51,38 @@
                             <div class="col-sm-10">
                                 <input type="text" id="satuan" class="form-control @error('satuan') is-invalid @enderror" name="satuan" value="{{ old('satuan', $barang->satuan) }}" required>
                                 @error('satuan')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="satuan" class="col-sm-2 col-form-label">Bulan yang di inginkan  <span class="text-danger">*</span></label>
+                            <div class="col-sm-10">
+                                <input type="month" id="expired"  class="form-control @error('expired') is-invalid @enderror" name="expired" required value="{{ old('expired',date('Y-m', strtotime($barang->expired))) }}">
+                                @error('expired')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="Jenis" class="col-sm-2 col-form-label">Jenis Barang <span class="text-danger">*</span></label>
+                            <div class="col-sm-10">
+                                <select class="form-select" aria-label="Default select example" id="jenis-barang" name="jenis_barang_id">
+                                    <option selected disabled>-- Pilih jenis barang --</option>
+                                    <option value="Aset" {{ ($barang->jenis_barang == 'Aset') ? 'selected' : ''}}>Aset</option>
+                                    <option value="Persediaan" {{ ($barang->jenis_barang == 'Persediaan') ? 'selected' : ''}}>Persediaan</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3" id="tujuan-barang">
+                            <label for="tujuan" class="col-sm-2 col-form-label">Tujuan  <span class="text-danger">*</span></label>
+                            <div class="col-sm-10">
+                                <input type="text" id="tujuan" placeholder="Masukan tujuan barang" class="form-control @error('tujuan') is-invalid @enderror" name="tujuan" required value="{{ old('tujuan',$barang->tujuan) }}">
+                                @error('tujuan')
                                 <div class="invalid-feedback">
                                     {{ $message }}
                                 </div>
@@ -63,7 +108,7 @@
                         <div class="row mb-3">
                             <div class="col-sm-12 d-flex justify-content-end gap-2">
                                 <a href="{{ route('pengajuan-barang.index') }}" class="btn btn-secondary">Kembali</a>
-                                <button type="submit" class="btn btn-primary">Ajukan Barang</button>
+                                <button type="submit" class="btn btn-primary" id="ajukan-barang">Ajukan Barang</button>
                             </div>
                         </div>
                     </form>
@@ -74,27 +119,86 @@
 </section>
 <script>
     $(document).ready(function() {
+        let debounceTimer;
+    
+        // $('#jenis-barang').change(function () { 
+        //    const jenisBarang = $(this).find(':selected')
+        //    const JenisBarangVal = jenisBarang.data('jenisBarang')
+        //    console.log(JenisBarangVal);
+        //    if (JenisBarangVal === 'Barang Aset') {
+        //     console.log('l');
+        //             $('#tujuan-barang').removeClass('d-none');
+        //         }else{
+        //             $('#tujuan-barang').addClass('d-none');
+        //         }
+        // });
+        $('#jenis-barang').change(function() {
+                const jenisBarang = $(this).find(':selected')
+                const jenisBarangVal =jenisBarang.data('tujuan') 
+                console.log(jenisBarangVal);
+                if (jenisBarangVal === 'Barang Aset') {
+                    $('#tujuan-barang').removeClass('d-none');
+                }else{
+                    $('#tujuan-barang').addClass('d-none');
+                }
+            })
+
         $('#harga').keyup(function() {
-            let harga = $(this).val();
-            $(this).val(formatRupiahInput(harga));
-        })
+            clearTimeout(debounceTimer);
+    
+            // Tunggu sebentar sebelum memproses input
+            debounceTimer = setTimeout(function() {
+                let harga = $('#harga').val();
+                $('#harga').val(formatRupiahInput(harga));
+    
+                const price = harga.replace(/\./g, ""); 
+                const priceFormatted = parseInt(price);
+    
+                const btn = document.querySelector('#ajukan-barang');
+                const info1 = document.querySelector('#info-limit-1');
+                const info2 = document.querySelector('#info-limit-2');
+                const satuanInput = document.querySelector('#stock');
+    
+                const limit = {{ $sisa }};
+    
+                if (priceFormatted > limit) {
+                    btn.classList.add('disabled');
+                    info1.classList.remove('d-none');
+                } else {
+                    btn.classList.remove('disabled');
+                    info1.classList.add('d-none');
+                }
+    
+                satuanInput.addEventListener('input', function () {
+                    satuan = satuanInput.value * priceFormatted;
+    
+                    if (satuan > limit) {
+                        btn.classList.add('disabled');
+                        info2.classList.remove('d-none');
+                    } else {
+                        btn.classList.remove('disabled');
+                        info2.classList.add('d-none');
+                    }
+                });
+            }, 300); // Tunggu 300ms sebelum memproses input
+        });
     });
-
-    function formatRupiahInput(angka, prefix) {
-        var number_string = angka.replace(/[^,\d]/g, "").toString()
-            , split = number_string.split(",")
-            , sisa = split[0].length % 3
-            , rupiah = split[0].substr(0, sisa)
-            , ribuan = split[0].substr(sisa).match(/\d{3}/gi);
-
-        if (ribuan) {
-            separator = sisa ? "." : "";
-            rupiah += separator + ribuan.join(".");
+    
+        function formatRupiahInput(angka, prefix) {
+            var number_string = angka.replace(/[^,\d]/g, "").toString(),
+                split = number_string.split(","),
+                sisa = split[0].length % 3,
+                rupiah = split[0].substr(0, sisa),
+                ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+    
+            if (ribuan) {
+                separator = sisa ? "." : "";
+                rupiah += separator + ribuan.join(".");
+            }
+    
+            rupiah = split[1] !== undefined ? rupiah + "," + split[1] : rupiah;
+            return prefix === undefined ? rupiah : rupiah ? rupiah : 0;
         }
-
-        rupiah = split[1] !== undefined ? rupiah + "," + split[1] : rupiah;
-        return prefix === undefined ? rupiah : rupiah ? rupiah : 0;
-    }
-
-</script>
+    
+    </script>
 @endsection

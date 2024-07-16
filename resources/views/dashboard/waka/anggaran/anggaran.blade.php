@@ -26,10 +26,10 @@
                                 <tr>
                                     <th scope="row">{{ $loop->iteration }}</th>
                                     <td>{{ 'Rp ' . number_format($item->anggaran, 0, ',', '.') }}</td>
-                                    <td>{{ $item->jenis }}</td>
+                                    <td>{{ $item->jenis_anggaran }}</td>
                                     <td>{{ $item->tahun }}</td>
                                     <td>
-                                        <div class="d-flex gap-3">
+                                        <div class="d-flex gap-3">  
                                             <div>
                                                 <a href="{{ route('anggaran.edit', ['anggaran' => $item->id]) }}"
                                                     class="btn btn-sm bg-warning link-light">

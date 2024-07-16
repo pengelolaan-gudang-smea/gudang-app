@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Models\Limit;
 use App\Models\Barang;
+use App\Models\Jenis_barang;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,7 +23,7 @@ class BarangController extends Controller
     // }
     public function index()
     {
-       
+
         $grand_total = Barang::where('user_id', Auth::user()->id)->where('status','<>','DiTolak')->sum('sub_total');
         $limit = Limit::where('jurusan_id',Auth::user()->jurusan->id)->sum('limit');
         $sisa = $limit - $grand_total;
@@ -47,7 +48,7 @@ class BarangController extends Controller
             'title' => 'Ajukan Barang',
             'grand_total' => $grand_total,
             'limit'=>$limit,
-            'sisa'=>$sisa
+            'sisa' => $sisa,
         ]);
     }
 
@@ -60,13 +61,18 @@ class BarangController extends Controller
             'name' => 'required',
             'spek' => 'required',
             'harga' => 'required',
+            'stock' => 'required|numeric',
+            'jenis_barang' => 'required',
+            'tujuan' => 'nullable',
             'satuan' => 'required',
             'user_id' => 'required',
             'jurusan_id' => 'required',
+            'expired' => 'required'
         ]);
         $harga = str_replace('.', '', $validate['harga']);
         $validate['harga'] = $harga;
-        $subtotal = $harga * $validate['satuan'];
+        $subtotal = $harga * $validate['stock'];
+        $validate['expired'] = $validate['expired'] . '-01';
 
         $slug = $validate['slug'] = Str::slug($validate['name']);
         $counter = 2;
@@ -83,10 +89,11 @@ class BarangController extends Controller
         ->withProperties(['attributes' => [
             'name' => $validate['name'],
             'harga' => $validate['harga'],
-            'satuan' => $validate['satuan'],
+            'stock' => $validate['stock'],
             'spek' => $validate['spek'],
         ]])
         ->log('Mengajukan barang');
+        // dd($validate);
 
         Barang::create($validate);
         return redirect()->route('pengajuan-barang.index')->with('success', 'Berhasil mengajukan barang');
@@ -99,6 +106,7 @@ class BarangController extends Controller
     {
         $barang = Barang::where('slug', $slug)->first();
         $barang->created_at_formatted = Carbon::parse($barang->created_at)->format('j F Y');
+        $barang->expired_formatted = Carbon::parse($barang->expired)->format('F Y');
 
         return response()->json([
             'status' => 'success',
@@ -112,9 +120,13 @@ class BarangController extends Controller
      */
     public function edit(Barang $barang)
     {
+        $grand_total = Barang::where('user_id', Auth::user()->id)->sum('sub_total');
+        $limit = Limit::where('jurusan_id', Auth::user()->jurusan->id)->sum('limit');
+        $sisa = $limit - $grand_total;
         return view('dashboard.kkk.edit', [
             'title' => 'Edit Barang',
-            'barang' => $barang
+            'barang' => $barang,
+            'sisa' => $sisa
         ]);
     }
 
@@ -126,13 +138,18 @@ class BarangController extends Controller
         $validate = $request->validate([
             'name' => 'required',
             'spek' => 'required',
-            'harga' => 'required',
-            'satuan' => 'required'
+            'harga' => 'required|numeric',
+            'stock' => 'required|numeric',
+            'jenis_barang_id' => 'required',
+            'tujuan' => 'nullable',
+            'satuan' => 'required',
+            'expired' => 'required'
         ]);
 
         $harga = str_replace('.', '', $validate['harga']);
         $validate['harga'] = $harga;
-        $subtotal = $harga * $validate['satuan'];
+        $subtotal = $harga * $validate['stock'];
+        $validate['expired'] = $validate['expired'] . '-01';
 
         if ($validate['name'] !== $barang->name) {
             $slug = $validate['slug'] = Str::slug($validate['name']);
@@ -149,7 +166,7 @@ class BarangController extends Controller
         ->withProperties(['old' => [
             'name' => $barang->name,
             'harga' => $barang->harga,
-            'satuan' => $barang->satuan,
+            'stock' => $barang->stock,
             'spek' => $barang->spek,
         ]])
         ->log('Mengubah data barang');
@@ -170,6 +187,7 @@ class BarangController extends Controller
             'harga' => $barang->harga,
             'satuan' => $barang->satuan,
             'spek' => $barang->spek,
+            'stock' => $barang->stock
         ]])
         ->log('Menghapus barang');
 

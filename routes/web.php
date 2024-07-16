@@ -12,6 +12,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QrController;
 use App\Http\Controllers\RekapController;
 use App\Http\Controllers\UserManagementController;
+use App\Models\Barang_keluar;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Models\Role;
@@ -77,18 +78,26 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
         Route::resource('/barang-acc', AdminAngaranController::class)->parameters(['barang-acc' => 'acc'])->except('create','store','destroy');
         Route::post('/filter-jurusan', [AdminAngaranController::class, 'filterJurusan'])->name('filter-jurusan');
         Route::post('/filter-barang', [AdminAngaranController::class, 'filterBarang'])->name('filter-barang');
+        Route::put('/barang-accepted/{slug}', [AdminAngaranController::class, 'EditBarangPersetujuan'])->name('persetujuan.editBarang');
+        Route::get('/barang-accepted/export', [AdminAngaranController::class, 'export'])->name('barang-acc.export');
     });
 
     // * Admin Gudang
     Route::middleware('can:Barang gudang')->group(function(){
         Route::resource('/barang-gudang',GudangController::class)->parameters(['barang-gudang'=>'gudang'])->except('edit');
-        Route::post('/barang-gudang/{slug}/qrcode',[GudangController::class,'Qr'])->name('qr.store');
-        Route::post('barang-gudang/qr-generate/{slug}',[GudangController::class,'generateQr']);
-        Route::get('/barang-gudang/print/{slug}', [GudangController::class, 'printQr'])->name('print-qr');
+        Route::controller(GudangController::class)->group(function () {
+            Route::post('/barang-gudang/{slug}/qrcode', 'Qr')->name('qr.store');
+            Route::post('barang-gudang/qr-generate/{slug}', 'generateQr');
+            Route::get('/barang-gudang/print/{slug}', 'printQr')->name('print-qr');
+            Route::post('/import-barang',  'ImportBarangGudang')->name('import.barang');
+        });
     });
 });
 
-Route::get('/dashboard/waka/check-anggaran/{id}', [AnggaranController::class, 'checkAnggaran']);
+Route::get('/dashboard/waka/check-anggaran/{id}/', [AnggaranController::class, 'checkAnggaran']);
 
 Route::get('/dashboard/graphic', [DashboardController::class, 'chartBarang'])->name('chart-barang');
-
+Route::get('/barang-gudang/keluar', function () {
+    return view('dashboard.gudang.barang-keluar', ['title' => 'Barang Keluar', 'barang' => Barang_keluar::all()]);
+})->name('barang.keluar');
+// Route::get

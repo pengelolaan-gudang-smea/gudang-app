@@ -28,7 +28,7 @@
                                     <th scope="row">{{ $loop->iteration }}</th>
                                     <td>{{ 'Rp ' . number_format($item->limit, 0, ',', '.') }}</td>
                                     <td>{{ $item->jurusan->name }}</td>
-                                    <td>{{ $item->anggaran->jenis }}</td>
+                                    <td>{{ $item->anggaran->jenis_anggaran }}</td>
                                     <td>{{ $item->anggaran->tahun }}</td>
                                     <td>
                                         <div class="d-flex gap-3">

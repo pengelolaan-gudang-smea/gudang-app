@@ -38,4 +38,9 @@ class Anggaran extends Model
     {
         return $this->hasMany(Limit::class);
     }
+
+    public function jenis_anggaran()
+    {
+        return $this->belongsTo(Jenis_anggaran::class);
+    }
 }
