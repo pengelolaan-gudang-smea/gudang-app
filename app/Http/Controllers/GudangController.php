@@ -172,15 +172,14 @@ class GudangController extends Controller
             'nama_barang' => $barang->name,
             'lokasi' => $request->input('lokasi'),
             'jenis_barang'=>$barang->jenis_barang,
-            'jurusan'=>$barang->jurusan->name
-
+            'jurusan'=>$barang->barang->jurusan->name
         ];
 
-        // dd($barang);
         $anggaran  = Anggaran::where('id', $barang->jenis_anggaran_id)->first();
         // dd($anggaran);
-        $data['anggaran'] = $anggaran->jenis_anggaran . "-" . $anggaran->tahun;
-        // dd($data);
+        $data['jenis_anggaran'] = $anggaran->jenis_anggaran;
+        $data['tahun_anggaran'] = $anggaran->tahun;
+
         $dataToEncode = json_encode($data);
 
         $qrCode = QrCode::format('png')->size(300)->generate($dataToEncode);

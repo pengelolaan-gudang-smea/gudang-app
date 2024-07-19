@@ -302,6 +302,7 @@
                         type: 'GET',
                         url: '/dashboard/barang-acc/' + barangId,
                         success: function(response) {
+                            console.log(response);
                             if (response.status == 'success') {
                                 $('#detailBarangModalLabel').text(
                                     `Detail Barang ${response.barang.name}`);
@@ -345,7 +346,7 @@
                                                     <li class="list-group-item"><small>Kuantitas (Qty) :</small><br> ${response.barang.stock}</li>
                                                     <li class="list-group-item"><small>Satuan  :</small><br> ${response.barang.satuan}</li>
                                                     <li class="list-group-item"><small>Status :</small><br></li>
-                                                    <li class="list-group-item"><small>Jenis Anggaran :</small><br>${response.barang.jenis_anggaran}</li>
+                                                    <li class="list-group-item"><small>Jenis Anggaran :</small><br>${response.barang.jenis_anggaran.name}</li>
                                                 </ul>`);
 
                                 listGroup.find('li:contains("Status :")').append(badgeElement);

@@ -48,7 +48,7 @@ class AdminAngaranController extends Controller
     public function show(string $slug)
     {
 
-        $barang = Barang::where('slug', $slug)->first();
+        $barang = Barang::where('slug', $slug)->with('jenis_anggaran')->first();
         $barang->created_at_formatted = Carbon::parse($barang->created_at)->format('j F Y');
         $barang->expired_formatted = Carbon::parse($barang->expired)->format('F Y');
 
@@ -75,85 +75,89 @@ class AdminAngaranController extends Controller
      */
     public function update(Request $request, Barang $acc)
     {
-        if ($request->has('persetujuan')) {
+        try {
+            if ($request->has('persetujuan')) {
 
-            // ? Update Barang jika di setujui
-            $validated = $request->validate([
-                'persetujuan' => 'required',
-                'jenis_anggaran' => 'required'
-            ]);
-
-            $validated['persetujuan'] = $request->input('persetujuan');
-            $validated['jenis_anggaran'] = $request->input('jenis_anggaran');
-            $acc->update([
-                'status' => 'Disetujui',
-                'keterangan' => $validated['persetujuan'],
-                'jenis_anggaran_id' => $validated['jenis_anggaran']
-            ]);
-            $message = 'Disetujui';
-            // dd($acc);
-
-            // ? Masukan Barang yang sudah disetujui ke Barang_Gudang
-            $barangGudang = BarangGudang::where('name', $acc->name)->where('jenis_barang', $acc->jenis_barang)->get();
-            if ($barangGudang->isNotEmpty()) {
-                foreach ($barangGudang as $barang_gudang) {
-                    $barang_gudang->increment('stock', $request->input('persetujuan'));
-                }
-            } else {
-                BarangGudang::create([
-                    'name' => $acc->name,
-                    'spek' => $acc->spek,
-                    'no_inventaris' => $acc->no_inventaris,
-                    'slug' => $acc->slug,
-                    'stock' => $request->input('persetujuan'),
-                    'barang_id' => $acc->id,
-                    'tahun' => Carbon::now()->year,
-                    'satuan' => $acc->satuan,
-                    'tujuan' => $acc->tujuan,
-                    'jenis_barang' => $acc->jenis_barang,
-                    'jenis_anggaran_id' => $acc->jenis_anggaran_id,
+                // ? Update Barang jika di setujui
+                $validated = $request->validate([
+                    'persetujuan' => 'required',
+                    'jenis_anggaran' => 'required'
                 ]);
+
+                $validated['persetujuan'] = $request->input('persetujuan');
+                $validated['jenis_anggaran'] = $request->input('jenis_anggaran');
+                $acc->update([
+                    'status' => 'Disetujui',
+                    'keterangan' => $validated['persetujuan'],
+                    'jenis_anggaran_id' => $validated['jenis_anggaran']
+                ]);
+                $message = 'Disetujui';
+                // dd($acc);
+
+                // ? Masukan Barang yang sudah disetujui ke Barang_Gudang
+                $barangGudang = BarangGudang::where('name', $acc->name)->where('jenis_barang', $acc->jenis_barang)->get();
+                if ($barangGudang->isNotEmpty()) {
+                    foreach ($barangGudang as $barang_gudang) {
+                        $barang_gudang->increment('stock', $request->input('persetujuan'));
+                    }
+                } else {
+                    BarangGudang::create([
+                        'name' => $acc->name,
+                        'spek' => $acc->spek,
+                        'no_inventaris' => $acc->no_inventaris,
+                        'slug' => $acc->slug,
+                        'stock' => $request->input('persetujuan'),
+                        'barang_id' => $acc->id,
+                        'tahun' => Carbon::now()->year,
+                        'satuan' => $acc->satuan,
+                        'tujuan' => $acc->tujuan,
+                        'jenis_barang' => $acc->jenis_barang,
+                        'jenis_anggaran_id' => $acc->jenis_anggaran_id,
+                    ]);
+                }
+
+                // ? Set Activity
+                activity()->performedOn(new Barang())->event('accepted')
+                    ->withProperties(['attributes' => [
+                        'name' => $acc->name,
+                        'harga' => $acc->harga,
+                        'satuan' => $acc->satuan,
+                        'spek' => $acc->spek,
+                    ]])
+                    ->log('Menyetujui barang yang diajukan oleh ' . $acc->user->username);
+                return back()->with('success', 'Barang ' . $message);
+            } elseif ($request->has('penolakan')) {
+
+                // ? Set Activity
+                activity()->performedOn(new Barang())->event('rejected')
+                    ->withProperties(['attributes' => [
+                        'name' => $acc->name,
+                        'harga' => $acc->harga,
+                        'satuan' => $acc->satuan,
+                        'spek' => $acc->spek,
+                    ]])->log('Menolak barang yang diajukan oleh ' . $acc->user->username);
+
+                // ? UPdate Barang jika status ditolak
+                $acc->update([
+                    'status' => 'Ditolak',
+                    'keterangan' => $request->input('penolakan')
+                ]);
+                $message = 'Ditolak';
+
+                // ? Kurangi stock barang gudang sesuai jumlah yang di setujui
+                $barang = BarangGudang::where('barang_id', $acc->id)->first();
+                $barangGudang = BarangGudang::where('name', $acc->name)->where('jenis_barang', $acc->jenis_barang)->get();
+                foreach ($barangGudang as $barang_gudang) {
+                    $barang_gudang->decrement('stock', $acc->stock);
+                }
+                if ($barang) {
+                    $barang->delete();
+                }
+                return back()->with('success', 'Barang ' . $message);
             }
-
-            // ? Set Activity
-            activity()->performedOn(new Barang())->event('accepted')
-            ->withProperties(['attributes' => [
-                'name' => $acc->name,
-                'harga' => $acc->harga,
-                'satuan' => $acc->satuan,
-                'spek' => $acc->spek,
-            ]])
-                ->log('Menyetujui barang yang diajukan oleh ' . $acc->user->username);
-        } elseif ($request->has('penolakan')) {
-
-            // ? Set Activity
-            activity()->performedOn(new Barang())->event('rejected')
-            ->withProperties(['attributes' => [
-                'name' => $acc->name,
-                'harga' => $acc->harga,
-                'satuan' => $acc->satuan,
-                'spek' => $acc->spek,
-            ]])->log('Menolak barang yang diajukan oleh ' . $acc->user->username);
-
-            // ? UPdate Barang jika status ditolak
-            $acc->update([
-                'status' => 'Ditolak',
-                'keterangan' => $request->input('penolakan')
-            ]);
-            $message = 'Ditolak';
-
-            // ? Kurangi stock barang gudang sesuai jumlah yang di setujui
-            $barang = BarangGudang::where('barang_id', $acc->id)->first();
-            $barangGudang = BarangGudang::where('name', $acc->name)->where('jenis_barang', $acc->jenis_barang)->get();
-            foreach ($barangGudang as $barang_gudang) {
-                $barang_gudang->decrement('stock', $acc->stock);
-            }
-            if ($barang) {
-                $barang->delete();
-            }
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
-
-        return back()->with('success', 'Barang ' . $message);
     }
 
 
