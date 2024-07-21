@@ -26,7 +26,7 @@ return new class extends Migration
             $table->date('expired')->nullable();
             $table->string('tujuan')->nullable();
             $table->enum('jenis_barang', ['Aset', 'Persediaan']);
-            $table->foreignId('jenis_anggaran_id')->nullable()->constrained(table: 'jenis_anggaran');
+            $table->foreignId('anggaran_id')->nullable()->constrained(table: 'anggaran');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('jurusan_id')->constrained('jurusan');
             $table->timestamps();

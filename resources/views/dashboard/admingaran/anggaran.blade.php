@@ -104,7 +104,7 @@
                                                             data-bs-target="#ModalEditBarang"
                                                             data-slug="{{ $item->slug }}"
                                                             data-keterangan="{{ $item->keterangan }}"
-                                                            data-jenisAnggaran='{{ $item->jenis_anggaran_id }}'
+                                                            data-jenisAnggaran='{{ $item->anggaran_id }}'
                                                             data-satuan ="{{ $item->stock }}"></button>
                                                     </div>
                                                 @endif
@@ -198,8 +198,8 @@
                                     <div class="col-sm-10">
                                         <select name="jenis_anggaran" id="" class="form-select">
                                             <option selected>-- jenis anggaran --</option>
-                                            @foreach ($jenis_anggaran as $item)
-                                                <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                            @foreach ($anggaran as $item)
+                                                <option value="{{ $item->id }}">{{ $item->jenis_anggaran }} - {{ $item->tahun }}</option>
                                             @endforeach
                                         </select>
                                         @error('jenis_anggaran')
@@ -239,8 +239,8 @@
                                     <div class="col-sm-10">
                                         <select name="jenis_anggaran" id="jenis-anggaran" class="form-select">
                                             <option selected>-- jenis anggaran --</option>
-                                            @foreach ($jenis_anggaran as $item)
-                                                <option value={{ $item->id }}>{{ $item->name }}</option>
+                                            @foreach ($anggaran as $item)
+                                                <option value={{ $item->id }}>{{ $item->jenis_anggaran }} - {{ $item->tahun }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -302,7 +302,7 @@
                         type: 'GET',
                         url: '/dashboard/barang-acc/' + barangId,
                         success: function(response) {
-                            console.log(response);
+                            console.log(response.barang);
                             if (response.status == 'success') {
                                 $('#detailBarangModalLabel').text(
                                     `Detail Barang ${response.barang.name}`);
@@ -325,9 +325,9 @@
                                 }
                                 let JenisAnggaran = '';
                                 let TujuanBarang = '';
-                                if (response.barang.jenis_anggaran !== null && response.barang
+                                if (response.barang.anggaran !== null && response.barang
                                     .tujuan !== null) {
-                                    JenisAnggaran = response.barang.jenis_anggaran;
+                                    JenisAnggaran = response.barang.anggaran;
                                     TujuanBarang = response.barang.tujuan;
                                 } else {
                                     JenisAnggaran = '-';
@@ -346,7 +346,7 @@
                                                     <li class="list-group-item"><small>Kuantitas (Qty) :</small><br> ${response.barang.stock}</li>
                                                     <li class="list-group-item"><small>Satuan  :</small><br> ${response.barang.satuan}</li>
                                                     <li class="list-group-item"><small>Status :</small><br></li>
-                                                    <li class="list-group-item"><small>Jenis Anggaran :</small><br>${response.barang.jenis_anggaran.name}</li>
+                                                    <li class="list-group-item"><small>Jenis Anggaran :</small><br>${response.barang.anggaran.jenis_anggaran} - ${response.barang.anggaran.tahun} </li>
                                                 </ul>`);
 
                                 listGroup.find('li:contains("Status :")').append(badgeElement);

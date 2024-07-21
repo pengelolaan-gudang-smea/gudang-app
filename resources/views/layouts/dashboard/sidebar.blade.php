@@ -96,9 +96,37 @@
                 <span>Barang Keluar</span>
             </a>
         </li>
+        <li class="nav-item">
+            <a class="{{ request()->routeIs('laporan.gudang') ? 'nav-link' : 'nav-link collapsed' }}"
+                href="{{ route('laporan.gudang') }}">
+                <i class="bi bi-pie-chart-fill"></i>
+                <span>Laporan Persediaan</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="{{ request()->routeIs('laporan.jurusan') ? 'nav-link' : 'nav-link collapsed' }}" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
+                <i class="bi bi-pie-chart-fill"></i>
+                <span>Laporan Aset</span>
 
+            </a>
+            <ul id="forms-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+              <li>
+                <a href="{{ route('laporan.aset') }}">
+                  <i class="bi bi-circle"></i><span>Jurusan</span>
+                </a>
+              </li>
+              <li>
+                <a href="{{ route('laporan.lab') }}">
+                  <i class="bi bi-circle"></i><span>Lab / Ruang</span>
+                </a>
+              </li>
+
+
+            </ul>
+          </li>
         @endcan
         <li class="nav-heading">Lainnya</li>
+
 
         <li class="nav-item">
             <a class="{{ request()->routeIs('dashboard.profile') ? 'nav-link' : 'nav-link collapsed' }}" href="{{ route('dashboard.profile',['user'=>Auth::user()->username]) }}">
@@ -107,7 +135,7 @@
             </a>
         </li><!-- End Profile Page Nav -->
 
-       
+
     </ul>
 
 </aside><!-- End Sidebar-->

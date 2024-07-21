@@ -36,7 +36,7 @@ class GudangController extends Controller
     {
         return view('dashboard.gudang.create', [
             'title' => 'Tambah Barang Gudang',
-            'jenis_anggaran'=>Jenis_anggaran::all()
+           'jenis_anggaran'=>Anggaran::all()
         ]);
     }
 
@@ -47,7 +47,7 @@ class GudangController extends Controller
     {
         $validatedData = $request->validate([
             'name' => 'required|string',
-            'stock' => 'required|required',
+            'stock_awal' => 'required|required',
             'satuan' => 'required',
             'tujuan' => 'nullable',
             'tahun' => 'required|numeric',
@@ -56,9 +56,11 @@ class GudangController extends Controller
             'lokasi' => 'required',
             'penerima' => 'required',
             'tgl_masuk' => 'required|date',
-            'jenis_anggaran_id' => 'required',
+            'jurusan_id' => 'nullable',
+            'anggaran_id' => 'required',
             'spek' => 'required|string',
         ]);
+        $validatedData['stock_akhir'] = $validatedData['stock_awal'];
         // dd($validatedData);
 
         $slug = $validatedData['slug'] = Str::slug($validatedData['name']);
@@ -124,7 +126,7 @@ class GudangController extends Controller
             return redirect()->route('barang-gudang.index')->with('success', 'Berhasil  Menerima Barang');
         } else if ($request->has('pengambilan')) {
             $pengambilan = $request->input('pengambilan');
-            $gudang->stock -= $pengambilan;
+            $gudang->stock_akhir -= $pengambilan;
             $gudang->save();
             Barang_keluar::create([
                 'nama_barang' => $gudang->name,
@@ -175,7 +177,7 @@ class GudangController extends Controller
             'jurusan'=>$barang->barang->jurusan->name
         ];
 
-        $anggaran  = Anggaran::where('id', $barang->jenis_anggaran_id)->first();
+        $anggaran  = Anggaran::where('id', $barang->anggaran_id)->first();
         // dd($anggaran);
         $data['jenis_anggaran'] = $anggaran->jenis_anggaran;
         $data['tahun_anggaran'] = $anggaran->tahun;

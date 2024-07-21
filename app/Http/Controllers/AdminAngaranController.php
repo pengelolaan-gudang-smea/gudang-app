@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\BarangAccExport;
+use App\Models\Anggaran;
 use Carbon\Carbon;
 use App\Models\Barang;
 use App\Models\BarangGudang;
@@ -22,7 +23,7 @@ class AdminAngaranController extends Controller
         return view('dashboard.admingaran.anggaran', [
             'title' => 'Barang diajukan',
             'barang' => Barang::all(),
-            'jenis_anggaran' => Jenis_anggaran::all()
+            'anggaran' => Anggaran::all()
         ]);
     }
 
@@ -48,7 +49,7 @@ class AdminAngaranController extends Controller
     public function show(string $slug)
     {
 
-        $barang = Barang::where('slug', $slug)->with('jenis_anggaran')->first();
+        $barang = Barang::where('slug', $slug)->with('anggaran')->first();
         $barang->created_at_formatted = Carbon::parse($barang->created_at)->format('j F Y');
         $barang->expired_formatted = Carbon::parse($barang->expired)->format('F Y');
 
@@ -89,13 +90,14 @@ class AdminAngaranController extends Controller
                 $acc->update([
                     'status' => 'Disetujui',
                     'keterangan' => $validated['persetujuan'],
-                    'jenis_anggaran_id' => $validated['jenis_anggaran']
+                    'anggaran_id' => $validated['jenis_anggaran']
                 ]);
                 $message = 'Disetujui';
                 // dd($acc);
 
                 // ? Masukan Barang yang sudah disetujui ke Barang_Gudang
                 $barangGudang = BarangGudang::where('name', $acc->name)->where('jenis_barang', $acc->jenis_barang)->get();
+                // dd($barangGudang);
                 if ($barangGudang->isNotEmpty()) {
                     foreach ($barangGudang as $barang_gudang) {
                         $barang_gudang->increment('stock', $request->input('persetujuan'));
@@ -106,13 +108,15 @@ class AdminAngaranController extends Controller
                         'spek' => $acc->spek,
                         'no_inventaris' => $acc->no_inventaris,
                         'slug' => $acc->slug,
-                        'stock' => $request->input('persetujuan'),
+                        'stock_awal' => $request->input('persetujuan'),
+                        'stock_akhir' => $request->input('persetujuan'),
                         'barang_id' => $acc->id,
                         'tahun' => Carbon::now()->year,
                         'satuan' => $acc->satuan,
                         'tujuan' => $acc->tujuan,
                         'jenis_barang' => $acc->jenis_barang,
-                        'jenis_anggaran_id' => $acc->jenis_anggaran_id,
+                        'anggaran_id' => $acc->anggaran_id,
+                        'jurusan_id' => $acc->jurusan_id,
                     ]);
                 }
 
@@ -169,12 +173,12 @@ class AdminAngaranController extends Controller
 
         $barang_update->update([
             'keterangan' => $request->input('jumlahBarang'),
-            'jenis_anggaran_' => $request->input('jenis_anggaran'),
+            'anggaran_id' => $request->input('jenis_anggaran'),
         ]);
 
         $barang_gudang->update([
             'stock' => $request->input('jumlahBarang'),
-            'jenis_anggaran' => $request->input('jenis_anggaran'),
+            'anggaran_id' => $request->input('jenis_anggaran'),
         ]);
         return back()->with('success', 'Berhasil mengedit barang');
     }

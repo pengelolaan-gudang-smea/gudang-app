@@ -31,7 +31,7 @@
                                 <tr>
                                     <th scope="row">{{ $loop->iteration }}</th>
                                     <td>{{ $item->name }}</td>
-                                    <td class="satuan">{{ $item->stock }}</td>
+                                    <td class="satuan">{{ $item->stock_akhir }}</td>
                                     <td class="keterangan">{!! $item->penerima ? '<i class="bi bi-check text-success fs-2 m-0"></i>' : '-' !!}</td>
                                     <td class="keterangan">
                                         <img src="{{ asset('storage/' . $item->qr_code) }}" alt="" width="50">

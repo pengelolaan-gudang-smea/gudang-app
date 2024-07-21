@@ -25,12 +25,12 @@
                         </div>
 
                         <div class="row mb-3">
-                            <label for="stock" class="col-sm-2 col-form-label">Kuantitas (Qty) <span
+                            <label for="stock_awal" class="col-sm-2 col-form-label">Kuantitas (Qty) <span
                                     class="text-danger">*</span></label>
                             <div class="col-sm-10">
-                                <input type="number" id="stock" placeholder="Masukan kuantitas barang"
-                                    class="form-control @error('stock') is-invalid @enderror" name="stock" required value="{{ old('stock') }}">
-                                @error('stock')
+                                <input type="number" id="stock_awal" placeholder="Masukan kuantitas barang"
+                                    class="form-control @error('stock_awal') is-invalid @enderror" name="stock_awal" required value="{{ old('stock_awal') }}">
+                                @error('stock_awal')
                                     <div class="invalid-feedback">
                                         {{ $message }}
                                     </div>
@@ -94,10 +94,10 @@
                                     class="text-danger">*</span></label>
                             <div class="col-sm-10">
                                 <select class="form-select" aria-label="Default select example" id="jenis-barang"
-                                    name="jenis_anggaran_id">
+                                    name="anggaran_id">
                                     <option selected disabled>-- Pilih jenis anggaran --</option>
                                     @foreach ($jenis_anggaran as $jenis )
-                                    <option value="{{ $jenis->id }}" >{{ $jenis->name }}</option>
+                                    <option value="{{ $jenis->id }}" >{{ $jenis->jenis_anggaran }} - {{ $jenis->tahun }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -142,6 +142,16 @@
                             </div>
                         </div>
                         <div class="row mb-3 d-none" id="tujuan-barang">
+                            <label for="tujuan" class="col-sm-2 col-form-label mb-3">Prodi <span
+                                    class="text-danger">*</span></label>
+                            <div class="col-sm-10">
+                                <select class="form-control" name="jurusan_id">
+                                    <option selected disabled>-- Pilih Jurusan --</option>
+                                    @foreach (App\Models\Jurusan::get() as $item)
+                                        <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                             <label for="tujuan" class="col-sm-2 col-form-label">Tujuan <span
                                     class="text-danger">*</span></label>
                             <div class="col-sm-10">
@@ -188,6 +198,9 @@
 
 <script>
     $(document).ready(function () {
+        $('select[name=jurusan]').select2({
+                    theme: "bootstrap-5"
+                })
         $('#jenis-barang').change(function() {
                 const jenisBarang = $(this).find(':selected')
                 const jenisBarangVal =jenisBarang.data('jenis-barang')
@@ -197,6 +210,7 @@
                     $('#tujuan-barang').addClass('d-none');
                 }
             })
+
     });
 </script>
 @endsection

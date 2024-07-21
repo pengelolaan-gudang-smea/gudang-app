@@ -42,9 +42,9 @@ class Barang extends Model
     public function gudang(){
         return $this->hasMany(BarangGudang::class);
     }
-    public function jenis_anggaran()
+    public function anggaran()
     {
-        return $this->belongsTo(Jenis_anggaran::class);
+        return $this->belongsTo(Anggaran::class);
     }
 
 }
