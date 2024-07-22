@@ -126,16 +126,29 @@ class GudangController extends Controller
             return redirect()->route('barang-gudang.index')->with('success', 'Berhasil  Menerima Barang');
         } else if ($request->has('pengambilan')) {
             $pengambilan = $request->input('pengambilan');
+            $diambil = $request->input('nama_pengambil');
+            $tujuan = $request->input('tujuan');
+            $gudang->barang_diambil = $diambil;
+            $gudang->tujuan = $tujuan;
             $gudang->stock_akhir -= $pengambilan;
             $gudang->save();
-            Barang_keluar::create([
-                'nama_barang' => $gudang->name,
-                'nama_pengambil' => $request->input('nama_pengambil'),
-                'tujuan' => $request->input('tujuan'),
-                'jumlah_pengambilan' => $request->input('pengambilan'),
-                'tgl_pengambilan' => Carbon::now('Asia/Jakarta'),
-                'qrCode'=>$gudang->qr_code
-            ]);
+            $barangKeluar = Barang_keluar::where('nama_barang', $gudang->name)
+            ->where('nama_pengambil', $diambil)
+            ->where('tujuan', $tujuan)
+            ->first();
+            if ($barangKeluar) {
+                $barangKeluar->jumlah_pengambilan += $pengambilan;
+                $barangKeluar->save();
+            } else {
+                Barang_keluar::create([
+                    'nama_barang' => $gudang->name,
+                    'nama_pengambil' => $diambil,
+                    'tujuan' => $tujuan,
+                    'jumlah_pengambilan' => $pengambilan,
+                    'tgl_pengambilan' => Carbon::now('Asia/Jakarta'),
+                    'qrCode' => $gudang->qr_code
+                ]);
+            }
             activity()->performedOn(new BarangGudang())->event('edited')
                 ->log('Barang diambil oleh petugas lapangan  ');
             return redirect()->route('barang-gudang.index')->with('success', 'Berhasil Mengambil Barang');
@@ -174,7 +187,7 @@ class GudangController extends Controller
             'nama_barang' => $barang->name,
             'lokasi' => $request->input('lokasi'),
             'jenis_barang'=>$barang->jenis_barang,
-            'jurusan'=>$barang->barang->jurusan->name
+            'jurusan'=>$barang->barang->jurusan->name ?? '-'
         ];
 
         $anggaran  = Anggaran::where('id', $barang->anggaran_id)->first();
@@ -197,6 +210,7 @@ class GudangController extends Controller
 
         BarangGudang::where('slug', $slug)->update([
             'lokasi' => $data['lokasi'],
+            'tgl_faktur' => Carbon::now(),
             'qr_code' => $filename
         ]);
 

@@ -100,6 +100,7 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
         Route::post('/reset-anggaran', 'resetSession')->name('reset-anggaran');
         Route::put('laporan/saldo-keluar/{slug}', 'saldo_keluar')->name('laporan-edit');
         Route::post('laporan/saldo-masuk', 'saldo_masuk')->name('laporan-saldo-masuk');
+        Route::post('/laporan/barang-persediaan/export','export_laporan')->name('laporan-persediaan');
     });
 
     Route::controller(LaporanAsetController::class)->group(function(){
@@ -109,6 +110,8 @@ Route::post('laporan/filter-barang', [LaporanAsetController::class, 'barangJurus
 Route::get('laporan-aset/barang-gudang/lab-ruang','labRuang')->name('laporan.lab');
 Route::post('laporan/filter-ruang-lab', [LaporanAsetController::class, 'laporan_ruang_lab'])->name('laporan-lab_ruang');
 Route::post('laporan/filter-barang/ruang-lab', [LaporanAsetController::class, 'barang_ruang_lab'])->name('barang-lab_ruang');
+Route::post('/laporan/barang-gudang/export','export_laporan_jurusan')->name('laporan-export-jurusan');
+Route::post('/laporan/barang-gudang-ruang/export','export_laporan_ruang_lab')->name('laporan-export-ruang-lab');
 
     });
 });

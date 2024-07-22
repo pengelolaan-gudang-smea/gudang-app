@@ -108,6 +108,14 @@
             <hr>
             @endif
             <!-- Default Table -->
+            <form id="export_Form" action="{{ route('laporan-persediaan') }}" method="POST">
+                @csrf
+                <input type="hidden" name="jenis_anggaran" value="{{ session('jenis_anggaran') }}">
+                <input type="hidden" name="laporan" value="{{ session('laporan') }}">
+                <input type="hidden" name="saldo_awal" value="{{ $saldo_awal }}">
+                <input type="hidden" name="saldo_akhir" value="{{ $saldo_akhir }}">
+                <button class="btn btn-md btn-outline-success my-3">Export Excel</button>
+            </form>
             <div class="table-responsive" id="viewTable">
                 <table class="table mt-2" id="barangsTable">
                     <thead>

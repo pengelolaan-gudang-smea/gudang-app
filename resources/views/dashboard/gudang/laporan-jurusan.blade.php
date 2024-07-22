@@ -38,6 +38,12 @@
                 </div>
                 <hr>
 
+                <form id="export_Form" action="{{ route('laporan-export-jurusan') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="jurusan" id="exportJurusan">
+                    <input type="hidden" name="tahun" id="exportTahun">
+                    <button class="btn btn-md btn-outline-success my-3">Export Excel</button>
+                </form>
                 <div class="table-responsive" id="viewTable">
                     <table class="table mt-2" id="barangsTable">
                         <thead>
@@ -100,15 +106,19 @@
                                 });
                                 filterTahun.change(function() {
                                     const selectedTahun = filterTahun.val();
+                                    $('#exportTahun').val(filterTahun.val());
                                     updateTabel(jurusan, selectedTahun);
                                 });
                             }
+                            $('#exportJurusan').val(jurusan);
                         }
                     });
                 });
                 function updateTabel(jurusan, selectedTahun) {
                     $("#viewTable").html(``)
-                    $("#viewTable").html(`<table class="table mt-2" id="barangsTable">
+                    $("#viewTable").html(`
+
+                    <table class="table mt-2" id="barangsTable">
                                             <thead>
                                                 <tr>
                                                     <th scope="col" class="text-center">#</th>

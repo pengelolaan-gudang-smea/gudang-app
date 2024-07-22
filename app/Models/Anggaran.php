@@ -43,4 +43,8 @@ class Anggaran extends Model
     {
         return $this->belongsTo(Jenis_anggaran::class);
     }
+
+    public function saldo(){
+        return $this->hasOne(Saldo::class);
+    }
 }
