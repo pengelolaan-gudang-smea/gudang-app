@@ -18,24 +18,37 @@ class ProfileController extends Controller
     public function update(Request $request, User $user)
     {
         $validate = $request->validate([
-            'username' => 'required',
-            'email' => 'required',
+            'name'=>['required'],
+            'username' => ['required','unique:users,username,'. $user->id],
+            'email' => ['required','email','unique:users,email,'. $user->id],
         ]);
+        activity()->performedOn(new User())->event('edited')
+        ->withProperties([
+            'old' => [
+                'name' => $user->name,
+                'username' => $user->username,
+                'email' => $user->email,
+            ]
+        ])
+        ->log('Mengubah profile ');
         $user->update($validate);
-        return back()->with('success', 'Berhasil mengubah profile');
+        return redirect()->route('dashboard.profile',['user'=>Auth::user()->username])->with('success', 'Berhasil mengubah profile');
     }
 
-    public function change(Request $request, User $user)
+    public function changePass(Request $request, User $user)
     {
-        $request->validate([
-            'current_password' => 'required|min:8',
-        ]);
+        $old_pass = $request->current_password;
 
-        $inputPassword = $request->input('current_password');
-        $storedPassword = $user->password;
-
-        if (Hash::check($inputPassword, $storedPassword)) {
-            return 'cocok';
+        if (Hash::check($old_pass, $user->password)) {
+            $pass = $request->validate([
+                'new_password' => ['min:8', 'confirmed']
+            ]);
+            $password_hash = Hash::make($pass['new_password']);
+            $user->update(['password' => $password_hash]);
+            // dd('berhasil');
+            return back()->with('success', 'Berhasil merubah password');
+        } else {
+            return back()->withInput()->withErrors(['current_password' => 'Password lama tidak cocok']);
         }
     }
 }

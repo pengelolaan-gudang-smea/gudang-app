@@ -2,13 +2,13 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-
-use App\Models\User;
+use App\Models\Anggaran;
+use App\Models\Barang;
+use App\Models\Jenis_barang;
+use App\Models\Jurusan;
+use App\Models\Limit;
+use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
@@ -17,34 +17,43 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
 
-        User::create([
-            'username' => 'roshit',
-            'email' => 'auliarasyidalzahrawi@gmail.com',
-            'password' => Hash::make('rosyid07'),
+        $jurusan = [
+            'Rekayasa Perangkat Lunak',
+            'Teknik Komputer dan Jaringan',
+            'Desain Komunikasi Visual',
+            'Akuntansi Keuangan Lembaga',
+            'Layanan Perbankan Syariah',
+            'Manajemen Perkantoran',
+            'Bisnis Ritel',
+            'Bisnis Daring',
+         ];
+         for ($i=0; $i < count($jurusan) ; $i++) {
+            Jurusan::create([
+                'name' => $jurusan[$i],
+                'slug' => Str::slug($jurusan[$i]),
+            ]);
+         }
+        $this->call([
+            PermissionSeeder::class,
+            UserSeeder::class,
+            JenisAnggaranSeeder::class,
         ]);
-        User::create([
-            'username' => 'Neptune',
-            'email' => 'Neptune@gmail.com',
-            'password' => Hash::make('neptune02'),
+        // Barang::factory(5)->create();
+        Anggaran::create([
+            'anggaran' => 10000000,
+            'jenis_anggaran' => 'APBD',
+            'tahun' => 2024
         ]);
-        Role::create([
-            'name' => 'WAKA',
-            'guard_name' => 'web'
-        ]);
-        Role::create([
-            'name' => 'KKK',
-            'guard_name' => 'web'
-        ]);
+        Limit::create(
+            [
+                'anggaran_id' => 1,
+                'limit' => 8000000,
+                'jurusan_id' => 1
+            ]
+        );
 
-        Permission::create([
-            'name' => 'edit akun',
-            'guard_name' => 'web'
-        ]);
-        Permission::create([
-            'name' => 'mengajukan barang',
-            'guard_name' => 'web'
-        ]);
+    
+
     }
 }

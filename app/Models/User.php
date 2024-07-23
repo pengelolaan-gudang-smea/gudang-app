@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -16,18 +18,21 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, CanResetPassword, HasRoles, HasPermissions;
-
     /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
     protected $fillable = [
+        'name',
         'username',
         'email',
         'password',
+        'jurusan_id',
     ];
 
+    
+    
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -44,12 +49,27 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+
 
     public function getRouteKeyName()
     {
         return 'username';
+    }
+
+    public function jurusan()
+    {
+        return $this->belongsTo(Jurusan::class);
+    }
+
+    public function barang()
+    {
+        return $this->hasMany(Barang::class);
+    }
+
+    public function rekapLogin(){
+        return $this->hasMany(RekapLogin::class);
     }
 }
