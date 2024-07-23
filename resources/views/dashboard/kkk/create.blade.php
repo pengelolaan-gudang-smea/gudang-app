@@ -157,8 +157,7 @@
                     let harga = $('#harga').val();
                     $('#harga').val(formatRupiahInput(harga));
 
-                    const price = harga.replace(/\./g,
-                    ""); // Hilangkan titik untuk memproses sebagai angka
+                    const price = harga.replace(/\./g,""); // Hilangkan titik untuk memproses sebagai angka
                     const priceFormatted = parseInt(price);
 
                     const btn = document.querySelector('#ajukan-barang');

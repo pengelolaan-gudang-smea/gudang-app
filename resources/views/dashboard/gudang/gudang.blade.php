@@ -65,7 +65,7 @@
                                                             <button type="button"
                                                                 class="bi bi-box-arrow-right fw-bold btn btn-sm bg-danger link-light"
                                                                 data-bs-toggle="modal" data-bs-target="#ModalPengambilan"
-                                                                data-bs-trigger="click" data-bs-title="Checklist"
+                                                                data-bs-trigger="click" data-bs-title="Pengambilan Barang"
                                                                 data-slug={{ $item->slug }} data-qty = "{{ $item->stock }}">
                                                             </button>
                                                         </div>

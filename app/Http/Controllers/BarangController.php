@@ -104,7 +104,7 @@ class BarangController extends Controller
      */
     public function show(string $slug)
     {
-        $barang = Barang::where('slug', $slug)->first();
+        $barang = Barang::where('slug', $slug)->with('anggaran')->first();
         $barang->created_at_formatted = Carbon::parse($barang->created_at)->format('j F Y');
         $barang->expired_formatted = Carbon::parse($barang->expired)->format('F Y');
 
