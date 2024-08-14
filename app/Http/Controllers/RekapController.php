@@ -47,23 +47,24 @@ class RekapController extends Controller
         }
     }
 
-    public function filterDate(Request $req)
-    {
-        $title = 'Rekap Login';
-        $start_date = $req->start_date;
-        $end_date = $req->end_date;
-
-        $login = RekapLogin::whereDate('created_at', '>=', $start_date)
-                            ->whereDate('created_at', '<=', $end_date)
-                            ->get();
-        return view('dashboard.waka.rekap.rekap_login', compact('login', 'title'));
+    public function rekapActivity(){
+        $title = 'Rekap Aktivitas';
+        return view('dashboard.waka.rekap.rekap_activity',compact('title'));
     }
 
-    public function rekapActivity(){
-       $activity = Activity::latest()->get();
-        return view('dashboard.waka.rekap.rekap_activity',[
-            'title'=>'Rekap Aktivitas',
-            'activity'=>$activity
-        ]);
+    public function dataRekapActivity(Request $request)
+    {
+
+        if ($request->ajax()) {
+            return DataTables::of(Activity::latest()->get())
+                ->addIndexColumn()
+                ->addColumn('name', function($row){
+                    return optional($row->causer)->name ? $row->causer->name : '-';
+                })
+                ->addColumn('created_at', function($row){
+                    return Carbon::parse($row->created_at)->format('H:i') . ' WIB, ' . Carbon::parse($row->created_at)->format('d M Y');
+                })
+                ->make(true);
+        }
     }
 }

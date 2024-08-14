@@ -10,10 +10,10 @@
             <a href="{{ route('user.create') }}" class="btn btn-primary my-3"><i class="bi bi-person-fill-add"></i> Tambah User</a>
             <!-- Default Table -->
             <div class="table-responsive">
-                <table class="table mt-2" id="usersTable">
+                <table class="table table-hover table-bordered mt-2" id="usersTable">
                     <thead>
                         <tr>
-                            <th scope="col">#</th>
+                            <th scope="col">No</th>
                             <th scope="col">Name</th>
                             <th scope="col">Username</th>
                             <th scope="col">Email</th>
@@ -22,46 +22,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($user as $item)
-                        <tr>
-                            <th scope="row">{{ $loop->iteration }}</th>
-                            <td>{{ $item->name }}</td>
-                            <td>{{ $item->username }}</td>
-                            <td>{{ $item->email }}</td>
-                            <td>
-                                @if ($item->hasRole('KKK'))
-                                {{ $item->roles->pluck('name')->implode(', ') }} - {{ $item->jurusan->name }}
-                                @else
-                                {{ $item->roles->pluck('name')->implode(', ') }}
-                                @endif
-                            </td>
-                            <td>
-                                <div class="d-flex gap-3">
-                                    <div>
-                                        <a href="{{ route('user.show', ['user' => $item->username]) }}" class="btn btn-sm bg-primary link-light">
-                                            <i class="bi bi-universal-access"></i>
-                                        </a>
-                                    </div>
-                                    <div>
-                                        <a href="{{ route('user.edit', ['user' => $item->username]) }}" class="btn btn-sm bg-warning link-light">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </a>
-                                    </div>
-                                    <div>
-                                        <button type="button" class="btn btn-sm btn-danger link-light deleteUserBtn" data-username="{{ $item->username }}">
-                                            <i class="bi bi-trash3"></i>
-                                        </button>
-                                        <form action="{{ route('user.destroy', ['user' => $item->username]) }}" method="post" hidden class="deleteUserForm" data-username="{{ $item->username }}">
-                                            @csrf
-                                            @method('DELETE')
-                                        </form>
-                                    </div>
-
-                                </div>
-                            </td>
-                        </tr>
-                        @endforeach
-
+                        <td colspan="6" class="text-center">Tabel tidak memiliki data</td>
                     </tbody>
                 </table>
             </div>
@@ -69,30 +30,121 @@
         </div>
     </div>
     </div>
+</section>
+@endsection
+@section('script')
     <script>
-        let table = new DataTable('#usersTable');
-
-        $(document).ready(function() {
-            $('.deleteUserBtn').click(function() {
-                const username = $(this).data('username');
-
-                Swal.fire({
-                    title: 'Anda yakin?'
-                    , text: "Anda tidak bisa mengembalikan data ini!"
-                    , icon: 'warning'
-                    , showCancelButton: true
-                    , confirmButtonColor: '#3085d6'
-                    , cancelButtonColor: '#d33'
-                    , confirmButtonText: 'Ya, hapus!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const deleteUserForm = $(`.deleteUserForm[data-username="${username}"]`);
-                        deleteUserForm.submit();
-                    }
-                });
-            });
+    let usersTable
+    $(document).ready(function() {
+        $(function() {
+            loadData();
         });
 
+        function loadData() {
+            if (usersTable !== undefined) {
+                usersTable.destroy();
+                usersTable.clear().draw();
+            }
+
+            usersTable = $('#usersTable').DataTable({
+                responsive: true,
+                searching: true,
+                autoWidth: false,
+                ordering: true,
+                processing: true,
+                serverSide: true,
+                aLengthMenu: [
+                    [5, 10, 25, 50, 100, 250, 500, -1],
+                    [5, 10, 25, 50, 100, 250, 500, "All"]
+                ],
+                pageLength: 10,
+                ajax: {
+                    url: "{{ route('users.data') }}",
+                    method: "GET"
+                },
+                drawCallback: function(settings) {
+                    $('table#usersTable tr').on('click', '#detail', function(e) {
+                        e.preventDefault();
+                        let url = $(this).data('url');
+                        let data = usersTable.row($(this).parents('tr')).data();
+                        show(data, url);
+                    });
+
+                    $('table#usersTable tr').on('click', '#ubah', function(e) {
+                        e.preventDefault();
+                        let url = $(this).data('url');
+                        let data = usersTable.row($(this).parents('tr')).data();
+                        edit(data, url);
+                    });
+
+                    $('table#usersTable tr').on('click', '#hapus', function(e) {
+                        e.preventDefault();
+                        let data = usersTable.row($(this).parents('tr')).data();
+                        let url = $(this).data('url');
+                        destroy(data, url);
+                    });
+                },
+                columns: [
+                    { data: 'DT_RowIndex', name: 'DT_RowIndex', width: '1%', class: 'fixed-side text-center', orderable: true, searchable: true },
+                    { data: 'name', name: 'name', orderable: false },
+                    { data: 'username', name: 'username', orderable: false },
+                    { data: 'email', name: 'email', orderable: false },
+                    { data: 'role', name: 'role', orderable: false },
+                    { data: 'action', name: 'action', orderable: false },
+                ]
+            });
+
+            usersTable.on('draw', function() {
+                $('[data-toggle="tooltip"]').tooltip();
+            });
+        }
+
+        show = function(data, url) {
+            window.location.href = url
+        }
+
+        edit = function(data, url) {
+            window.location.href = url
+        }
+
+        destroy = function(data, url) {
+            Swal.fire({
+                title: 'Apakah anda yakin?'
+                , text: "Ingin menghapus data ini?"
+                , icon: 'warning'
+                , showCancelButton: true
+                , confirmButtonColor: '#0D6EFD'
+                , cancelButtonColor: '#DC3545'
+                , confirmButtonText: 'Ya!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: url
+                        , data: {
+                            _token: "{{ csrf_token() }}"
+                            , _method: "delete"
+                        }
+                        , type: 'POST'
+                        , success: function(res) {
+                            if (res.status == 'success') {
+                                Swal.fire({
+                                    icon: 'success'
+                                    , title: 'Berhasil'
+                                    , text: res.msg
+                                    , showConfirmButton: false
+                                    , timer: 1500
+                                })
+                            }
+                            usersTable.ajax.reload(null, false)
+                        }
+                        , error: function(err) {
+                            console.log(err);
+                        }
+                    })
+                }
+            })
+        }
+
+    });
     </script>
-</section>
 @endsection

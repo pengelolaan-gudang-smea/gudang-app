@@ -16,13 +16,6 @@
         @can('Edit akun')
         <li class="nav-heading">Kelola User</li>
             <li class="nav-item">
-                <a class="{{ request()->routeIs('user*') ? 'nav-link' : 'nav-link collapsed' }}"
-                    href="{{ route('user.index') }}">
-                    <i class="bi bi-people-fill"></i>
-                    <span>User Management</span>
-                </a>
-            </li>
-            <li class="nav-item">
                 <a class="{{ request()->routeIs('rekap.login') ? 'nav-link' : 'nav-link collapsed' }}"
                     href="{{ route('rekap.login') }}">
                     <i class="bx bxs-user-account"></i>
@@ -36,7 +29,13 @@
                     <span>Rekap Aktivitas user</span>
                 </a>
             </li>
-
+            <li class="nav-item">
+                <a class="{{ request()->routeIs('user*') ? 'nav-link' : 'nav-link collapsed' }}"
+                    href="{{ route('user.index') }}">
+                    <i class="bi bi-people-fill"></i>
+                    <span>Manajemen User</span>
+                </a>
+            </li>
         <li class="nav-heading">Kelola Anggaran</li>
             <li class="nav-item">
                 <a class="{{ request()->routeIs('anggaran*') ? 'nav-link' : 'nav-link collapsed' }}"

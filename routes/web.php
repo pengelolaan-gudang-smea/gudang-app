@@ -58,6 +58,7 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
 
     //  * WAKA
     Route::middleware('can:Edit akun')->group(function () {
+        Route::get('/users/data', [UserManagementController::class, 'data'])->name('users.data');
         Route::resource('/user', UserManagementController::class);
         Route::post('/hak-akses/{user:username}', [UserManagementController::class, 'akses'])->name('user.akses');
         Route::resource('/anggaran', AnggaranController::class);
@@ -66,6 +67,7 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
             Route::get('/login', 'rekapLogin')->name('rekap.login');
             Route::get('/activity', 'rekapActivity')->name('rekap.activity');
             Route::get('/login/data', 'dataRekapLogin')->name('rekap.login.data');
+            Route::get('/activity/data', 'dataRekapActivity')->name('rekap.activity.data');
             Route::get('/filter', 'filterDate')->name('filter.date');
         });
     });

@@ -28,7 +28,7 @@
             </div>
 
             <div class="table-responsive pt-3">
-                <table class="table mt-3 table-hover" id="tableLogin">
+                <table class="table mt-3 table-hover table-bordered" id="tableLogin">
                     <thead class="thead-dark">
                         <tr>
                             <th scope="col">No</th>

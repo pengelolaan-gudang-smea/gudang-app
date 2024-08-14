@@ -4,6 +4,6 @@
             &copy; Copyright <strong><span>RPL {{ date('Y') }}</span></strong>. All Rights Reserved
         </div>
         <div class="credits">
-            Designed by <a href="https://skansaba.dev" target="_blank">Skansaba.dev</a>
+            Developed by <a href="https://skansaba.dev" target="_blank">Skansaba.dev</a>
         </div>
     </footer><!-- End Footer -->

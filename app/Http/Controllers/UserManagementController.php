@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Yajra\DataTables\Facades\DataTables;
 
 class UserManagementController extends Controller
 {
@@ -16,12 +17,43 @@ class UserManagementController extends Controller
      */
     public function index()
     {
-        return view('dashboard.waka.users.user', [
-            'title' => 'User Management',
-            'user' =>  User::whereDoesntHave('roles', function ($query) {
-                $query->where('name', 'WAKA');
-            })->get()
-        ]);
+        $title = 'User Management';
+        return view('dashboard.waka.users.user', compact('title'));
+        // 'user' =>  User::whereDoesntHave('roles', function ($query) {
+        //     $query->where('name', 'WAKA');
+        // })->get()
+    }
+
+    public function data(Request $request)
+    {  
+        $users = User::whereDoesntHave('roles', function ($q) {
+            $q->where('name', 'WAKA');
+        })->get();
+
+        if ($request->ajax()) {
+            return DataTables::of($users)
+                ->addIndexColumn()
+                ->addColumn('id', function ($row) {
+                    return encrypt($row->id);
+                })
+                ->addColumn('role', function ($row) {
+                    $role = $row->roles->first()->name;
+                    $data = $role !== 'KKK' ? $row->roles->pluck('name')->implode(', ') : $row->roles->pluck('name')->implode(', ') . ' - ' . $row->jurusan->name;
+                    return $data;
+                })
+                ->addColumn('action', function ($row) {
+                    $route_detail = route('user.show', $row->username);
+                    $route_edit = route('user.edit', $row->username);
+                    $route_delete = route('user.destroy', $row->username);
+                    $btn = '';
+                    $btn = '<button class="edit btn btn-info btn-sm link-light me-1" data-toggle="tooltip" title="Detail" data-placement="top" data-url="' . $route_detail . '" id="detail"><i class="bi bi-universal-access"></i></button>';
+                    $btn .= '<button class="edit btn btn-warning btn-sm link-light me-1" data-toggle="tooltip" title="Edit" data-placement="top" data-url="' . $route_edit . '" id="ubah"><i class="bi bi-pencil-square"></i></button>';
+                    $btn .= '<button class="edit btn btn-danger btn-sm btn-icon" data-toggle="tooltip" title="Delete" data-placement="top" id="hapus" data-url="' . $route_delete . '"><i class="bi bi-trash3"></i></button>';
+                    return $btn;
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
     }
 
     /**
@@ -205,6 +237,9 @@ class UserManagementController extends Controller
 
         $user->delete();
 
-        return redirect()->route('user.index')->with('success', 'Berhasil menghapus pengguna');
+        return response()->json([
+            'status' => 'success',
+            'msg' => 'Berhasil menghapus user.',
+        ]);
     }
 }
