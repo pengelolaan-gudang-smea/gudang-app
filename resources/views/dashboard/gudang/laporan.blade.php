@@ -172,7 +172,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="saldo_masuk_form" method="post">
+                    <form id="saldo_masuk_form" method="POST">
                         @csrf
                         <label for="saldo_masuk" class="col-sm-4 col-form-label">Saldo Masuk<span
                                 class="text-danger">*</span></label>
@@ -273,7 +273,7 @@
                     const button = $(event.relatedTarget);
                     const form = $(this).find('form#saldo_masuk_form');
                     const anggaran = button.data('anggaran');
-                    const actionUrl = `/dashboard/laporan/saldo-masuk/`;
+                    const actionUrl = "{{ route('laporan-saldo-masuk') }}";
                     form.attr('action', actionUrl);
                     $('#saldo_masuk').attr('max',anggaran);
                     $('#saldo_masuk').on('input', function() {
