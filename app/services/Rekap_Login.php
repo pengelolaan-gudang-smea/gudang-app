@@ -16,12 +16,12 @@ class Rekap_Login
         ]);
     }
 
-    // public static function logout($user)
-    // {
-    //     $userId = RekapLogin::where('user_id', $user)->whereNull('logout')->latest('login')->first();
+    public static function logout($user)
+    {
+        $userId = RekapLogin::where('user_id', $user)->whereNull('logout')->latest('login')->first();
 
-    //     $userId->update([
-    //         'logout' => Carbon::now()
-    //     ]);
-    // }
+        $userId->update([
+            'logout' => Carbon::now()
+        ]);
+    }
 }
