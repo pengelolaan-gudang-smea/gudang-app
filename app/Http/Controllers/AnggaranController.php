@@ -7,7 +7,10 @@ use App\Models\Barang;
 use App\Models\Jenis_anggaran;
 use App\Models\Jurusan;
 use App\Models\Limit;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Yajra\DataTables\Facades\DataTables;
 
 class AnggaranController extends Controller
 {
@@ -20,6 +23,34 @@ class AnggaranController extends Controller
             'title' => 'List Anggaran',
             'anggaran' => Anggaran::all()
         ]);
+    }
+
+    public function data(Request $request)
+    {
+        $data = Anggaran::orderByDesc('id')->get();
+        if ($request->ajax()) {
+            return DataTables::of($data)
+                ->addIndexColumn()
+                ->addColumn('id', function ($row) {
+                    return encrypt($row->id);
+                })
+                ->addColumn('anggaran', function($row) {
+                    return 'Rp ' . number_format($row->anggaran, 0, ',', '.');
+                })
+                ->addColumn('created_at', function($row) {
+                    return Carbon::parse($row->created_at)->format('H:i') . ' WIB, ' . Carbon::parse($row->created_at)->format('d M Y');
+                })
+                ->addColumn('action', function ($row) {
+                    $route_edit = route('anggaran.edit', encrypt($row->id));
+                    $route_delete = route('anggaran.destroy', encrypt($row->id));
+                    $btn = '';
+                    $btn .= '<button class="edit btn btn-warning btn-sm link-light me-1" data-toggle="tooltip" title="Edit" data-placement="top" data-url="' . $route_edit . '" id="ubah"><i class="bi bi-pencil-square"></i></button>';
+                    $btn .= '<button class="edit btn btn-danger btn-sm btn-icon" data-toggle="tooltip" title="Delete" data-placement="top" id="hapus" data-url="' . $route_delete . '"><i class="bi bi-trash3"></i></button>';
+                    return $btn;
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
     }
 
     /**
@@ -43,6 +74,12 @@ class AnggaranController extends Controller
             'jenis_anggaran' => 'required',
             'tahun' => 'required',
         ]);
+
+        activity()
+        ->causedBy(Auth::user())
+        ->performedOn(new Anggaran())->event('created')
+        ->log('Menambahkan anggaran');
+
         $anggaran = new Anggaran();
         $anggaran->anggaran = str_replace('.', '', $validate['anggaran']);
         $anggaran->jenis_anggaran = $validate['jenis_anggaran'];
@@ -63,12 +100,13 @@ class AnggaranController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Anggaran $anggaran)
+    public function edit($id)
     {
-        return view('dashboard.waka.anggaran.edit', [
-            'title' => 'Edit Anggaran',
-            'anggaran' => $anggaran
-        ]);
+        $title = 'Edit Anggaran';
+        $decryptedId = decrypt($id);
+        $anggaran = Anggaran::findOrFail($decryptedId);
+
+        return view('dashboard.waka.anggaran.edit', compact('title', 'anggaran'));
     }
 
     /**
@@ -83,7 +121,7 @@ class AnggaranController extends Controller
         ]);
 
         $anggaran->anggaran = str_replace('.', '', $validate['anggaran']);
-        $anggaran->jenis = $validate['jenis'];
+        $anggaran->jenis_anggaran = $validate['jenis'];
         $anggaran->tahun = $validate['tahun'];
         $anggaran->update();
 
@@ -93,11 +131,16 @@ class AnggaranController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Anggaran $anggaran)
+    public function destroy($id)
     {
+        $decryptedId = decrypt($id);
+        $anggaran = Anggaran::findOrFail($decryptedId);
         $anggaran->delete();
 
-        return redirect()->route('anggaran.index')->with('success', 'Berhasil menghapus data anggaran');
+        return response()->json([
+            'status' => 'success',
+            'msg' => 'Berhasil menghapus anggaran.',
+        ]);
     }
 
     public function checkAnggaran($id)

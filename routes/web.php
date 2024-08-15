@@ -61,6 +61,8 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
         Route::get('/users/data', [UserManagementController::class, 'data'])->name('users.data');
         Route::resource('/user', UserManagementController::class);
         Route::post('/hak-akses/{user:username}', [UserManagementController::class, 'akses'])->name('user.akses');
+        Route::get('/anggaran/data', [AnggaranController::class, 'data'])->name('anggaran.data');
+        Route::get('limit-anggaran/data', [LimitController::class, 'data'])->name('limit-anggaran.data');
         Route::resource('/anggaran', AnggaranController::class);
         Route::resource('/limit-anggaran', LimitController::class)->parameters(['limit-anggaran' => 'limit']);
         Route::controller(RekapController::class)->prefix('/rekap')->group(function () {

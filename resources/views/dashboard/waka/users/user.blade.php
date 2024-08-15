@@ -18,7 +18,7 @@
                             <th scope="col">Username</th>
                             <th scope="col">Email</th>
                             <th scope="col">Role</th>
-                            <th scope="col">Action</th>
+                            <th scope="col">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -138,7 +138,13 @@
                             usersTable.ajax.reload(null, false)
                         }
                         , error: function(err) {
-                            console.log(err);
+                            Swal.fire({
+                                    icon: 'error'
+                                    , title: 'Gagal'
+                                    , text: err
+                                    , showConfirmButton: false
+                                    , timer: 1500
+                                })
                         }
                     })
                 }

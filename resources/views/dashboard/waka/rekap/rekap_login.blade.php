@@ -7,7 +7,7 @@
                 <div class="accordion-item">
                     <h2 class="accordion-header">
                         <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#filterTanggalAccordion" aria-expanded="true" aria-controls="filterTanggalAccordion">
-                            <b>Filter Tanggal</b>
+                            <i class="bi bi-funnel-fill me-2"></i> <b>Filter Tanggal</b>
                         </button>
                     </h2>
                     <div id="filterTanggalAccordion" class="accordion-collapse collapse show" data-bs-parent="#accordionFilter">
