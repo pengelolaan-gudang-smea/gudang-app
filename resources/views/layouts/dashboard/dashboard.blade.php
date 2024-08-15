@@ -38,6 +38,10 @@
 </head>
 
 <body>
+    {{-- Preloader --}}
+    <div class="preloader flex-column justify-content-center align-items-center">
+        <img class="animation__wobble" src="{{ asset('assets/img/smk.png') }}" alt="Preloader" height="150" width="150">
+    </div>
 
     @include('layouts.dashboard.header')
 
@@ -88,8 +92,13 @@
                 }
             });
         })
-    </script>
 
+        $(window).on('load', function() {
+            $('.preloader').fadeOut('slow', function() {
+                $(this).remove();
+            });
+        });
+    </script>
     @yield('script')
 </body>
 
