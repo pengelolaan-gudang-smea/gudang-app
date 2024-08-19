@@ -28,16 +28,12 @@
                 <!-- Form Container -->
                 <div class="form-container w-75 p-4 bg-white rounded shadow">
                     <h3 class="text-center mb-4 fw-bold">Login</h3>
-                    @if (session()->has('success'))
-                    <div class="alert alert-success">
-                        {{ session()->get('success') }}
-
-                    </div>
-                    @endif
                     @if (session()->has('error'))
-                    <div class="alert alert-danger">
-                        {{ session()->get('error') }}
-
+                    <div class="alert alert-danger d-flex align-items-center">
+                        <i class="bi bi-exclamation-circle me-2"></i>
+                        <div>
+                            {{ session()->get('error') }}
+                        </div>
                     </div>
                     @endif
                     <form class="row g-3" action="{{ route('login.auth') }}" method="post">

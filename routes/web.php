@@ -76,6 +76,7 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
 
     // * KKK
     Route::middleware('checkJurusan', 'can:Mengajukan barang')->group(function () {
+        Route::get('/pengajuan-barang/data', [BarangController::class, 'data'])->name('pengajuan-barang.data');
         Route::resource('/pengajuan-barang', BarangController::class)->parameters(['pengajuan-barang' => 'barang']);
         Route::get('/barang-disetujui', [BarangController::class, 'setuju'])->name('barang.setuju');
     });
@@ -127,4 +128,3 @@ Route::get('/dashboard/graphic', [DashboardController::class, 'chartBarang'])->n
 Route::get('/barang-gudang/keluar', function () {
     return view('dashboard.gudang.barang-keluar', ['title' => 'Barang Keluar', 'barang' => Barang_keluar::all()]);
 })->name('barang.keluar');
-// Route::get

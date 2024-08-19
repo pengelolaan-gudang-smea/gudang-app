@@ -7,6 +7,43 @@
     @endif
     <div class="card">
         <div class="card-body">
+            <div class="accordion my-3" id="accordionFilter">
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#filterTanggalAccordion" aria-expanded="true" aria-controls="filterTanggalAccordion">
+                            <i class="bi bi-funnel-fill me-2"></i> <b>Filter</b>
+                        </button>
+                    </h2>
+                    <div id="filterTanggalAccordion" class="accordion-collapse collapse show" data-bs-parent="#accordionFilter">
+                        <div class="accordion-body">
+                            <form action="{{ route('filter.date') }}" method="GET">
+                                <div class="d-flex justify-content-center mb-2">
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="input-group">
+                                                <span class="input-group-text" id="filterDateInput"><i class="bi bi-calendar-range-fill"></i></span>
+                                                <input type="text" name="filter_date" class="form-control" placeholder="Filter Tanggal" aria-describedby="filterDateInput">
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <select name="filter_status" id="filter_status" class="form-control">
+                                                <option value="all" >Semua</option>
+                                                <option value="Disetujui">Disetujui</option>
+                                                <option value="Belum disetujui">Belum Disetujui</option>
+                                                <option value="Ditolak">Ditolak</option>
+                                            </select>
+                                        </div>
+                                        <div class="col">
+                                            <button type="submit" class="btn btn-primary"><i class="bi bi-funnel"></i> Filter</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <a href="{{ route('pengajuan-barang.create') }}" class="btn btn-primary my-3 {{ ($grand_total >= $limit) ? 'disabled': ''}}"> <i class="bi bi-box2-fill"></i>
                 Ajukan
                 barang</a>
@@ -15,75 +52,35 @@
                 @endif
             <!-- Default Table -->
             <div class="table-responsive">
-                <table class="table mt-2" id="barangsTable">
+                <table class="table table-hover table-bordered mt-2" id="barangsTable">
                     <thead>
                         <tr>
-                            <th scope="col">#</th>
+                            <th scope="col">No</th>
                             <th scope="col">Nama Barang</th>
+                            <th scope="col">Waktu Pengajuan</th>
                             <th scope="col">Harga (Satuan)</th>
                             <th scope="col">Kuantitas (Qty)</th>
                             <th scope="col">Status</th>
                             <th scope="col">Sub Total</th>
-                            <th scope="col">Action</th>
+                            <th scope="col">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($barang as $item)
-                        <tr>
-                            <th scope="row">{{ $loop->iteration }}</th>
-                            <td>{{ $item->name }}</td>
-                            <td class="harga">{{ 'Rp ' . number_format($item->harga, 0, ',', '.') }}</td>
-                            <td class="satuan">{{ $item->stock }}</td>
-                            <td>
-                                @if($item->status == 'Disetujui')
-                                    <span class="badge bg-success">{{ $item->status }}</span>
-                                @elseif($item->status != 'Disetujui' && $item->status != 'Belum disetujui')
-                                    <span class="badge bg-danger">Ditolak</span>
-                                @elseif($item->status == 'Belum disetujui')
-                                    <span class="badge bg-warning text-white">{{ $item->status }}</span>
-                                @endif
-                            </td>
-
-                            <td class="sub-total">{{ 'Rp ' . number_format($item->sub_total, 0, ',', '.') }}</td>
-                            <td>
-                                <div class="d-flex gap-3">
-                                    <div>
-                                        <button type="button" data-barang="{{ $item->slug }}" class="btn btn-sm bg-primary link-light detailBarangBtn" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-title="Detail">
-                                            <i class="bi bi-eye"></i>
-                                        </button>
-                                    </div>
-                                    <div>
-                                        <a href="{{ route('pengajuan-barang.edit', ['barang' => $item->slug]) }}" class="btn btn-sm bg-warning link-light" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-title="Edit">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </a>
-                                    </div>
-                                    <div>
-                                        <button type="button" class="btn btn-sm btn-danger link-light deleteBarangBtn" data-barang="{{ $item->name }}" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-title="Hapus">
-                                            <i class="bi bi-trash3"></i>
-                                        </button>
-                                        <form action="{{ route('pengajuan-barang.destroy', ['barang' => $item->slug]) }}"
-                                            method="post" hidden class="deleteBarangForm"
-                                            data-barang="{{ $item->name }}">
-                                            @csrf
-                                            @method('DELETE')
-                                        </form>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        @endforeach
-
+                        <td colspan="7" class="text-center">Tabel tidak memiliki data</td>
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="6" class="text-right"></th>
+                            <th colspan="2" class="text-right"></th>
+                        </tr>
+                    </tfoot>
                 </table>
-                <p class="fw-bold mb-0">Total Keseluruhan : Rp {{ number_format($grand_total, 0, ',', '.') }},00 dari Rp {{number_format($limit, 0, ',','.')  }},00</p>
-                <p>Sisa Anggaran : Rp {{ number_format($sisa, 0, ',','.') }},00</p>
             </div>
-            <!-- End Default Table Example -->
         </div>
     </div>
     </div>
     <div class="modal fade" id="detailBarangModal" tabindex="-1" aria-labelledby="detailBarangModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="detailBarangModalLabel">Modal title</h1>
@@ -98,102 +95,241 @@
             </div>
         </div>
     </div>
+</section>
+@endsection
+@section('script')
     <script>
-        let table = new DataTable('#barangsTable');
-        //$('[data-bs-toggle="popover"]').popover();
-        $(document).ready(function() {
-            $('.detailBarangBtn').click(function() {
-                const barangId = $(this).data('barang');
-                $.ajax({
-                    type: 'GET'
-                    , url: '/dashboard/pengajuan-barang/' + barangId
-                    , success: function(response) {
-                        if (response.status == 'success') {
-                            $('#detailBarangModalLabel').text(`Detail Barang ${response.barang.name}`);
-                            $('.modal-body').empty();
-                            // Menggunakan formatRupiah untuk harga dan sub_total
-                            const formattedHarga = formatRupiah(response.barang.harga);
-                            const formattedSubTotal = formatRupiah(response.barang.sub_total);
-                            const statusBadgeClass = getStatusBadgeClass(response.barang.status);
+    let barangsTable
+    let startDate = ''
+    let endDate = ''
+    $(document).ready(function() {
+        let total = "{{ number_format($grand_total, 0, ',', '.') }}";
+        let limit = "{{ number_format($limit, 0, ',', '.') }}";
+        let sisa = "{{ number_format($sisa, 0, ',', '.') }}";
 
-                            const badgeElement = $(`<span class="badge ${statusBadgeClass}">${response.barang.status}</span>`);
-
-                            let tujuanBarang = ''
-                            if(response.barang.tujuan !== null){
-                                 tujuanBarang = response.barang.tujuan
-                            }else{
-                                 tujuanBarang = '-'
-                            }
-
-                            const listGroup = $(`<ul class="list-group">
-                                                    <li class="list-group-item"><small>Nama Barang :</small><br> ${response.barang.name}</li>
-                                                    <li class="list-group-item"><small>Waktu Pengajuan :</small><br> ${response.barang.created_at_formatted}</li>
-                                                    <li class="list-group-item"><small>Bulan yang di inginkan  :</small><br> ${response.barang.expired_formatted}</li>
-                                                    <li class="list-group-item"><small>Tujuan Barang  :</small><br> ${tujuanBarang}</li>
-                                                    <li class="list-group-item"><small>Jenis Barang  :</small><br> ${response.barang.jenis_barang}</li>
-                                                    <li class="list-group-item"><small>Spek Teknis :</small><br> ${response.barang.spek}</li>
-                                                    <li class="list-group-item"><small>Harga Satuan :</small><br>Rp ${response.barang.harga}</li>
-                                                    <li class="list-group-item"><small>Kuantitas (Qty) :</small><br> ${response.barang.stock}</li>
-                                                    <li class="list-group-item"><small>Satuan  :</small><br> ${response.barang.satuan}</li>
-                                                    <li class="list-group-item"><small>Status :</small><br></li>
-                                                    <li class="list-group-item"><small>Sub Total :</small><br>Rp ${response.barang.sub_total}</li>
-                                                </ul>`);
-
-                            listGroup.find('li:contains("Status :")').append(badgeElement);
-                            listGroup.find('li:contains("Harga Satuan :")').html(`<small>Harga Satuan :</small><br>${formattedHarga}`);
-                            listGroup.find('li:contains("Sub Total :")').html(`<small>Sub Total :</small><br>${formattedSubTotal}`);
-
-                            $('.modal-body').append(listGroup);
-
-                            $('#detailBarangModal').modal('show');
-                        } else {
-                            // Handle other cases
-                        }
-
-                        function formatRupiah(angka) {
-                            return new Intl.NumberFormat('id-ID', {
-                                style: 'currency'
-                                , currency: 'IDR'
-                            }).format(angka);
-                        }
-
-                        function getStatusBadgeClass(status) {
-                            if (status === 'Belum disetujui') {
-                                return 'bg-warning text-dark';
-                            } else if (status === 'Disetujui') {
-                                return 'bg-success';
-                            } else  {
-                                return 'bg-danger';
-                            }
-                        }
-
-                    }
-                , });
-            });
-
-            $('.deleteBarangBtn').click(function() {
-                const barang = $(this).data('barang');
-                console.log(barang);
-                Swal.fire({
-                    title: 'Anda yakin?'
-                    , text: "Anda tidak bisa mengembalikan data ini!"
-                    , icon: 'warning'
-                    , showCancelButton: true
-                    , confirmButtonColor: '#3085d6'
-                    , cancelButtonColor: '#d33'
-                    , confirmButtonText: 'Ya, hapus!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const deleteBarangForm = $(`.deleteBarangForm[data-barang="${barang}"]`);
-                        deleteBarangForm.submit();
-                    }
-                });
-            });
+        $('input[name="filter_date"]').on('apply.daterangepicker', function(ev, picker) {
+            startDate = picker.startDate.format('YYYY-MM-DD');
+            endDate = picker.endDate.format('YYYY-MM-DD');
+            $(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));
         });
 
-        const harga = document.querySelectorAll('.harga');
-        const sub_total = document.querySelectorAll('.sub-total');
+        $('input[name="filter_date"]').on('cancel.daterangepicker', function(ev, picker) {
+            startDate = '';
+            endDate = '';
+            $(this).val('');
+        });
 
+        $('form').on('submit', function(e) {
+            e.preventDefault();
+            loadData();
+        });
+
+        $(function() {
+            loadData();
+        });
+
+        function loadData() {
+            if (barangsTable !== undefined) {
+                barangsTable.destroy();
+                barangsTable.clear().draw();
+            }
+
+            let status = $('select[name="filter_status"]').val();
+
+            barangsTable = $('#barangsTable').DataTable({
+                responsive: true,
+                searching: true,
+                autoWidth: false,
+                ordering: true,
+                processing: true,
+                serverSide: true,
+                aLengthMenu: [
+                    [5, 10, 25, 50, 100, 250, 500, -1],
+                    [5, 10, 25, 50, 100, 250, 500, "All"]
+                ],
+                pageLength: 10,
+                ajax: {
+                    url: "{{ route('pengajuan-barang.data') }}",
+                    method: "GET",
+                    data: {
+                        startDate: startDate ? startDate : null,
+                        endDate: endDate ? endDate : null,
+                        status: status ? status : null
+                    }
+                },
+                drawCallback: function(settings) {
+                    $('table#barangsTable tr').on('click', '#detail', function(e) {
+                        e.preventDefault();
+                        let url = $(this).data('url');
+                        let data = barangsTable.row($(this).parents('tr')).data();
+                        show(data, url);
+                    });
+
+                    $('table#barangsTable tr').on('click', '#ubah', function(e) {
+                        e.preventDefault();
+                        let url = $(this).data('url');
+                        let data = barangsTable.row($(this).parents('tr')).data();
+                        edit(data, url);
+                    });
+
+                    $('table#barangsTable tr').on('click', '#hapus', function(e) {
+                        e.preventDefault();
+                        let data = barangsTable.row($(this).parents('tr')).data();
+                        let url = $(this).data('url');
+                        destroy(data, url);
+                    });
+                },
+                columns: [
+                    { data: 'DT_RowIndex', name: 'DT_RowIndex', width: '1%', orderable: true, searchable: true },
+                    { data: 'name', name: 'name', orderable: false },
+                    { data: 'created_at', name: 'created_at', orderable: false },
+                    { data: 'harga', name: 'harga', orderable: false },
+                    { data: 'stock', name: 'stock', orderable: false },
+                    { data: 'status', name: 'status', orderable: false },
+                    { data: 'sub_total', name: 'sub_total', orderable: false },
+                    { data: 'action', name: 'action', orderable: false },
+                ],
+                footerCallback: function(row, data, start, end, display) {
+                    var api = this.api();
+
+                    $(api.column(5).footer()).css({
+                        'text-align': 'right',
+                        'padding-right': '10px'
+                    }).html(
+                        '<strong>Total Keseluruhan :</strong>' +
+                        '<br/>Total Anggaran :' +
+                        '<br/>Sisa Anggaran :'
+                    );
+
+                    $(api.column(6).footer()).html(
+                        'Rp ' + total + ',00' +
+                        '<br/> Rp ' + limit + ',00' +
+                        '<br/> Rp ' + sisa + ',00'
+                    );
+                }
+            });
+
+            barangsTable.on('draw', function() {
+                $('[data-toggle="tooltip"]').tooltip();
+            });
+        }
+
+        show = function(data, url) {
+            if (data) {
+                $('#detailBarangModalLabel').text(`Detail Barang ${data.name}`);
+                $('.modal-body').empty();
+
+                let expiredDate = new Date(data.expired);
+                let formattedExpiredDate = expiredDate.toLocaleDateString('id-ID', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                });
+
+                let tableContent = `
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>Kode</th>
+                            <td>${data.no_inventaris}</td>
+                        </tr>
+                        <tr>
+                            <th>Barang</th>
+                            <td>${data.name}</td>
+                        </tr>
+                        <tr>
+                            <th>Waktu Pengajuan</th>
+                            <td>${data.created_at}</td>
+                        </tr>
+                        <tr>
+                            <th>Bulan yang diinginkan</th>
+                            <td>${formattedExpiredDate}</td>
+                        </tr>
+                        <tr>
+                            <th>Tujuan Barang</th>
+                            <td>${data.tujuan}</td>
+                        </tr>
+                        <tr>
+                            <th>Jenis Barang</th>
+                            <td>${data.jenis_barang}</td>
+                        </tr>
+                        <tr>
+                            <th>Spek Teknis</th>
+                            <td>${data.spek}</td>
+                        </tr>
+                        <tr>
+                            <th>Harga Satuan</th>
+                            <td>${data.harga}</td>
+                        </tr>
+                        <tr>
+                            <th>Kuantitas (Qty)</th>
+                            <td>${data.stock}</td>
+                        </tr>
+                        <tr>
+                            <th>Satuan</th>
+                            <td>${data.satuan}</td>
+                        </tr>
+                        <tr>
+                            <th>Status</th>
+                            <td>${data.status}</td>
+                        </tr>
+                        <tr>
+                            <th>Sub Total</th>
+                            <td>${data.sub_total}</td>
+                        </tr>
+                    </table>`;
+
+                $('.modal-body').append(tableContent);
+                $('#detailBarangModal').modal('show');
+            }
+        }
+
+        edit = function(data, url) {
+            window.location.href = url
+        }
+
+        destroy = function(data, url) {
+            Swal.fire({
+                title: 'Apakah anda yakin?'
+                , text: "Ingin menghapus data ini?"
+                , icon: 'warning'
+                , showCancelButton: true
+                , confirmButtonColor: '#0D6EFD'
+                , cancelButtonColor: '#DC3545'
+                , confirmButtonText: 'Ya!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: url
+                        , data: {
+                            _token: "{{ csrf_token() }}"
+                            , _method: "delete"
+                        }
+                        , type: 'POST'
+                        , success: function(res) {
+                            if (res.status == 'success') {
+                                Swal.fire({
+                                    icon: 'success'
+                                    , title: 'Berhasil'
+                                    , text: res.msg
+                                    , showConfirmButton: false
+                                    , timer: 1500
+                                })
+                            }
+                            barangsTable.ajax.reload(null, false)
+                        }
+                        , error: function(err) {
+                            Swal.fire({
+                                    icon: 'error'
+                                    , title: 'Gagal'
+                                    , text: err
+                                    , showConfirmButton: false
+                                    , timer: 1500
+                                })
+                        }
+                    })
+                }
+            })
+        }
+    });
     </script>
-</section>
 @endsection

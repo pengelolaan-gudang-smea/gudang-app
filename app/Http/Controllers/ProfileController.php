@@ -6,13 +6,15 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class ProfileController extends Controller
 {
     public function index()
     {
         return view('dashboard.profile.index', [
-            'title' => 'Profile ' . Auth::user()->username
+            'title' => 'Profile ' . Auth::user()->username,
+            'tab' => 'profile_overview'
         ]);
     }
     public function update(Request $request, User $user)
@@ -32,23 +34,38 @@ class ProfileController extends Controller
         ])
         ->log('Mengubah profile ');
         $user->update($validate);
-        return redirect()->route('dashboard.profile',['user'=>Auth::user()->username])->with('success', 'Berhasil mengubah profile');
+        return redirect()->route('dashboard.profile',['user'=>Auth::user()->username])->with([
+            'success' => 'Berhasil mengubah profile',
+            'tab' => 'profile_edit'
+        ]);
     }
 
     public function changePass(Request $request, User $user)
     {
-        $old_pass = $request->current_password;
+        $validator = Validator::make($request->all(), [
+            'current_password' => ['required'],
+            'new_password' => ['required', 'min:8', 'confirmed']
+        ]);
 
-        if (Hash::check($old_pass, $user->password)) {
-            $pass = $request->validate([
-                'new_password' => ['min:8', 'confirmed']
-            ]);
-            $password_hash = Hash::make($pass['new_password']);
+        if ($validator->fails()) {
+            return back()
+                ->withErrors($validator)
+                ->withInput()
+                ->with('tab', 'profile_change_password');
+        }
+
+        if (Hash::check($request->current_password, $user->password)) {
+            dd($user->password);
+            $password_hash = Hash::make($request->new_password);
             $user->update(['password' => $password_hash]);
-            // dd('berhasil');
-            return back()->with('success', 'Berhasil merubah password');
+            return back()->with([
+                'success' => 'Berhasil merubah password',
+                'tab' => 'profile_change_password'
+            ]);
         } else {
-            return back()->withInput()->withErrors(['current_password' => 'Password lama tidak cocok']);
+            return back()->withErrors([
+                'current_password' => 'Password lama tidak cocok'
+            ])->withInput()->with('tab', 'profile_change_password');
         }
     }
 }
