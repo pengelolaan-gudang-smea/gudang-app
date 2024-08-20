@@ -1,4 +1,7 @@
-
+$('.select2').select2({
+    theme: "bootstrap-5",
+    width: "100%"
+});
 
 function formatRupiahInput(angka, prefix) {
     var number_string = angka.replace(/[^,\d]/g, "").toString()

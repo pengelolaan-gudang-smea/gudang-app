@@ -7,48 +7,45 @@
         @endif
         <div class="card">
             <div class="card-body">
-                <div class="row d-flex justify-content-between mt-5 mb-3">
-                    <div class="col-md-6">
-                        <div class="form-group row d-flex align-items-center">
-                            <label class="col-2">Jurusan</label>
-                            <label class="col-1 text-right">:</label>
-                            <div class="col-md-6">
-                                <select class="form-control" name="jurusan">
-                                    <option selected disabled>-- Pilih Jurusan --</option>
-                                    <option>All</option>
-                                    @foreach (App\Models\Jurusan::get() as $item)
-                                        <option value="{{ $item->id }}">{{ $item->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group row d-flex align-items-center justify-content-end">
-                            <label class="col-2">Tahun</label>
-                            <label class="col-1 ">:</label>
-                            <div class="col-md-6">
-                                <select class="form-control" name="tahun" disabled>
-                                    <option selected disabled>-Pilih Tahun-</option>
-                                </select>
+                <div class="accordion my-3" id="accordionFilter">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#filterAccordion" aria-expanded="true" aria-controls="filterAccordion">
+                                <i class="bi bi-funnel-fill me-2"></i> <b>Filter</b>
+                            </button>
+                        </h2>
+                        <div id="filterAccordion" class="accordion-collapse collapse show" data-bs-parent="#accordionFilter">
+                            <div class="accordion-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <select class="form-control select2 fixed-width" name="jurusan" data-toggle="tooltip" title="Filter Jurusan">
+                                                    <option selected disabled>-- Pilih Jurusan --</option>
+                                                    <option value="all">All</option>
+                                                    @foreach (App\Models\Jurusan::get() as $item)
+                                                        <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <select class="form-control select2 fixed-width" name="tahun" data-toggle="tooltip" title="Filter Tahun" disabled>
+                                                    <option selected disabled>-- Pilih Tahun --</option>
+                                                </select>
+                                            </div>
+                                        </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <hr>
-                <form action="{{ route('barang-acc.export') }}" method="get" class="my-3">
-
-
-
-                    <button class="btn btn-outline-success">Export Excel</button>
-                </form>
-                <div class="table-responsive" id="viewTable">
+                    <button class="btn btm-sm btn-success"><i class="bi bi-file-earmark-excel"></i> Excel</button>
+                    <button class="btn btm-sm btn-danger"><i class="bi bi-filetype-pdf"></i> PDF</button>
+                    <button class="btn btm-sm btn-info text-light"><i class="bi bi-printer"></i> Print</button>
+                <div class="table-responsive mt-3" id="viewTable">
                     <table class="table table-hover table-bordered mt-2" id="barangsTable">
                         <thead>
                             <tr>
                                 <th scope="col" class="text-center">No</th>
                                 <th scope="col">Nama</th>
-                                <th scope="col">Waktu Pengajuan</th>
                                 <th scope="col">Harga (Satuan)</th>
                                 <th scope="col">Kuantitas (Qty)</th>
                                 <th scope="col">Sub total</th>
@@ -57,7 +54,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <td colspan="8" class="text-center">Tabel tidak memiliki data</td>
+                            <td colspan="7" class="text-center">Tabel tidak memiliki data</td>
                         </tbody>
                     </table>
                     <div class="modal fade" id="detailBarangModal" tabindex="-1" aria-labelledby="detailBarangModalLabel"
@@ -70,7 +67,7 @@
                                         aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body-detail">
-                                    ...
+                                    {{-- modal body goes here. --}}
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -197,43 +194,6 @@
         </div>
         {{-- <script>
             $(document).ready(function() {
-                $('[data-bs-toggle="popover"]').popover();
-                $('select[name=jurusan]').select2({
-                    theme: "bootstrap-5"
-                })
-                $('select[name=jurusan]').change(function() {
-                    let jurusan = $(this).val();
-                    $.ajax({
-                        url: '{{ route('filter-jurusan') }}',
-                        type: 'POST',
-                        data: {
-                            _token: '{{ csrf_token() }}',
-                            jurusan: jurusan
-                        },
-                        success: function(data) {
-                            const filterTahun = $('select[name=tahun]');
-                            filterTahun.html('');
-                            if (data.length > 0) {
-                                var options = '';
-                                options += '<option selected disabled>-- Pilih Tahun --</option>';
-                                $.each(data, function(index, tahun) {
-                                    options += '<option value="' + tahun + '">' + tahun +
-                                        '</option>';
-                                });
-                                filterTahun.append(options);
-                                filterTahun.attr('disabled', false);
-                                filterTahun.select2({
-                                    theme: "bootstrap-5"
-                                });
-                                filterTahun.change(function() {
-                                    const selectedTahun = filterTahun.val();
-                                    updateTabel(jurusan, selectedTahun);
-                                });
-                            }
-                        }
-                    });
-                });
-
                 $('.detailBarangBtn').click(function() {
                     const barangId = $(this).data('barang');
                     $.ajax({
@@ -396,9 +356,13 @@
     $(document).ready(function() {
         $(function() {
             loadData();
+            filter();
         });
 
         function loadData() {
+            let jurusanId = $('select[name=jurusan]').val();
+            let tahun = $('select[name=tahun]').val();
+
             if (barangsTable !== undefined) {
                 barangsTable.destroy();
                 barangsTable.clear().draw();
@@ -419,6 +383,10 @@
                 ajax: {
                     url: "{{ route('barang-acc.data') }}",
                     method: "GET",
+                    data: {
+                        jurusan: jurusanId,
+                        tahun: tahun,
+                    },
                 },
                 drawCallback: function(settings) {
                     $('table#barangsTable tr').on('click', '#detail', function(e) {
@@ -445,7 +413,6 @@
                 columns: [
                     { data: 'DT_RowIndex', name: 'DT_RowIndex', width: '1%', class: 'fixed-side text-center', orderable: true, searchable: true },
                     { data: 'name', name: 'name', orderable: false },
-                    { data: 'created_at', name: 'created_at', orderable: false },
                     { data: 'harga', name: 'harga', orderable: false },
                     { data: 'stock', name: 'stock', orderable: false },
                     { data: 'sub_total', name: 'sub_total', orderable: false },
@@ -456,6 +423,46 @@
 
             barangsTable.on('draw', function() {
                 $('[data-toggle="tooltip"]').tooltip();
+            });
+        }
+
+        function filter() {
+            let selectJurusan = $('select[name=jurusan]');
+            let selectTahun = $('select[name=tahun]');
+
+            selectJurusan.on('change', function() {
+                let jurusanId = $(this).val();
+                if (jurusanId !== 'all') {
+                    $.ajax({
+                        url: "{{ route('filter-jurusan') }}",
+                        method: "GET",
+                        data: { jurusan_id: jurusanId },
+                        success: function(data) {
+                            if (data.length > 0) {
+                                selectTahun.prop('disabled', false);
+                                selectTahun.empty();
+                                selectTahun.append('<option selected disabled>-- Pilih Tahun --</option>');
+                                selectTahun.append('<option value="all">All</option>');
+                                $.each(data, function(key, value) {
+                                    selectTahun.append('<option value="'+ value +'">'+ value +'</option>');
+                                });
+                            } else {
+                                selectTahun.prop('disabled', true);
+                                selectTahun.empty();
+                                selectTahun.append('<option selected disabled>-- Pilih Tahun --</option>');
+                            }
+                        }
+                    });
+                } else {
+                    selectTahun.prop('disabled', true);
+                    selectTahun.empty();
+                    selectTahun.append('<option selected disabled>-- Pilih Tahun --</option>');
+                }
+                loadData();
+            });
+
+            selectTahun.on('change', function() {
+                loadData();
             });
         }
 

@@ -85,7 +85,7 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
     Route::middleware('can:Menyetujui barang')->group(function () {
         Route::get('/barang-acc/data', [AdminAngaranController::class, 'data'])->name('barang-acc.data');
         Route::resource('/barang-acc', AdminAngaranController::class)->parameters(['barang-acc' => 'acc'])->except('create', 'store', 'destroy');
-        Route::post('/filter-jurusan', [AdminAngaranController::class, 'filterJurusan'])->name('filter-jurusan');
+        Route::get('/filter-jurusan', [AdminAngaranController::class, 'getTahunByJurusan'])->name('filter-jurusan');
         Route::post('/filter-barang', [AdminAngaranController::class, 'filterBarang'])->name('filter-barang');
         Route::put('/barang-accepted/{slug}', [AdminAngaranController::class, 'EditBarangPersetujuan'])->name('persetujuan.editBarang');
         Route::get('/barang-accepted/export', [AdminAngaranController::class, 'export'])->name('barang-acc.export');

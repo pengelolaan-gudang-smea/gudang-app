@@ -29,7 +29,14 @@ class AdminAngaranController extends Controller
 
     public function data(Request $request)
     {
-        $barang = Barang::with('anggaran')->get();
+        $barang = Barang::with('anggaran')
+                            ->when($request->jurusan && $request->jurusan !== 'all', function($query) use ($request) {
+                                $query->where('jurusan_id', $request->jurusan);
+                            })
+                            ->when($request->tahun && $request->tahun !== 'all', function($query) use ($request) {
+                                $query->whereYear('created_at', $request->tahun);
+                            })
+                            ->get();
 
         if ($request->ajax()) {
             return DataTables::of($barang)
@@ -38,7 +45,7 @@ class AdminAngaranController extends Controller
                     return encrypt($q->id);
                 })
                 ->addColumn('created_at', function ($q) {
-                    return Carbon::parse($q->created_at)->format('H:i') . ', ' . Carbon::parse($q->created_at)->format('d/m/y');
+                    return Carbon::parse($q->created_at)->format('H:i') . ', ' . Carbon::parse($q->created_at)->format('d M Y');
                 })
                 ->addColumn('harga', function ($q) {
                     return 'Rp ' . number_format($q->harga, 0, ',', '.');
@@ -262,15 +269,14 @@ class AdminAngaranController extends Controller
      */
     public function destroy(Barang $acc) {}
 
-    public function filterJurusan(Request $request)
+    public function getTahunByJurusan(Request $request)
     {
-        $tahun = Barang::where('jurusan_id', $request->jurusan)
-            ->distinct()
-            ->selectRaw('YEAR(created_at) as tahun')
-            ->pluck('tahun')
-            ->toArray();
+        $tahun = Barang::where('jurusan_id', $request->jurusan_id)
+                ->selectRaw('YEAR(created_at) as year')
+                ->distinct()
+                ->pluck('year');
 
-        return $tahun;
+        return response()->json($tahun);
     }
 
     public function filterBarang(Request $request)
