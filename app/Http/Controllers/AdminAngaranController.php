@@ -27,20 +27,94 @@ class AdminAngaranController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function data(Request $request)
     {
-        //
-    }
+        $barang = Barang::with('anggaran')->get();
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+        if ($request->ajax()) {
+            return DataTables::of($barang)
+                ->addIndexColumn()
+                ->addColumn('id', function ($q) {
+                    return encrypt($q->id);
+                })
+                ->addColumn('created_at', function ($q) {
+                    return Carbon::parse($q->created_at)->format('H:i') . ', ' . Carbon::parse($q->created_at)->format('d/m/y');
+                })
+                ->addColumn('harga', function ($q) {
+                    return 'Rp ' . number_format($q->harga, 0, ',', '.');
+                })
+                ->addColumn('status', function ($q) {
+
+                    $originalStatus = $q->status;
+                    $statusWithBadge = '';
+
+                    switch ($q->status) {
+                        case 'Disetujui':
+                            $statusWithBadge = '<span class="badge bg-success">' . $originalStatus . '</span>';
+                            break;
+                        case 'Belum disetujui':
+                            $statusWithBadge = '<span class="badge bg-warning">' . $originalStatus . '</span>';
+                            break;
+                        case 'Ditolak':
+                            $statusWithBadge = '<span class="badge bg-danger">' . $originalStatus . '</span>';
+                            break;
+                        default:
+                            $statusWithBadge = '<span class="badge bg-secondary">' . $originalStatus . '</span>';
+                    }
+
+                    $q->status_with_badge = $statusWithBadge;
+
+                    $q->original_status = $originalStatus;
+                    return $q->status_with_badge;
+                })
+                ->addColumn('keterangan_with_badge', function ($q) {
+
+                    $keteranganWithBadge = '';
+
+                    switch ($q->status) {
+                        case 'Disetujui':
+                            $keteranganWithBadge = '<span class="badge bg-success">' . $q->keterangan . ' barang disetujui' . '</span>';
+                            break;
+                        case 'Belum disetujui':
+                            $keteranganWithBadge = '<span class="badge bg-warning">' . $q->status . '</span>';
+                            break;
+                        case 'Ditolak':
+                            $keteranganWithBadge = '<span class="badge bg-danger">' . $q->keterangan . ' barang ditolak' . '</span>';
+                            break;
+                        default:
+                            $keteranganWithBadge = '<span class="badge bg-secondary">' . $q->keterangan . '</span>';
+                    }
+
+                    $q->keterangan_with_badge = $keteranganWithBadge;
+
+                    return $q->keterangan_with_badge;
+                })
+                ->addColumn('sub_total', function ($q) {
+                    return 'Rp ' . number_format($q->sub_total, 0, ',', '.');
+                })
+                ->addColumn('action', function ($q) {
+                    $route_detail = route('barang-acc.show', encrypt($q->id));
+                    $route_edit = route('barang-acc.edit', encrypt($q->id));
+                    $route_reject = route('barang-acc.update', encrypt($q->id));
+                    $btn = '';
+                    // Button "Detail" selalu ditampilkan
+                    $btn .= '<button class="edit btn btn-info btn-sm link-light me-1" data-toggle="tooltip" title="Detail" data-placement="top" data-url="' . $route_detail . '" id="detail"><i class="bi bi-eye"></i></button>';
+
+                    if ($q->original_status == 'Belum disetujui') {
+                        $btn .= '<button class="edit btn btn-success btn-sm link-light me-1" data-toggle="tooltip" title="Setujui" data-placement="top" data-url="' . $route_edit . '" id="ubah"><i class="bi bi-check2"></i></button>';
+                        $btn .= '<button class="edit btn btn-danger btn-sm btn-icon" data-toggle="tooltip" title="Tolak" data-placement="top" id="hapus" data-url="' . $route_reject . '"><i class="bi bi-x"></i></button>';
+                    } elseif ($q->original_status == 'Disetujui') {
+                        $btn .= '<button class="edit btn btn-warning btn-sm link-light me-1" data-toggle="tooltip" title="Edit barang disetujui" data-placement="top" data-url="' . $route_edit . '" id="ubah"><i class="bi bi-pencil-square"></i></button>';
+                        $btn .= '<button class="edit btn btn-danger btn-sm btn-icon" data-toggle="tooltip" title="Tolak" data-placement="top" id="hapus" data-url="' . $route_reject . '"><i class="bi bi-x"></i></button>';
+                    } elseif ($q->original_status == 'Ditolak') {
+                        $btn .= '<button class="edit btn btn-success btn-sm link-light me-1" data-toggle="tooltip" title="Setujui" data-placement="top" data-url="' . $route_edit . '" id="ubah"><i class="bi bi-check2"></i></button>';
+                    }
+
+                    return $btn;
+                })
+                ->rawColumns(['status', 'keterangan_with_badge', 'action'])
+                ->make(true);
+        }
     }
 
     /**
@@ -186,9 +260,7 @@ class AdminAngaranController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Barang $acc)
-    {
-    }
+    public function destroy(Barang $acc) {}
 
     public function filterJurusan(Request $request)
     {

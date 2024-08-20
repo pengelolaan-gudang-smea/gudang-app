@@ -16,22 +16,25 @@
                     </h2>
                     <div id="filterTanggalAccordion" class="accordion-collapse collapse show" data-bs-parent="#accordionFilter">
                         <div class="accordion-body">
-                            <form action="{{ route('filter.date') }}" method="GET">
+                            <form method="GET" id="formFilter">
                                 <div class="d-flex justify-content-center mb-2">
                                     <div class="row">
                                         <div class="col">
                                             <div class="input-group">
                                                 <span class="input-group-text" id="filterDateInput"><i class="bi bi-calendar-range-fill"></i></span>
-                                                <input type="text" name="filter_date" class="form-control" placeholder="Filter Tanggal" aria-describedby="filterDateInput">
+                                                <input type="text" name="filter_date" class="form-control" placeholder="Filter Tanggal" aria-describedby="filterDateInput" data-toggle="tooltip" title="Filter Tanggal">
                                             </div>
                                         </div>
                                         <div class="col">
-                                            <select name="filter_status" id="filter_status" class="form-control">
-                                                <option value="all" >Semua</option>
-                                                <option value="Disetujui">Disetujui</option>
-                                                <option value="Belum disetujui">Belum Disetujui</option>
-                                                <option value="Ditolak">Ditolak</option>
-                                            </select>
+                                            <div class="input-group">
+                                                <span class="input-group-text" id="filterStatusInput"><i class="bi bi-activity"></i></span>
+                                                <select name="filter_status" id="filter_status" class="form-control" data-toggle="tooltip" title="Filter Status">
+                                                    <option value="all" >Semua</option>
+                                                    <option value="Disetujui">Disetujui</option>
+                                                    <option value="Belum disetujui">Belum Disetujui</option>
+                                                    <option value="Ditolak">Ditolak</option>
+                                                </select>
+                                            </div>
                                         </div>
                                         <div class="col">
                                             <button type="submit" class="btn btn-primary"><i class="bi bi-funnel"></i> Filter</button>
@@ -43,12 +46,12 @@
                     </div>
                 </div>
             </div>
-            
+
             <a href="{{ route('pengajuan-barang.create') }}" class="btn btn-primary my-3 {{ ($grand_total >= $limit) ? 'disabled': ''}}"> <i class="bi bi-box2-fill"></i>
                 Ajukan
                 barang</a>
                 @if ($grand_total == $limit)
-                <small class="text-danger">Limit telah tercapai</small>
+                    <small class="text-danger">Limit telah tercapai</small>
                 @endif
             <!-- Default Table -->
             <div class="table-responsive">
@@ -80,7 +83,7 @@
     </div>
     </div>
     <div class="modal fade" id="detailBarangModal" tabindex="-1" aria-labelledby="detailBarangModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-dialog modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="detailBarangModalLabel">Modal title</h1>
@@ -119,7 +122,7 @@
             $(this).val('');
         });
 
-        $('form').on('submit', function(e) {
+        $('form#formFilter').on('submit', function(e) {
             e.preventDefault();
             loadData();
         });

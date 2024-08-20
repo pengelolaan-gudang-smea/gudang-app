@@ -43,83 +43,21 @@
                     <button class="btn btn-outline-success">Export Excel</button>
                 </form>
                 <div class="table-responsive" id="viewTable">
-                    <table class="table mt-2" id="barangsTable">
+                    <table class="table table-hover table-bordered mt-2" id="barangsTable">
                         <thead>
                             <tr>
-                                <th scope="col" class="text-center">#</th>
+                                <th scope="col" class="text-center">No</th>
                                 <th scope="col">Nama</th>
+                                <th scope="col">Waktu Pengajuan</th>
                                 <th scope="col">Harga (Satuan)</th>
                                 <th scope="col">Kuantitas (Qty)</th>
                                 <th scope="col">Sub total</th>
                                 <th scope="col">Status</th>
-                                <th scope="col">Action</th>
+                                <th scope="col">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($barang as $item)
-                                <tr>
-                                    <th scope="row">{{ $loop->iteration }}</th>
-                                    <td>{{ $item->name }}</td>
-                                    <td>{{ 'Rp ' . number_format($item->harga, 0, ',', '.') }}</td>
-                                    <td>{{ $item->stock }}</td>
-                                    <td class="sub-total">{{ 'Rp ' . number_format($item->sub_total, 0, ',', '.') }}</td>
-
-                                    <td>
-                                        @if ($item->status == 'Disetujui')
-                                            <span class="badge bg-success">{{ $item->status }}</span>
-                                        @elseif($item->status != 'Disetujui' && $item->status != 'Belum disetujui')
-                                            <span class="badge bg-danger">Ditolak</span>
-                                        @elseif($item->status == 'Belum disetujui')
-                                            <span class="badge bg-warning text-white">{{ $item->status }}</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <div class="d-flex gap-3">
-                                            <div>
-                                                <button type="button" data-barang="{{ $item->slug }}"
-                                                    class="btn btn-sm bg-primary link-light detailBarangBtn"
-                                                    data-bs-toggle="popover" data-bs-trigger="hover" data-bs-title="Detail"
-                                                    data-bs-target="#detailBarangModal">
-                                                    <i class="bi bi-eye"></i>
-                                                </button>
-                                            </div>
-                                            @if ($item->status != 'Disetujui')
-                                                <div>
-                                                    <button
-                                                        class="bi bi-check fw-bold btn btn-sm bg-success link-light persetujuan"
-                                                        data-bs-toggle="popover" data-bs-trigger="hover"
-                                                        data-bs-title="Setujui" data-bs-target="#ModalPersetujuan"
-                                                        data-slug="{{ $item->slug }}"
-                                                        data-satuan ="{{ $item->stock }}"></button>
-                                                </div>
-                                            @endif
-
-                                            @if ($item->status == 'Disetujui' || $item->status == 'Belum disetujui')
-                                                @if ($item->status === 'Disetujui')
-                                                    <div>
-                                                        <button
-                                                            class="bi bi-pen fw-bold btn btn-sm bg-warning link-light EditJumlahBarang"
-                                                            data-bs-toggle="popover" data-bs-trigger="hover"
-                                                            data-bs-title="Edit jumlah barang yg di setujui"
-                                                            data-bs-target="#ModalEditBarang"
-                                                            data-slug="{{ $item->slug }}"
-                                                            data-keterangan="{{ $item->keterangan }}"
-                                                            data-jenisAnggaran='{{ $item->anggaran_id }}'
-                                                            data-satuan ="{{ $item->stock }}"></button>
-                                                    </div>
-                                                @endif
-                                                <div>
-                                                    <button
-                                                        class="bi bi-x fw-bold btn btn-sm bg-danger link-light penolakan"
-                                                        data-bs-toggle="popover" data-bs-trigger="hover"
-                                                        data-bs-title="Tolak" data-bs-target="#ModalPenolakan"
-                                                        data-slug="{{ $item->slug }}"></button>
-                                                </div>
-                                            @endif
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
+                            <td colspan="8" class="text-center">Tabel tidak memiliki data</td>
                         </tbody>
                     </table>
                     <div class="modal fade" id="detailBarangModal" tabindex="-1" aria-labelledby="detailBarangModalLabel"
@@ -257,7 +195,7 @@
             </div>
         </div>
         </div>
-        <script>
+        {{-- <script>
             $(document).ready(function() {
                 $('[data-bs-toggle="popover"]').popover();
                 $('select[name=jurusan]').select2({
@@ -448,118 +386,202 @@
                 $('#submitEditjmulahBarang').click(function() {
                     $('#EditJumlahBarangForm').submit()
                 })
-
-
-                function updateTabel(jurusan, selectedTahun) {
-                    $("#viewTable").html(``)
-                    $("#viewTable").html(`<table class="table mt-2" id="barangsTable">
-                                            <thead>
-                                                <tr>
-                                                    <th scope="col" class="text-center">#</th>
-                                                    <th scope="col">Nama</th>
-                                                    <th scope="col">Harga (Satuan)</th>
-                                                    <th scope="col">Kuantitas (Qty)</th>
-                                                    <th scope="col">Sub total</th>
-                                                    <th scope="col">Status</th>
-                                                    <th scope="col">Action</th>
-                                                </tr>
-                                            </thead>
-                                            </table>`);
-                    $('#barangsTable').DataTable({
-                        processing: true,
-                        serverSide: true,
-                        responsive: true,
-                        pageLength: 25,
-                        "paging": true,
-                        "order": [
-                            [0, "asc"]
-                        ],
-                        ajax: {
-                            "url": "{{ route('filter-barang') }}",
-                            "type": "POST",
-                            "data": {
-                                "_token": "{{ csrf_token() }}",
-                                "jurusan": jurusan,
-                                "tahun": selectedTahun
-                            },
-                        },
-                        columns: [{
-                                data: 'DT_RowIndex',
-                                orderable: false,
-                                searchable: false,
-                                width: "8%",
-                                className: "text-center"
-                            }, {
-                                data: 'nama',
-                                className: "text-center"
-                            }, {
-                                data: 'harga',
-                                className: "text-center"
-                            }, {
-                                data: 'satuan',
-                                className: "text-center"
-                            }, {
-                                data: 'sub_total',
-                                className: "text-center"
-                            },
-                            {
-                                data: 'status',
-                                className: "text-center",
-                                render: function(data, type, row) {
-                                    // Implementasi badge sesuai dengan nilai status
-                                    let badgeClass = '';
-                                    if (data === 'Disetujui') {
-                                        badgeClass = 'badge text-success';
-                                    } else if (data === 'Ditolak') {
-                                        badgeClass = 'badge text-danger';
-                                    } else {
-                                        badgeClass = 'badge text-warning';
-                                    }
-                                    return '<span class="' + badgeClass + '">' + data + '</span>';
-                                }
-                            },
-                            {
-                                data: 'action',
-                                render: function(data, type, row) {
-                                    let slug = row.action;
-                                    let buttons = '<div class="d-flex gap-3">';
-                                    buttons += '<div>';
-                                    buttons += '<form action="{{ route('barang-acc.update', '') }}/' +
-                                        slug + '" method="POST">';
-                                    buttons += '@method('PUT')';
-                                    buttons += '@csrf';
-                                    buttons += '<input type="hidden" name="status" value="Disetujui">';
-                                    buttons +=
-                                        '<button class="bi bi-check fw-bold btn btn-sm bg-success link-light" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-title="Setujui"></button>';
-                                    buttons += '</form>';
-                                    buttons += '</div>';
-                                    buttons += '<div>';
-                                    buttons += '<form action="{{ route('barang-acc.update', '') }}/' +
-                                        slug + '" method="POST">';
-                                    buttons += '@csrf';
-                                    buttons += '@method('PUT')';
-                                    buttons += '<input type="hidden" name="status" value="Ditolak">';
-                                    buttons +=
-                                        '<button class="bi bi-x fw-bold btn btn-sm bg-danger link-light" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-title="Tolak"></button>';
-                                    buttons += '</form>';
-                                    buttons += '</div>';
-                                    buttons += '</div>';
-
-                                    return buttons;
-                                }
-                            }
-                        ],
-                        "language": {
-                            "paginate": {
-                                "previous": 'Previous',
-                                "next": 'Next'
-                            }
-                        }
-                    });
-                }
-
-                let table = new DataTable('#barangsTable');
             });
-        </script>
+        </script> --}}
     </section>
+@endsection
+@section('script')
+    <script>
+    let barangsTable
+    $(document).ready(function() {
+        $(function() {
+            loadData();
+        });
+
+        function loadData() {
+            if (barangsTable !== undefined) {
+                barangsTable.destroy();
+                barangsTable.clear().draw();
+            }
+
+            barangsTable = $('#barangsTable').DataTable({
+                responsive: true,
+                searching: true,
+                autoWidth: false,
+                ordering: true,
+                processing: true,
+                serverSide: true,
+                aLengthMenu: [
+                    [5, 10, 25, 50, 100, 250, 500, -1],
+                    [5, 10, 25, 50, 100, 250, 500, "All"]
+                ],
+                pageLength: 10,
+                ajax: {
+                    url: "{{ route('barang-acc.data') }}",
+                    method: "GET",
+                },
+                drawCallback: function(settings) {
+                    $('table#barangsTable tr').on('click', '#detail', function(e) {
+                        e.preventDefault();
+                        let url = $(this).data('url');
+                        let data = barangsTable.row($(this).parents('tr')).data();
+                        show(data, url);
+                    });
+
+                    $('table#barangsTable tr').on('click', '#ubah', function(e) {
+                        e.preventDefault();
+                        let url = $(this).data('url');
+                        let data = barangsTable.row($(this).parents('tr')).data();
+                        edit(data, url);
+                    });
+
+                    $('table#barangsTable tr').on('click', '#hapus', function(e) {
+                        e.preventDefault();
+                        let data = barangsTable.row($(this).parents('tr')).data();
+                        let url = $(this).data('url');
+                        destroy(data, url);
+                    });
+                },
+                columns: [
+                    { data: 'DT_RowIndex', name: 'DT_RowIndex', width: '1%', class: 'fixed-side text-center', orderable: true, searchable: true },
+                    { data: 'name', name: 'name', orderable: false },
+                    { data: 'created_at', name: 'created_at', orderable: false },
+                    { data: 'harga', name: 'harga', orderable: false },
+                    { data: 'stock', name: 'stock', orderable: false },
+                    { data: 'sub_total', name: 'sub_total', orderable: false },
+                    { data: 'status', name: 'status', orderable: false },
+                    { data: 'action', name: 'action', orderable: false },
+                ],
+            });
+
+            barangsTable.on('draw', function() {
+                $('[data-toggle="tooltip"]').tooltip();
+            });
+        }
+
+        show = function(data, url) {
+            console.log(data);
+
+            if (data) {
+                $('#detailBarangModalLabel').text(`Detail Barang ${data.name}`);
+                $('.modal-body-detail').empty();
+
+                let expiredDate = new Date(data.expired);
+                let formattedExpiredDate = expiredDate.toLocaleDateString('id-ID', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                });
+                let jenisAnggaran = data.anggaran ? data.anggaran.jenis_anggaran + ' - ' + data.anggaran.tahun : '<small class="text-secondary">Jenis anggaran belum dialokasikan</small>';
+
+                let tableContent = `
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>Kode</th>
+                            <td>${data.no_inventaris}</td>
+                        </tr>
+                        <tr>
+                            <th>Barang</th>
+                            <td>${data.name}</td>
+                        </tr>
+                        <tr>
+                            <th>Waktu Pengajuan</th>
+                            <td>${data.created_at}</td>
+                        </tr>
+                        <tr>
+                            <th>Bulan yang diinginkan</th>
+                            <td>${formattedExpiredDate}</td>
+                        </tr>
+                        <tr>
+                            <th>Tujuan Barang</th>
+                            <td>${data.tujuan}</td>
+                        </tr>
+                        <tr>
+                            <th>Jenis Barang</th>
+                            <td>${data.jenis_barang}</td>
+                        </tr>
+                        <tr>
+                            <th>Spek Teknis</th>
+                            <td>${data.spek}</td>
+                        </tr>
+                        <tr>
+                            <th>Harga Satuan</th>
+                            <td>${data.harga}</td>
+                        </tr>
+                        <tr>
+                            <th>Kuantitas (Qty)</th>
+                            <td>${data.stock}</td>
+                        </tr>
+                        <tr>
+                            <th>Satuan</th>
+                            <td>${data.satuan}</td>
+                        </tr>
+                        <tr>
+                            <th>Status</th>
+                            <td>${data.keterangan_with_badge}</td>
+                        </tr>
+                        <tr>
+                            <th>Sub Total</th>
+                            <td>${data.sub_total}</td>
+                        </tr>
+                        <tr>
+                            <th>Jenis Anggaran</th>
+                            <td>${jenisAnggaran}</td>
+                        </tr>
+                    </table>`;
+
+                $('.modal-body-detail').append(tableContent);
+                $('#detailBarangModal').modal('show');
+            }
+        }
+
+        edit = function(data, url) {
+            window.location.href = url
+        }
+
+        destroy = function(data, url) {
+            Swal.fire({
+                title: 'Apakah anda yakin?'
+                , text: "Ingin menghapus data ini?"
+                , icon: 'warning'
+                , showCancelButton: true
+                , confirmButtonColor: '#0D6EFD'
+                , cancelButtonColor: '#DC3545'
+                , confirmButtonText: 'Ya!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: url
+                        , data: {
+                            _token: "{{ csrf_token() }}"
+                            , _method: "delete"
+                        }
+                        , type: 'POST'
+                        , success: function(res) {
+                            if (res.status == 'success') {
+                                Swal.fire({
+                                    icon: 'success'
+                                    , title: 'Berhasil'
+                                    , text: res.msg
+                                    , showConfirmButton: false
+                                    , timer: 1500
+                                })
+                            }
+                            barangsTable.ajax.reload(null, false)
+                        }
+                        , error: function(err) {
+                            Swal.fire({
+                                    icon: 'error'
+                                    , title: 'Gagal'
+                                    , text: err
+                                    , showConfirmButton: false
+                                    , timer: 1500
+                                })
+                        }
+                    })
+                }
+            })
+        }
+    });
+    </script>
 @endsection

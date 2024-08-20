@@ -83,6 +83,7 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
 
     // * Admin Anggaran
     Route::middleware('can:Menyetujui barang')->group(function () {
+        Route::get('/barang-acc/data', [AdminAngaranController::class, 'data'])->name('barang-acc.data');
         Route::resource('/barang-acc', AdminAngaranController::class)->parameters(['barang-acc' => 'acc'])->except('create', 'store', 'destroy');
         Route::post('/filter-jurusan', [AdminAngaranController::class, 'filterJurusan'])->name('filter-jurusan');
         Route::post('/filter-barang', [AdminAngaranController::class, 'filterBarang'])->name('filter-barang');
