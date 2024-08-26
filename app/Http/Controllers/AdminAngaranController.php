@@ -7,8 +7,6 @@ use App\Models\Anggaran;
 use Carbon\Carbon;
 use App\Models\Barang;
 use App\Models\BarangGudang;
-use App\Models\Jenis_anggaran;
-use App\Models\Jenis_barang;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
@@ -74,6 +72,9 @@ class AdminAngaranController extends Controller
                     $q->original_status = $originalStatus;
                     return $q->status_with_badge;
                 })
+                ->addColumn('original_status', function ($q) {
+                    return $q->original_status;
+                })
                 ->addColumn('keterangan_with_badge', function ($q) {
 
                     $keteranganWithBadge = '';
@@ -84,9 +85,6 @@ class AdminAngaranController extends Controller
                             break;
                         case 'Belum disetujui':
                             $keteranganWithBadge = '<span class="badge bg-warning">' . $q->status . '</span>';
-                            break;
-                        case 'Ditolak':
-                            $keteranganWithBadge = '<span class="badge bg-danger">' . $q->keterangan . ' barang ditolak' . '</span>';
                             break;
                         default:
                             $keteranganWithBadge = '<span class="badge bg-secondary">' . $q->keterangan . '</span>';
@@ -101,20 +99,21 @@ class AdminAngaranController extends Controller
                 })
                 ->addColumn('action', function ($q) {
                     $route_detail = route('barang-acc.show', encrypt($q->id));
-                    $route_edit = route('barang-acc.edit', encrypt($q->id));
-                    $route_reject = route('barang-acc.update', encrypt($q->id));
+                    $route_edit = route('persetujuan.editBarang', $q->slug);
+                    $route_acc = route('barang-acc.update', $q->slug);
+                    $route_reject = route('barang-acc.update', $q->slug);
                     $btn = '';
                     // Button "Detail" selalu ditampilkan
                     $btn .= '<button class="edit btn btn-info btn-sm link-light me-1" data-toggle="tooltip" title="Detail" data-placement="top" data-url="' . $route_detail . '" id="detail"><i class="bi bi-eye"></i></button>';
 
                     if ($q->original_status == 'Belum disetujui') {
-                        $btn .= '<button class="edit btn btn-success btn-sm link-light me-1" data-toggle="tooltip" title="Setujui" data-placement="top" data-url="' . $route_edit . '" id="ubah"><i class="bi bi-check2"></i></button>';
-                        $btn .= '<button class="edit btn btn-danger btn-sm btn-icon" data-toggle="tooltip" title="Tolak" data-placement="top" id="hapus" data-url="' . $route_reject . '"><i class="bi bi-x"></i></button>';
+                        $btn .= '<button class="edit btn btn-success btn-sm link-light me-1" data-toggle="tooltip" title="Setujui" data-placement="top" data-url="' . $route_acc . '" id="acc"><i class="bi bi-check2"></i></button>';
+                        $btn .= '<button class="edit btn btn-danger btn-sm btn-icon" data-toggle="tooltip" title="Tolak" data-placement="top" id="reject" data-url="' . $route_reject . '" id="acc"><i class="bi bi-x"></i></button>';
                     } elseif ($q->original_status == 'Disetujui') {
                         $btn .= '<button class="edit btn btn-warning btn-sm link-light me-1" data-toggle="tooltip" title="Edit barang disetujui" data-placement="top" data-url="' . $route_edit . '" id="ubah"><i class="bi bi-pencil-square"></i></button>';
-                        $btn .= '<button class="edit btn btn-danger btn-sm btn-icon" data-toggle="tooltip" title="Tolak" data-placement="top" id="hapus" data-url="' . $route_reject . '"><i class="bi bi-x"></i></button>';
+                        $btn .= '<button class="edit btn btn-danger btn-sm btn-icon" data-toggle="tooltip" title="Tolak" data-placement="top" id="reject" data-url="' . $route_reject . '"><i class="bi bi-x"></i></button>';
                     } elseif ($q->original_status == 'Ditolak') {
-                        $btn .= '<button class="edit btn btn-success btn-sm link-light me-1" data-toggle="tooltip" title="Setujui" data-placement="top" data-url="' . $route_edit . '" id="ubah"><i class="bi bi-check2"></i></button>';
+                        $btn .= '<button class="edit btn btn-success btn-sm link-light me-1" data-toggle="tooltip" title="Setujui" data-placement="top" data-url="' . $route_acc . '" id="acc"><i class="bi bi-check2"></i></button>';
                     }
 
                     return $btn;
@@ -129,7 +128,6 @@ class AdminAngaranController extends Controller
      */
     public function show(string $slug)
     {
-
         $barang = Barang::where('slug', $slug)->with('anggaran')->first();
         $barang->created_at_formatted = Carbon::parse($barang->created_at)->format('j F Y');
         $barang->expired_formatted = Carbon::parse($barang->expired)->format('F Y');
@@ -158,7 +156,7 @@ class AdminAngaranController extends Controller
     public function update(Request $request, Barang $acc)
     {
         try {
-            if ($request->has('persetujuan')) {
+            if ($request->ajax() && $request->has('persetujuan')) {
 
                 // ? Update Barang jika di setujui
                 $validated = $request->validate([
@@ -174,14 +172,13 @@ class AdminAngaranController extends Controller
                     'anggaran_id' => $validated['jenis_anggaran']
                 ]);
                 $message = 'Disetujui';
-                // dd($acc);
 
                 // ? Masukan Barang yang sudah disetujui ke Barang_Gudang
                 $barangGudang = BarangGudang::where('name', $acc->name)->where('jenis_barang', $acc->jenis_barang)->get();
-                // dd($barangGudang);
                 if ($barangGudang->isNotEmpty()) {
                     foreach ($barangGudang as $barang_gudang) {
-                        $barang_gudang->increment('stock', $request->input('persetujuan'));
+                        $barang_gudang->increment('stock_awal', $request->input('persetujuan'));
+                        $barang_gudang->increment('stock_akhir', $request->input('persetujuan'));
                     }
                 } else {
                     BarangGudang::create([
@@ -210,9 +207,11 @@ class AdminAngaranController extends Controller
                         'spek' => $acc->spek,
                     ]])
                     ->log('Menyetujui barang yang diajukan oleh ' . $acc->user->username);
-                return back()->with('success', 'Barang ' . $message);
+                return response()->json([
+                    'status' => 'success',
+                    'msg' => 'Berhasil menyetujui barang ' . $acc->no_inventaris,
+                ]);
             } elseif ($request->has('penolakan')) {
-
                 // ? Set Activity
                 activity()->performedOn(new Barang())->event('rejected')
                     ->withProperties(['attributes' => [
@@ -222,7 +221,7 @@ class AdminAngaranController extends Controller
                         'spek' => $acc->spek,
                     ]])->log('Menolak barang yang diajukan oleh ' . $acc->user->username);
 
-                // ? UPdate Barang jika status ditolak
+                // ? Update Barang jika status ditolak
                 $acc->update([
                     'status' => 'Ditolak',
                     'keterangan' => $request->input('penolakan')
@@ -233,35 +232,45 @@ class AdminAngaranController extends Controller
                 $barang = BarangGudang::where('barang_id', $acc->id)->first();
                 $barangGudang = BarangGudang::where('name', $acc->name)->where('jenis_barang', $acc->jenis_barang)->get();
                 foreach ($barangGudang as $barang_gudang) {
-                    $barang_gudang->decrement('stock', $acc->stock);
+                    $barang_gudang->decrement('stock_akhir', $acc->stock);
                 }
                 if ($barang) {
                     $barang->delete();
                 }
-                return back()->with('success', 'Barang ' . $message);
+
+                return response()->json([
+                    'status' => 'success',
+                    'msg' => 'Berhasil menolak barang ' . $acc->no_inventaris,
+                ]);
             }
         } catch (\Exception $e) {
-            return back()->with('error', $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'msg' => $e->getMessage(),
+            ]);
         }
     }
 
 
     public function EditBarangPersetujuan(Request $request, $slug)
     {
-        // dd('masuk');
         $barang_update = Barang::where('slug', $slug)->first();
         $barang_gudang = BarangGudang::where('slug', $slug)->first();
 
         $barang_update->update([
-            'keterangan' => $request->input('jumlahBarang'),
-            'anggaran_id' => $request->input('jenis_anggaran'),
+            'keterangan' => $request->jumlah,
+            'anggaran_id' => $request->jenis_anggaran
         ]);
 
         $barang_gudang->update([
-            'stock' => $request->input('jumlahBarang'),
-            'anggaran_id' => $request->input('jenis_anggaran'),
+            'stock' => $request->jumlah,
+            'anggaran_id' => $request->jenis_anggaran,
         ]);
-        return back()->with('success', 'Berhasil mengedit barang');
+
+        return response()->json([
+            'status' => 'success',
+            'msg' => 'Berhasil mengubah jumlah barang yang disetujui.',
+        ]);
     }
 
     /**

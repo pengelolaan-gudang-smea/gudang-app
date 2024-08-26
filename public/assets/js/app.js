@@ -1,6 +1,23 @@
 $('.select2').select2({
     theme: "bootstrap-5",
-    width: "100%"
+    width: "100%",
+    placeholder: "Pilih",
+    allowClear: true,
+    language: {
+        noResults: function() {
+            return "Tidak ditemukan";
+        },
+        searching: function() {
+            return "Mencari...";
+        },
+        inputTooLong: function(args) {
+            var overChars = args.input.length - args.maximum;
+            return "Ketikkan " + overChars + " karakter lagi";
+        },
+        clearSearch: function() {
+            return "Hapus Pencarian";
+        }
+    }
 });
 
 function formatRupiahInput(angka, prefix) {

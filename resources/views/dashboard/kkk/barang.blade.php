@@ -22,7 +22,7 @@
                                         <div class="col">
                                             <div class="input-group">
                                                 <span class="input-group-text" id="filterDateInput"><i class="bi bi-calendar-range-fill"></i></span>
-                                                <input type="text" name="filter_date" class="form-control" placeholder="Filter Tanggal" aria-describedby="filterDateInput" data-toggle="tooltip" title="Filter Tanggal">
+                                                <input type="text" name="filter_date" class="form-control" placeholder="Filter Tanggal" autocomplete="off" aria-describedby="filterDateInput" data-toggle="tooltip" title="Filter Tanggal">
                                             </div>
                                         </div>
                                         <div class="col">
