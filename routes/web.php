@@ -84,12 +84,9 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
     // * Admin Anggaran
     Route::middleware('can:Menyetujui barang')->group(function () {
         Route::get('/barang-acc/data', [AdminAngaranController::class, 'data'])->name('barang-acc.data');
-        // Route::put('/barang-acc/{acc}', [AdminAngaranController::class, 'update'])->name('barang-acc.update');
         Route::resource('/barang-acc', AdminAngaranController::class)->parameters(['barang-acc' => 'acc'])->except('create', 'store', 'destroy');
         Route::get('/filter-jurusan', [AdminAngaranController::class, 'getTahunByJurusan'])->name('filter-jurusan');
-        Route::post('/filter-barang', [AdminAngaranController::class, 'filterBarang'])->name('filter-barang');
         Route::put('/barang-accepted/{slug}', [AdminAngaranController::class, 'EditBarangPersetujuan'])->name('persetujuan.editBarang');
-        Route::get('/barang-accepted/export', [AdminAngaranController::class, 'export'])->name('barang-acc.export');
     });
 
     // * Admin Gudang
@@ -122,7 +119,16 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
     Route::post('/laporan/barang-gudang-ruang/export','export_laporan_ruang_lab')->name('laporan-export-ruang-lab');
 
     });
+
+    Route::prefix('/export')->name('export.')->group(function () {
+        // Admin anggaran
+        Route::prefix('/anggaran')->name('anggaran.')->group(function () {
+            Route::get('/export-pdf', [AdminAngaranController::class, 'exportPdf'])->name('export-pdf');
+            Route::get('/export-xlsx', [AdminAngaranController::class, 'exportExcel'])->name('export-excel');
+        });
+    });
 });
+
 
 Route::get('/dashboard/waka/check-anggaran/{id}/', [AnggaranController::class, 'checkAnggaran']);
 

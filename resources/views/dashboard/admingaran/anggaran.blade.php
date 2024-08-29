@@ -7,7 +7,7 @@
     @endif
     <div class="card">
         <div class="card-body">
-            <div class="accordion my-3" id="accordionFilter">
+            <div class="my-3 accordion" id="accordionFilter">
                 <div class="accordion-item">
                     <h2 class="accordion-header">
                         <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#filterAccordion" aria-expanded="true" aria-controls="filterAccordion">
@@ -32,16 +32,22 @@
                                     </select>
                                 </div>
                             </div>
+
+                            <div class="mt-3 alert alert-primary d-flex align-items-center" role="alert">
+                                <i class="flex-shrink-0 bi bi-info-circle-fill me-2"></i>
+                                <small>
+                                    Filter yang Anda terapkan akan memengaruhi data yang akan dicetak dalam format PDF dan Excel.
+                                </small>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             <hr>
-            <button class="btn btm-sm btn-success"><i class="bi bi-file-earmark-excel"></i> Excel</button>
-            <button class="btn btm-sm btn-danger"><i class="bi bi-filetype-pdf"></i> PDF</button>
-            <button class="btn btm-sm btn-info text-light"><i class="bi bi-printer"></i> Print</button>
-            <div class="table-responsive mt-3" id="viewTable">
-                <table class="table table-hover table-bordered mt-2" id="barangsTable">
+            <button class="btn btm-sm btn-success export-excel" data-toggle="tooltip" title="Export ke Excel"><i class="bi bi-file-earmark-excel"></i> Excel</button>
+            <button class="btn btm-sm btn-danger export-pdf" data-toggle="tooltip" title="Export ke PDF & Print"><i class="bi bi-filetype-pdf"></i> PDF</button>
+            <div class="mt-3 table-responsive" id="viewTable">
+                <table class="table mt-2 table-hover table-bordered" id="barangsTable">
                     <thead>
                         <tr>
                             <th scope="col" class="text-center">No</th>
@@ -174,7 +180,7 @@
                     </div>
                 </div>
             </div>
-            {{-- end modal persetujuan  --}}
+            {{-- end modal edit barang  --}}
         </div>
     </div>
     </div>
@@ -187,6 +193,8 @@
         $(function() {
             loadData();
             filter();
+            exportPdf();
+            exportExcel();
         });
 
         function loadData() {
@@ -335,8 +343,29 @@
             });
         }
 
+        function exportPdf() {
+            $('.export-pdf').on('click', function(e) {
+                e.preventDefault();
+
+                let jurusanId = $('select[name=jurusan]').val();
+                let tahun = $('select[name=tahun]').val();
+
+                window.open("{{ route('export.anggaran.export-pdf') }}?jurusan=" + jurusanId + "&tahun=" + tahun, '_blank');
+            });
+        }
+
+        function exportExcel() {
+            $('.export-excel').on('click', function(e) {
+                e.preventDefault();
+
+                let jurusanId = $('select[name=jurusan]').val();
+                let tahun = $('select[name=tahun]').val();
+
+                window.open("{{ route('export.anggaran.export-excel') }}?jurusan=" + jurusanId + "&tahun=" + tahun, '_blank');
+            });
+        }
+
         show = function(data, url) {
-            console.log(data);
 
             if (data) {
                 $('#detailBarangModalLabel').text(`Detail Barang ${data.name}`);
@@ -422,8 +451,6 @@
             }
         }
 
-
-
         edit = function(data, url) {
             let stock = data.stock;
             let keterangan = data.keterangan;
@@ -507,7 +534,6 @@
         }
 
         acc = function(data, url) {
-            console.log(url);
             let stock = data.stock;
             let keterangan = data.keterangan;
             let jenisAnggaran = data.jenis_anggaran;
@@ -588,11 +614,24 @@
         }
 
         reject = function(data, url) {
-            console.log(url);
             $('#ModalPenolakan').modal('show');
 
             $('#penolakanForm').off('submit').on('submit', function(e) {
                 e.preventDefault();
+
+                let penolakan = $('#penolakan').val().trim();
+
+                if (penolakan === '') {
+                    $('#penolakan').addClass('is-invalid');
+                    if (!$('.invalid-feedback').length) {
+                        $('#penolakan').after('<div class="invalid-feedback">Alasan penolakan wajib diisi.</div>');
+                    }
+                    return;
+                } else {
+                    $('#penolakan').removeClass('is-invalid');
+                    $('.invalid-feedback').remove();
+                }
+
 
                 Swal.fire({
                     title: 'Loading',
@@ -604,7 +643,6 @@
                     }
                 });
 
-                let penolakan = $('#penolakan').val();
                 $('#ModalPenolakan').modal('hide');
 
                 $.ajax({

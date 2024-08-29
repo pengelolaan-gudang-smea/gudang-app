@@ -7,6 +7,9 @@ use App\Models\Anggaran;
 use Carbon\Carbon;
 use App\Models\Barang;
 use App\Models\BarangGudang;
+use App\Models\Jurusan;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
@@ -288,40 +291,68 @@ class AdminAngaranController extends Controller
         return response()->json($tahun);
     }
 
-    public function filterBarang(Request $request)
+    public function exportPdf(Request $request)
     {
-        if ($request->ajax()) {
-            $data = Barang::where('jurusan_id', $request->jurusan)->whereYear('created_at', $request->tahun)->get();
+        $filename = "laporan_pengajuan_barang_" . date("Y-m-d") . ".pdf";
+        $jurusanId = $request->jurusan;
+        $tahun = $request->tahun;
 
-            $result = DataTables::of($data)
-                ->addIndexColumn()
-                ->addColumn('nama', function ($q) {
-                    return $q->name;
-                })
-                ->addColumn('harga', function ($q) {
-                    return 'Rp ' . number_format($q->harga, 0, ',', '.');
-                })
-                ->addColumn('stock', function ($q) {
-                    return $q->stock;
-                })
-                ->addColumn('sub_total', function ($q) {
-                    return 'Rp ' . number_format($q->sub_total, 0, ',', '.');
-                })
-                ->addColumn('status', function ($q) {
-                    return $q->status;
-                })
-                ->addColumn('action', function ($q) {
-                    return $q->slug;
-                })
-                ->make(true);
-            return $result;
+        $query = Barang::query();
+
+        // Handling jurusan filter
+        $jurusanName = 'Semua Jurusan';
+        if ($jurusanId !== null && $jurusanId !== 'all' && $jurusanId !== 'null') {
+            $jurusan = Jurusan::find($jurusanId);
+            if ($jurusan) {
+                $jurusanName = $jurusan->name;
+            }
         }
+
+        // Handling tahun filter
+        $tahunName = 'Semua Tahun';
+        if ($tahun !== null && $tahun !== 'all' && $tahun !== 'null') {
+            $tahunName = $tahun;
+        }
+
+        // Applying filters
+        if ($jurusanId !== null && $jurusanId !== 'all' && $jurusanId !== 'null') {
+            $query->where('jurusan_id', $jurusanId);
+        }
+
+        if ($tahun !== null && $tahun !== 'all' && $tahun !== 'null') {
+            $query->whereYear('created_at', $tahun);
+        }
+
+        $data = $query->get();
+
+        $view = view('dashboard.admingaran.export_pdf', [
+            'data' => $data,
+            'heading' => "Laporan Pengajuan Barang oleh Admin Anggaran", // heading
+            'date' => Carbon::now()->locale('id')->isoFormat('D MMMM Y, hh:mm:ss') . ' WIB',
+            'jurusan' => $jurusanName,
+            'tahun' => $tahunName,
+        ])->render();
+
+        // instance Dompdf
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $dompdf = new Dompdf($options);
+
+        // load view into dompdf
+        $dompdf->loadHtml($view);
+
+        // setup paper and orientation
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+        return $dompdf->stream($filename);
     }
 
-
-    public function export()
+    public function exportExcel(Request $request)
     {
-        // dd('halo');
-        return Excel::download(new BarangAccExport, 'Barang-acc.xlsx');
+        $jurusanId = $request->jurusan;
+        $tahun = $request->tahun;
+
+        $filename = "laporan_pengajuan_barang_" . date("Y-m-d") . ".xlsx";
+        return Excel::download(new BarangAccExport($jurusanId, $tahun), $filename);
     }
 }
