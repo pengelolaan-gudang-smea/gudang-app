@@ -14,7 +14,7 @@
                             <i class="bi bi-funnel-fill me-2"></i> <b>Filter</b>
                         </button>
                     </h2>
-                    <div id="filterAccordion" class="accordion-collapse collapse show" data-bs-parent="#accordionFilter">
+                    <div id="filterAccordion" class="accordion-collapse collapse" data-bs-parent="#accordionFilter">
                         <div class="accordion-body">
                             <div class="row">
                                 <div class="col-md-6">
