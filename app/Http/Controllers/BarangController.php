@@ -9,6 +9,7 @@ use App\Models\Jenis_barang;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Yajra\DataTables\Facades\DataTables;
 
 class BarangController extends Controller
 {
@@ -24,16 +25,74 @@ class BarangController extends Controller
     public function index()
     {
 
-        $grand_total = Barang::where('user_id', Auth::user()->id)->where('status','<>','DiTolak')->sum('sub_total');
+        $grand_total = Barang::where('user_id', Auth::user()->id)->where('status','<>','Ditolak')->sum('sub_total');
         $limit = Limit::where('jurusan_id',Auth::user()->jurusan->id)->sum('limit');
         $sisa = $limit - $grand_total;
-        return view('dashboard.kkk.barang', [
-            'title' => 'Pengajuan Barang',
-            'barang' => Barang::where('user_id',Auth::user()->id)->get(),
-            'grand_total' => $grand_total,
-            'limit'=>$limit,
-            'sisa'=>$sisa
-        ]);
+        $title = 'Pengajuan Barang';
+        return view('dashboard.kkk.barang', compact('title', 'grand_total', 'limit', 'sisa'));
+    }
+
+    public function data(Request $request)
+    {
+        $query = Barang::where('user_id', Auth::user()->id);
+
+        if (!empty($request->startDate) && !empty($request->endDate)) {
+            $startDate = Carbon::createFromFormat('Y-m-d', $request->startDate)->startOfDay();
+            $endDate = Carbon::createFromFormat('Y-m-d', $request->endDate)->endOfDay();
+
+            $query->whereBetween('created_at', [$startDate, $endDate]);
+        }
+
+        if ($request->has('status') && $request->filled('status') && $request->status != 'all') {
+            $query->where('status', $request->status);
+        }
+
+        $data = $query->get();
+
+        if ($request->ajax()) {
+            return DataTables::of($data)
+                ->addIndexColumn()
+                ->addColumn('id', function ($row) {
+                    return encrypt($row->id);
+                })
+                ->addColumn('created_at', function ($q) {
+                    return Carbon::parse($q->created_at)->format('H:i') . ', ' . Carbon::parse($q->created_at)->format('d/m/y');
+                })
+                ->addColumn('harga', function ($q) {
+                    return 'Rp ' . number_format($q->harga, 0, ',', '.');
+                })
+                ->addColumn('status', function ($q) {
+                    switch ($q->status) {
+                        case 'Disetujui':
+                            $q->status = '<span class="badge bg-success">' . $q->status . '</span>';
+                            break;
+                        case 'Belum disetujui':
+                            $q->status = '<span class="badge bg-warning">' . $q->status . '</span>';
+                            break;
+                        case 'Ditolak':
+                            $q->status = '<span class="badge bg-danger">' . $q->status . '</span>';
+                            break;
+                        default:
+                            $q->status = '<span class="badge bg-secondary">' . $q->status . '</span>';
+                    }
+                    return $q->status;
+                })
+                ->addColumn('sub_total', function ($q) {
+                    return 'Rp ' . number_format($q->sub_total, 0, ',', '.');
+                })
+                ->addColumn('action', function ($row) {
+                    $route_detail = route('pengajuan-barang.show', encrypt($row->id));
+                    $route_edit = route('pengajuan-barang.edit', encrypt($row->id));
+                    $route_delete = route('pengajuan-barang.destroy', encrypt($row->id));
+                    $btn = '';
+                    $btn = '<button class="edit btn btn-info btn-sm link-light me-1" data-toggle="tooltip" title="Detail" data-placement="top" data-url="' . $route_detail . '" id="detail"><i class="bi bi-eye"></i></button>';
+                    $btn .= '<button class="edit btn btn-warning btn-sm link-light me-1" data-toggle="tooltip" title="Edit" data-placement="top" data-url="' . $route_edit . '" id="ubah"><i class="bi bi-pencil-square"></i></button>';
+                    $btn .= '<button class="edit btn btn-danger btn-sm btn-icon" data-toggle="tooltip" title="Delete" data-placement="top" id="hapus" data-url="' . $route_delete . '"><i class="bi bi-trash3"></i></button>';
+                    return $btn;
+                })
+                ->rawColumns(['status', 'action'])
+                ->make(true);
+        }
     }
 
     /**
@@ -118,16 +177,15 @@ class BarangController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Barang $barang)
+    public function edit($id)
     {
+        $title = 'Edit Barang';
+        $barang = Barang::findOrFail(decrypt($id));
         $grand_total = Barang::where('user_id', Auth::user()->id)->sum('sub_total');
         $limit = Limit::where('jurusan_id', Auth::user()->jurusan->id)->sum('limit');
         $sisa = $limit - $grand_total;
-        return view('dashboard.kkk.edit', [
-            'title' => 'Edit Barang',
-            'barang' => $barang,
-            'sisa' => $sisa
-        ]);
+
+        return view('dashboard.kkk.edit', compact('title', 'barang', 'sisa'));
     }
 
     /**
@@ -179,8 +237,9 @@ class BarangController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Barang $barang)
+    public function destroy($id)
     {
+        $barang = Barang::findOrFail(decrypt($id));
         activity()->performedOn(new Barang())->event('deleted')
         ->withProperties(['old' => [
             'name' => $barang->name,
@@ -192,7 +251,11 @@ class BarangController extends Controller
         ->log('Menghapus barang');
 
         $barang->delete();
-        return redirect()->back()->with('success','Behasil menghapus data barang');
+
+        return response()->json([
+            'status' => 'success',
+            'msg' => 'Berhasil menghapus barang.',
+        ]);
     }
 
 

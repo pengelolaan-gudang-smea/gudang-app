@@ -26,7 +26,7 @@
                 <a class="{{ request()->routeIs('rekap.activity') ? 'nav-link' : 'nav-link collapsed' }}"
                     href="{{ route('rekap.activity') }}">
                     <i class="bi bi-activity"></i>
-                    <span>Rekap Aktivitas user</span>
+                    <span>Rekap Aktivitas User</span>
                 </a>
             </li>
             <li class="nav-item">

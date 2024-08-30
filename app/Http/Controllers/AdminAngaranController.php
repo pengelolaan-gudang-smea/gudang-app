@@ -7,8 +7,9 @@ use App\Models\Anggaran;
 use Carbon\Carbon;
 use App\Models\Barang;
 use App\Models\BarangGudang;
-use App\Models\Jenis_anggaran;
-use App\Models\Jenis_barang;
+use App\Models\Jurusan;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
@@ -27,20 +28,102 @@ class AdminAngaranController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function data(Request $request)
     {
-        //
-    }
+        $barang = Barang::with('anggaran')
+                            ->when($request->jurusan && $request->jurusan !== 'all', function($query) use ($request) {
+                                $query->where('jurusan_id', $request->jurusan);
+                            })
+                            ->when($request->tahun && $request->tahun !== 'all', function($query) use ($request) {
+                                $query->whereYear('created_at', $request->tahun);
+                            })
+                            ->get();
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+        if ($request->ajax()) {
+            return DataTables::of($barang)
+                ->addIndexColumn()
+                ->addColumn('id', function ($q) {
+                    return encrypt($q->id);
+                })
+                ->addColumn('created_at', function ($q) {
+                    return Carbon::parse($q->created_at)->format('H:i') . ', ' . Carbon::parse($q->created_at)->format('d M Y');
+                })
+                ->addColumn('harga', function ($q) {
+                    return 'Rp ' . number_format($q->harga, 0, ',', '.');
+                })
+                ->addColumn('status', function ($q) {
+
+                    $originalStatus = $q->status;
+                    $statusWithBadge = '';
+
+                    switch ($q->status) {
+                        case 'Disetujui':
+                            $statusWithBadge = '<span class="badge bg-success">' . $originalStatus . '</span>';
+                            break;
+                        case 'Belum disetujui':
+                            $statusWithBadge = '<span class="badge bg-warning">' . $originalStatus . '</span>';
+                            break;
+                        case 'Ditolak':
+                            $statusWithBadge = '<span class="badge bg-danger">' . $originalStatus . '</span>';
+                            break;
+                        default:
+                            $statusWithBadge = '<span class="badge bg-secondary">' . $originalStatus . '</span>';
+                    }
+
+                    $q->status_with_badge = $statusWithBadge;
+
+                    $q->original_status = $originalStatus;
+                    return $q->status_with_badge;
+                })
+                ->addColumn('original_status', function ($q) {
+                    return $q->original_status;
+                })
+                ->addColumn('keterangan_with_badge', function ($q) {
+
+                    $keteranganWithBadge = '';
+
+                    switch ($q->status) {
+                        case 'Disetujui':
+                            $keteranganWithBadge = '<span class="badge bg-success">' . $q->keterangan . ' barang disetujui' . '</span>';
+                            break;
+                        case 'Belum disetujui':
+                            $keteranganWithBadge = '<span class="badge bg-warning">' . $q->status . '</span>';
+                            break;
+                        default:
+                            $keteranganWithBadge = '<span class="badge bg-secondary">' . $q->keterangan . '</span>';
+                    }
+
+                    $q->keterangan_with_badge = $keteranganWithBadge;
+
+                    return $q->keterangan_with_badge;
+                })
+                ->addColumn('sub_total', function ($q) {
+                    return 'Rp ' . number_format($q->sub_total, 0, ',', '.');
+                })
+                ->addColumn('action', function ($q) {
+                    $route_detail = route('barang-acc.show', encrypt($q->id));
+                    $route_edit = route('persetujuan.editBarang', $q->slug);
+                    $route_acc = route('barang-acc.update', $q->slug);
+                    $route_reject = route('barang-acc.update', $q->slug);
+                    $btn = '';
+                    // Button "Detail" selalu ditampilkan
+                    $btn .= '<button class="edit btn btn-info btn-sm link-light me-1" data-toggle="tooltip" title="Detail" data-placement="top" data-url="' . $route_detail . '" id="detail"><i class="bi bi-eye"></i></button>';
+
+                    if ($q->original_status == 'Belum disetujui') {
+                        $btn .= '<button class="edit btn btn-success btn-sm link-light me-1" data-toggle="tooltip" title="Setujui" data-placement="top" data-url="' . $route_acc . '" id="acc"><i class="bi bi-check2"></i></button>';
+                        $btn .= '<button class="edit btn btn-danger btn-sm btn-icon" data-toggle="tooltip" title="Tolak" data-placement="top" id="reject" data-url="' . $route_reject . '" id="acc"><i class="bi bi-x"></i></button>';
+                    } elseif ($q->original_status == 'Disetujui') {
+                        $btn .= '<button class="edit btn btn-warning btn-sm link-light me-1" data-toggle="tooltip" title="Edit barang disetujui" data-placement="top" data-url="' . $route_edit . '" id="ubah"><i class="bi bi-pencil-square"></i></button>';
+                        $btn .= '<button class="edit btn btn-danger btn-sm btn-icon" data-toggle="tooltip" title="Tolak" data-placement="top" id="reject" data-url="' . $route_reject . '"><i class="bi bi-x"></i></button>';
+                    } elseif ($q->original_status == 'Ditolak') {
+                        $btn .= '<button class="edit btn btn-success btn-sm link-light me-1" data-toggle="tooltip" title="Setujui" data-placement="top" data-url="' . $route_acc . '" id="acc"><i class="bi bi-check2"></i></button>';
+                    }
+
+                    return $btn;
+                })
+                ->rawColumns(['status', 'keterangan_with_badge', 'action'])
+                ->make(true);
+        }
     }
 
     /**
@@ -48,7 +131,6 @@ class AdminAngaranController extends Controller
      */
     public function show(string $slug)
     {
-
         $barang = Barang::where('slug', $slug)->with('anggaran')->first();
         $barang->created_at_formatted = Carbon::parse($barang->created_at)->format('j F Y');
         $barang->expired_formatted = Carbon::parse($barang->expired)->format('F Y');
@@ -77,7 +159,7 @@ class AdminAngaranController extends Controller
     public function update(Request $request, Barang $acc)
     {
         try {
-            if ($request->has('persetujuan')) {
+            if ($request->ajax() && $request->has('persetujuan')) {
 
                 // ? Update Barang jika di setujui
                 $validated = $request->validate([
@@ -93,14 +175,13 @@ class AdminAngaranController extends Controller
                     'anggaran_id' => $validated['jenis_anggaran']
                 ]);
                 $message = 'Disetujui';
-                // dd($acc);
 
                 // ? Masukan Barang yang sudah disetujui ke Barang_Gudang
                 $barangGudang = BarangGudang::where('name', $acc->name)->where('jenis_barang', $acc->jenis_barang)->get();
-                // dd($barangGudang);
                 if ($barangGudang->isNotEmpty()) {
                     foreach ($barangGudang as $barang_gudang) {
-                        $barang_gudang->increment('stock', $request->input('persetujuan'));
+                        $barang_gudang->increment('stock_awal', $request->input('persetujuan'));
+                        $barang_gudang->increment('stock_akhir', $request->input('persetujuan'));
                     }
                 } else {
                     BarangGudang::create([
@@ -129,9 +210,11 @@ class AdminAngaranController extends Controller
                         'spek' => $acc->spek,
                     ]])
                     ->log('Menyetujui barang yang diajukan oleh ' . $acc->user->username);
-                return back()->with('success', 'Barang ' . $message);
+                return response()->json([
+                    'status' => 'success',
+                    'msg' => 'Berhasil menyetujui barang ' . $acc->no_inventaris,
+                ]);
             } elseif ($request->has('penolakan')) {
-
                 // ? Set Activity
                 activity()->performedOn(new Barang())->event('rejected')
                     ->withProperties(['attributes' => [
@@ -141,7 +224,7 @@ class AdminAngaranController extends Controller
                         'spek' => $acc->spek,
                     ]])->log('Menolak barang yang diajukan oleh ' . $acc->user->username);
 
-                // ? UPdate Barang jika status ditolak
+                // ? Update Barang jika status ditolak
                 $acc->update([
                     'status' => 'Ditolak',
                     'keterangan' => $request->input('penolakan')
@@ -152,89 +235,124 @@ class AdminAngaranController extends Controller
                 $barang = BarangGudang::where('barang_id', $acc->id)->first();
                 $barangGudang = BarangGudang::where('name', $acc->name)->where('jenis_barang', $acc->jenis_barang)->get();
                 foreach ($barangGudang as $barang_gudang) {
-                    $barang_gudang->decrement('stock', $acc->stock);
+                    $barang_gudang->decrement('stock_akhir', $acc->stock);
                 }
                 if ($barang) {
                     $barang->delete();
                 }
-                return back()->with('success', 'Barang ' . $message);
+
+                return response()->json([
+                    'status' => 'success',
+                    'msg' => 'Berhasil menolak barang ' . $acc->no_inventaris,
+                ]);
             }
         } catch (\Exception $e) {
-            return back()->with('error', $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'msg' => $e->getMessage(),
+            ]);
         }
     }
 
 
     public function EditBarangPersetujuan(Request $request, $slug)
     {
-        // dd('masuk');
         $barang_update = Barang::where('slug', $slug)->first();
         $barang_gudang = BarangGudang::where('slug', $slug)->first();
 
         $barang_update->update([
-            'keterangan' => $request->input('jumlahBarang'),
-            'anggaran_id' => $request->input('jenis_anggaran'),
+            'keterangan' => $request->jumlah,
+            'anggaran_id' => $request->jenis_anggaran
         ]);
 
         $barang_gudang->update([
-            'stock' => $request->input('jumlahBarang'),
-            'anggaran_id' => $request->input('jenis_anggaran'),
+            'stock' => $request->jumlah,
+            'anggaran_id' => $request->jenis_anggaran,
         ]);
-        return back()->with('success', 'Berhasil mengedit barang');
+
+        return response()->json([
+            'status' => 'success',
+            'msg' => 'Berhasil mengubah jumlah barang yang disetujui.',
+        ]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Barang $acc)
+    public function destroy(Barang $acc) {}
+
+    public function getTahunByJurusan(Request $request)
     {
+        $tahun = Barang::where('jurusan_id', $request->jurusan_id)
+                ->selectRaw('YEAR(created_at) as year')
+                ->distinct()
+                ->pluck('year');
+
+        return response()->json($tahun);
     }
 
-    public function filterJurusan(Request $request)
+    public function exportPdf(Request $request)
     {
-        $tahun = Barang::where('jurusan_id', $request->jurusan)
-            ->distinct()
-            ->selectRaw('YEAR(created_at) as tahun')
-            ->pluck('tahun')
-            ->toArray();
+        $filename = "laporan_pengajuan_barang_" . date("Y-m-d") . ".pdf";
+        $jurusanId = $request->jurusan;
+        $tahun = $request->tahun;
 
-        return $tahun;
-    }
+        $query = Barang::query();
 
-    public function filterBarang(Request $request)
-    {
-        if ($request->ajax()) {
-            $data = Barang::where('jurusan_id', $request->jurusan)->whereYear('created_at', $request->tahun)->get();
-
-            $result = DataTables::of($data)
-                ->addIndexColumn()
-                ->addColumn('nama', function ($q) {
-                    return $q->name;
-                })
-                ->addColumn('harga', function ($q) {
-                    return 'Rp ' . number_format($q->harga, 0, ',', '.');
-                })
-                ->addColumn('stock', function ($q) {
-                    return $q->stock;
-                })
-                ->addColumn('sub_total', function ($q) {
-                    return 'Rp ' . number_format($q->sub_total, 0, ',', '.');
-                })
-                ->addColumn('status', function ($q) {
-                    return $q->status;
-                })
-                ->addColumn('action', function ($q) {
-                    return $q->slug;
-                })
-                ->make(true);
-            return $result;
+        // Handling jurusan filter
+        $jurusanName = 'Semua Jurusan';
+        if ($jurusanId !== null && $jurusanId !== 'all' && $jurusanId !== 'null') {
+            $jurusan = Jurusan::find($jurusanId);
+            if ($jurusan) {
+                $jurusanName = $jurusan->name;
+            }
         }
+
+        // Handling tahun filter
+        $tahunName = 'Semua Tahun';
+        if ($tahun !== null && $tahun !== 'all' && $tahun !== 'null') {
+            $tahunName = $tahun;
+        }
+
+        // Applying filters
+        if ($jurusanId !== null && $jurusanId !== 'all' && $jurusanId !== 'null') {
+            $query->where('jurusan_id', $jurusanId);
+        }
+
+        if ($tahun !== null && $tahun !== 'all' && $tahun !== 'null') {
+            $query->whereYear('created_at', $tahun);
+        }
+
+        $data = $query->get();
+
+        $view = view('dashboard.admingaran.export_pdf', [
+            'data' => $data,
+            'heading' => "Laporan Pengajuan Barang oleh Admin Anggaran", // heading
+            'date' => Carbon::now()->locale('id')->isoFormat('D MMMM Y, hh:mm:ss') . ' WIB',
+            'jurusan' => $jurusanName,
+            'tahun' => $tahunName,
+        ])->render();
+
+        // instance Dompdf
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $dompdf = new Dompdf($options);
+
+        // load view into dompdf
+        $dompdf->loadHtml($view);
+
+        // setup paper and orientation
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+        return $dompdf->stream($filename);
     }
 
-
-    public function export()
+    public function exportExcel(Request $request)
     {
-        // dd('halo');
-        return Excel::download(new BarangAccExport, 'Barang-acc.xlsx');
+        $jurusanId = $request->jurusan;
+        $tahun = $request->tahun;
+
+        $filename = "laporan_pengajuan_barang_" . date("Y-m-d") . ".xlsx";
+        return Excel::download(new BarangAccExport($jurusanId, $tahun), $filename);
     }
 }

@@ -5,7 +5,7 @@
             <div>
                 <div class="card">
                     <div class="card-body">
-                        <p class="card-title">Form Tambah Anggaran</p>
+                        <p class="card-title">Form Edit Anggaran</p>
 
                         <!-- General Form Elements -->
                         <form action="{{ route('anggaran.update',['anggaran'=>$anggaran->id]) }}" method="POST">
@@ -16,7 +16,7 @@
                                         class="text-danger">*</span></label>
                                 <div class="col-sm-10">
                                     <input type="text" id="anggaran"
-                                        class="form-control @error('anggaran') is-invalid @enderror" name="anggaran" required value="{{ old('anggaran',$anggaran->anggaran) }}">
+                                        class="form-control @error('anggaran') is-invalid @enderror" name="anggaran" required value="{{ old('anggaran', number_format($anggaran->anggaran, 0, ',', '.')) }}">
                                     @error('anggaran')
                                         <div class="invalid-feedback">
                                             {{ $message }}
@@ -31,8 +31,8 @@
                                             <select class="form-select" aria-label="Default select example" id="jenis"
                                                 name="jenis">
                                                 <option selected disabled>-- Pilih jenis anggaran --</option>
-                                                    <option value="APBD" >APBD</option>
-                                                    <option value="BOS">BOS</option>
+                                                    <option value="APBD" {{ $anggaran->jenis_anggaran == 'APBD' ? 'selected' : '' }}>APBD</option>
+                                                    <option value="BOS" {{ $anggaran->jenis_anggaran == 'BOS' ? 'selected' : '' }}>BOS</option>
                                             </select>
                                         </div>
                             </div>
@@ -58,7 +58,7 @@
                             <div class="row mb-3">
                                 <div class="col-sm-12 d-flex justify-content-end gap-2">
                                     <a href="{{ route('anggaran.index') }}" class="btn btn-secondary">Kembali</a>
-                                    <button type="submit" class="btn btn-primary">Tambah Anggaran</button>
+                                    <button type="submit" class="btn btn-primary">Update Anggaran</button>
                                 </div>
                             </div>
                         </form>
@@ -78,22 +78,5 @@
                 theme: "bootstrap-5",
             });
         });
-
-        function formatRupiahInput(angka, prefix) {
-            var number_string = angka.replace(/[^,\d]/g, "").toString()
-                , split = number_string.split(",")
-                , sisa = split[0].length % 3
-                , rupiah = split[0].substr(0, sisa)
-                , ribuan = split[0].substr(sisa).match(/\d{3}/gi);
-
-            // tambahkan titik jika yang di input sudah menjadi angka ribuan
-            if (ribuan) {
-                separator = sisa ? "." : "";
-                rupiah += separator + ribuan.join(".");
-            }
-
-            rupiah = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
-            return prefix == undefined ? rupiah : rupiah ? rupiah : 0;
-        }
     </script>
 @endsection

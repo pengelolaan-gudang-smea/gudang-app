@@ -36,7 +36,12 @@
                     <li>
                         <hr class="dropdown-divider">
                     </li>
-
+                    <li class="dropdown-header">
+                       {{ Carbon\Carbon::now()->translatedFormat('l, d F Y') }}
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
                     <li>
                         <a class="dropdown-item d-flex align-items-center"
                             href="{{ route('dashboard.profile', ['user' => Auth::user()->username]) }}">

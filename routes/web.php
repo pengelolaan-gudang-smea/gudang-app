@@ -61,6 +61,8 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
         Route::get('/users/data', [UserManagementController::class, 'data'])->name('users.data');
         Route::resource('/user', UserManagementController::class);
         Route::post('/hak-akses/{user:username}', [UserManagementController::class, 'akses'])->name('user.akses');
+        Route::get('/anggaran/data', [AnggaranController::class, 'data'])->name('anggaran.data');
+        Route::get('limit-anggaran/data', [LimitController::class, 'data'])->name('limit-anggaran.data');
         Route::resource('/anggaran', AnggaranController::class);
         Route::resource('/limit-anggaran', LimitController::class)->parameters(['limit-anggaran' => 'limit']);
         Route::controller(RekapController::class)->prefix('/rekap')->group(function () {
@@ -74,17 +76,17 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
 
     // * KKK
     Route::middleware('checkJurusan', 'can:Mengajukan barang')->group(function () {
+        Route::get('/pengajuan-barang/data', [BarangController::class, 'data'])->name('pengajuan-barang.data');
         Route::resource('/pengajuan-barang', BarangController::class)->parameters(['pengajuan-barang' => 'barang']);
         Route::get('/barang-disetujui', [BarangController::class, 'setuju'])->name('barang.setuju');
     });
 
     // * Admin Anggaran
     Route::middleware('can:Menyetujui barang')->group(function () {
+        Route::get('/barang-acc/data', [AdminAngaranController::class, 'data'])->name('barang-acc.data');
         Route::resource('/barang-acc', AdminAngaranController::class)->parameters(['barang-acc' => 'acc'])->except('create', 'store', 'destroy');
-        Route::post('/filter-jurusan', [AdminAngaranController::class, 'filterJurusan'])->name('filter-jurusan');
-        Route::post('/filter-barang', [AdminAngaranController::class, 'filterBarang'])->name('filter-barang');
+        Route::get('/filter-jurusan', [AdminAngaranController::class, 'getTahunByJurusan'])->name('filter-jurusan');
         Route::put('/barang-accepted/{slug}', [AdminAngaranController::class, 'EditBarangPersetujuan'])->name('persetujuan.editBarang');
-        Route::get('/barang-accepted/export', [AdminAngaranController::class, 'export'])->name('barang-acc.export');
     });
 
     // * Admin Gudang
@@ -117,7 +119,16 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
     Route::post('/laporan/barang-gudang-ruang/export','export_laporan_ruang_lab')->name('laporan-export-ruang-lab');
 
     });
+
+    Route::prefix('/export')->name('export.')->group(function () {
+        // Admin anggaran
+        Route::prefix('/anggaran')->name('anggaran.')->group(function () {
+            Route::get('/export-pdf', [AdminAngaranController::class, 'exportPdf'])->name('export-pdf');
+            Route::get('/export-xlsx', [AdminAngaranController::class, 'exportExcel'])->name('export-excel');
+        });
+    });
 });
+
 
 Route::get('/dashboard/waka/check-anggaran/{id}/', [AnggaranController::class, 'checkAnggaran']);
 
@@ -125,4 +136,3 @@ Route::get('/dashboard/graphic', [DashboardController::class, 'chartBarang'])->n
 Route::get('/barang-gudang/keluar', function () {
     return view('dashboard.gudang.barang-keluar', ['title' => 'Barang Keluar', 'barang' => Barang_keluar::all()]);
 })->name('barang.keluar');
-// Route::get

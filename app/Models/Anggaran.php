@@ -13,15 +13,16 @@ class Anggaran extends Model
     protected $table = 'anggaran';
     protected $guarded = ['id'];
 
-    public function getActivitylogOptions() :LogOptions
+    public function getActivitylogOptions() : LogOptions
     {
      return LogOptions::defaults()
      ->setDescriptionForEvent(function(string $eventName){
+        $message = 'Action performed';
         switch ($eventName) {
             case 'created':
                 $message = 'Menambahkan anggaran';
                 break;
-            case 'edited':
+            case 'updated':
                 $message = 'Mengubah data anggaran';
                 break;
             case 'deleted':
