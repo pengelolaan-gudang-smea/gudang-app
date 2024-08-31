@@ -44,8 +44,15 @@
                 </div>
             </div>
             <hr>
-            <button class="btn btm-sm btn-success export-excel" data-toggle="tooltip" title="Export ke Excel"><i class="bi bi-file-earmark-excel"></i> Excel</button>
-            <button class="btn btm-sm btn-danger export-pdf" data-toggle="tooltip" title="Export ke PDF & Print"><i class="bi bi-filetype-pdf"></i> PDF</button>
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="tooltip" title="Export Excel & PDF" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-file-earmark-arrow-down"></i> Export
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item export-excel" href="#"><i class="bi bi-file-earmark-excel"></i> Excel</a></li>
+                  <li><a class="dropdown-item export-pdf" href="#"><i class="bi bi-filetype-pdf"></i> PDF</a></li>
+                </ul>
+            </div>
             <div class="mt-3 table-responsive" id="viewTable">
                 <table class="table mt-2 table-hover table-bordered" id="barangsTable">
                     <thead>

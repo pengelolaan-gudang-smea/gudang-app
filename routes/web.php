@@ -61,10 +61,6 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
         Route::get('/users/data', [UserManagementController::class, 'data'])->name('users.data');
         Route::resource('/user', UserManagementController::class);
         Route::post('/hak-akses/{user:username}', [UserManagementController::class, 'akses'])->name('user.akses');
-        Route::get('/anggaran/data', [AnggaranController::class, 'data'])->name('anggaran.data');
-        Route::get('limit-anggaran/data', [LimitController::class, 'data'])->name('limit-anggaran.data');
-        Route::resource('/anggaran', AnggaranController::class);
-        Route::resource('/limit-anggaran', LimitController::class)->parameters(['limit-anggaran' => 'limit']);
         Route::controller(RekapController::class)->prefix('/rekap')->group(function () {
             Route::get('/login', 'rekapLogin')->name('rekap.login');
             Route::get('/activity', 'rekapActivity')->name('rekap.activity');
@@ -76,6 +72,8 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
 
     // * KKK
     Route::middleware('checkJurusan', 'can:Mengajukan barang')->group(function () {
+
+        // manage barang
         Route::get('/pengajuan-barang/data', [BarangController::class, 'data'])->name('pengajuan-barang.data');
         Route::resource('/pengajuan-barang', BarangController::class)->parameters(['pengajuan-barang' => 'barang']);
         Route::get('/barang-disetujui', [BarangController::class, 'setuju'])->name('barang.setuju');
@@ -83,6 +81,12 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
 
     // * Admin Anggaran
     Route::middleware('can:Menyetujui barang')->group(function () {
+        // manage anggaran
+        Route::get('/anggaran/data', [AnggaranController::class, 'data'])->name('anggaran.data');
+        Route::get('limit-anggaran/data', [LimitController::class, 'data'])->name('limit-anggaran.data');
+        Route::resource('/anggaran', AnggaranController::class);
+        Route::resource('/limit-anggaran', LimitController::class)->parameters(['limit-anggaran' => 'limit']);
+
         Route::get('/barang-acc/data', [AdminAngaranController::class, 'data'])->name('barang-acc.data');
         Route::resource('/barang-acc', AdminAngaranController::class)->parameters(['barang-acc' => 'acc'])->except('create', 'store', 'destroy');
         Route::get('/filter-jurusan', [AdminAngaranController::class, 'getTahunByJurusan'])->name('filter-jurusan');
@@ -105,19 +109,18 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
         Route::post('/reset-anggaran', 'resetSession')->name('reset-anggaran');
         Route::put('laporan/saldo-keluar/{slug}', 'saldo_keluar')->name('laporan-edit');
         Route::post('laporan/saldo-masuk', 'saldo_masuk')->name('laporan-saldo-masuk');
-        Route::post('/laporan/barang-persediaan/export','export_laporan')->name('laporan-persediaan');
+        Route::post('/laporan/barang-persediaan/export', 'export_laporan')->name('laporan-persediaan');
     });
 
-    Route::controller(LaporanAsetController::class)->group(function(){
-    Route::get('/laporan-aset/barang-gudang','index')->name('laporan.aset');
-    Route::post('laporan/filter-jurusan', [LaporanAsetController::class, 'laporanJurusan'])->name('laporan-jurusan');
-    Route::post('laporan/filter-barang', [LaporanAsetController::class, 'barangJurusan'])->name('barang-jurusan');
-    Route::get('laporan-aset/barang-gudang/lab-ruang','labRuang')->name('laporan.lab');
-    Route::post('laporan/filter-ruang-lab', [LaporanAsetController::class, 'laporan_ruang_lab'])->name('laporan-lab_ruang');
-    Route::post('laporan/filter-barang/ruang-lab', [LaporanAsetController::class, 'barang_ruang_lab'])->name('barang-lab_ruang');
-    Route::post('/laporan/barang-gudang/export','export_laporan_jurusan')->name('laporan-export-jurusan');
-    Route::post('/laporan/barang-gudang-ruang/export','export_laporan_ruang_lab')->name('laporan-export-ruang-lab');
-
+    Route::controller(LaporanAsetController::class)->group(function () {
+        Route::get('/laporan-aset/barang-gudang', 'index')->name('laporan.aset');
+        Route::post('laporan/filter-jurusan', [LaporanAsetController::class, 'laporanJurusan'])->name('laporan-jurusan');
+        Route::post('laporan/filter-barang', [LaporanAsetController::class, 'barangJurusan'])->name('barang-jurusan');
+        Route::get('laporan-aset/barang-gudang/lab-ruang', 'labRuang')->name('laporan.lab');
+        Route::post('laporan/filter-ruang-lab', [LaporanAsetController::class, 'laporan_ruang_lab'])->name('laporan-lab_ruang');
+        Route::post('laporan/filter-barang/ruang-lab', [LaporanAsetController::class, 'barang_ruang_lab'])->name('barang-lab_ruang');
+        Route::post('/laporan/barang-gudang/export', 'export_laporan_jurusan')->name('laporan-export-jurusan');
+        Route::post('/laporan/barang-gudang-ruang/export', 'export_laporan_ruang_lab')->name('laporan-export-ruang-lab');
     });
 
     Route::prefix('/export')->name('export.')->group(function () {

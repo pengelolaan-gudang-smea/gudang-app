@@ -53,7 +53,8 @@
                 @if ($grand_total == $limit)
                     <small class="text-danger">Limit telah tercapai</small>
                 @endif
-            <!-- Default Table -->
+
+                <button class="btn btn-success"><i class="bi bi-file-earmark-arrow-up"></i> Import</button>
             <div class="table-responsive">
                 <table class="table table-hover table-bordered mt-2" id="barangsTable">
                     <thead>
