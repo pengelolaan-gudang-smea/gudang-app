@@ -258,16 +258,46 @@ class BarangController extends Controller
         ]);
     }
 
-
     public function setuju()
     {
+        $title = 'Barang Disetujui';
+        return view('dashboard.kkk.setuju', compact('title'));        
+    }
+
+
+    public function setujuData(Request $request)
+    {
         $userJurusan = Auth::user()->jurusan->slug;
-        $barang = Barang::where('status', 'Disetujui')->whereHas('jurusan', function($query) use ($userJurusan) {
+        $query = Barang::query();
+
+        if (!empty($request->startDate) && !empty($request->endDate)) {
+            $startDate = Carbon::createFromFormat('Y-m-d', $request->startDate)->startOfDay();
+            $endDate = Carbon::createFromFormat('Y-m-d', $request->endDate)->endOfDay();
+
+            $query->whereBetween('created_at', [$startDate, $endDate]);
+        }
+
+        $data = $query->where('status', 'Disetujui')->whereHas('jurusan', function($query) use ($userJurusan) {
             $query->where('slug', $userJurusan);
         })->get();
-        return view('dashboard.kkk.setuju', [
-            'title' => 'Barang disetujui',
-            'barang' => $barang
-        ]);
+        
+        if($request->ajax()) {
+            return DataTables::of($data)
+                    ->addIndexColumn()
+                    ->addColumn('id', function ($row) {
+                        return encrypt($row->id);
+                    })
+                    ->addColumn('harga', function ($q) {
+                        return 'Rp ' . number_format($q->harga, 0, ',', '.');
+                    })
+                    ->addColumn('status', function ($q) {
+                        return '<span class="badge bg-success">' . $q->status . '</span>';
+                    })
+                    ->addColumn('created_at', function ($q) {
+                        return Carbon::parse($q->created_at)->format('H:i') . ', ' . Carbon::parse($q->created_at)->format('d/m/y');
+                    })
+                    ->rawColumns(['status'])
+                    ->make(true);
+        }
     }
 }

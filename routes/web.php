@@ -77,6 +77,7 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
         Route::get('/pengajuan-barang/data', [BarangController::class, 'data'])->name('pengajuan-barang.data');
         Route::resource('/pengajuan-barang', BarangController::class)->parameters(['pengajuan-barang' => 'barang']);
         Route::get('/barang-disetujui', [BarangController::class, 'setuju'])->name('barang.setuju');
+        Route::get('/barang-disetujui/data', [BarangController::class, 'setujuData'])->name('barang.setuju.data');
     });
 
     // * Admin Anggaran
