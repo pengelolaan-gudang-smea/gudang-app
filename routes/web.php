@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GudangController;
+use App\Http\Controllers\JurusanController;
 use App\Http\Controllers\LaporanAsetController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\LimitController;
@@ -78,6 +79,8 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
         Route::resource('/pengajuan-barang', BarangController::class)->parameters(['pengajuan-barang' => 'barang']);
         Route::get('/barang-disetujui', [BarangController::class, 'setuju'])->name('barang.setuju');
         Route::get('/barang-disetujui/data', [BarangController::class, 'setujuData'])->name('barang.setuju.data');
+        Route::get('/barang-masuk/data', [BarangController::class, 'masukData'])->name('barang.masuk.data');
+        Route::get('/barang-masuk', [BarangController::class, 'masuk'])->name('barang.masuk');
     });
 
     // * Admin Anggaran
@@ -92,6 +95,11 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
         Route::resource('/barang-acc', AdminAngaranController::class)->parameters(['barang-acc' => 'acc'])->except('create', 'store', 'destroy');
         Route::get('/filter-jurusan', [AdminAngaranController::class, 'getTahunByJurusan'])->name('filter-jurusan');
         Route::put('/barang-accepted/{slug}', [AdminAngaranController::class, 'EditBarangPersetujuan'])->name('persetujuan.editBarang');
+
+        Route::prefix('/data-master')->name('data-master.')->group(function () {
+            Route::get('/jurusan/data', [JurusanController::class, 'data'])->name('jurusan.data');
+            Route::resource('jurusan', JurusanController::class);
+        });
     });
 
     // * Admin Gudang

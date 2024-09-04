@@ -47,6 +47,12 @@
                 <span>Barang Disetujui</span>
             </a>
         </li>
+        <li class="nav-item">
+            <a href="{{ route('barang.masuk') }}" class="{{ request()->routeIs('barang.masuk') ? 'nav-link' : 'nav-link collapsed' }}">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Barang Masuk</span>
+            </a>
+        </li>
         @endcan
         @can('Menyetujui barang')
         <li class="nav-heading">Kelola Anggaran</li>
@@ -68,6 +74,14 @@
             <a class="{{ request()->routeIs('barang-acc.index') ? 'nav-link' : 'nav-link collapsed' }}" href="{{ route('barang-acc.index') }}">
                 <i class="bi bi-box-seam-fill"></i>
                 <span>Barang Diajukan</span>
+            </a>
+        </li>
+
+        <li class="nav-heading">Data Master</li>
+        <li class="nav-item">
+            <a class="{{ request()->routeIs('data-master.*') ? 'nav-link' : 'nav-link collapsed' }}" href="{{ route('data-master.jurusan.index') }}">
+                <i class="bi bi-list-stars"></i>
+                <span>Master Jurusan</span>
             </a>
         </li>
         @endcan

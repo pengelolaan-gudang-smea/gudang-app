@@ -52,8 +52,5 @@ class DatabaseSeeder extends Seeder
                 'jurusan_id' => 1
             ]
         );
-
-    
-
     }
 }

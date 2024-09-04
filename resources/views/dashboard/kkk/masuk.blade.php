@@ -8,7 +8,7 @@
     <div class="card">
         <div class="card-body">
 
-            <div class="my-3 accordion" id="accordionFilter">
+            {{-- <div class="my-3 accordion" id="accordionFilter">
                 <div class="accordion-item">
                     <h2 class="accordion-header">
                     <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#filterTanggalAccordion" aria-expanded="true" aria-controls="filterTanggalAccordion">
@@ -30,7 +30,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             <!-- Default Table -->
             <div class="my-3 table-responsive">
@@ -39,11 +39,10 @@
                         <tr>
                             <th scope="col">No</th>
                             <th scope="col">Nama Barang</th>
-                            <th scope="col">Harga (Satuan)</th>
-                            <th scope="col">Satuan (Qty)</th>
-                            <th scope="col">Jumlah Disetujui</th>
-                            <th scope="col">Waktu Pengajuan</th>
-                            <th scope="col">Status</th>
+                            <th scope="col">Stok Awal</th>
+                            <th scope="col">Jumlah Diambil</th>
+                            <th scope="col">Lokasi</th>
+                            <th scope="col">Penerima Barang</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -62,24 +61,7 @@
     let barangsTable;
 
     $(document).ready(function() {
-        let startDate = '';
-        let endDate = '';
-
         $(function() {
-            $('input[name="filter_date"]').on('apply.daterangepicker', function(ev, picker) {
-                startDate = picker.startDate.format('YYYY-MM-DD');
-                endDate = picker.endDate.format('YYYY-MM-DD');
-                $(this).val(picker.startDate.format('DD/MM/YYYY') + ' - ' + picker.endDate.format('DD/MM/YYYY'));
-                loadData();
-            });
-
-            $('input[name="filter_date"]').on('cancel.daterangepicker', function(ev, picker) {
-                startDate = '';
-                endDate = '';
-                $(this).val('');
-                loadData();
-            });
-
             loadData();
         })
 
@@ -102,12 +84,12 @@
                 ]
                 , pageLength: 10
                 , ajax: {
-                    url: "{{ route('barang.setuju.data') }}"
+                    url: "{{ route('barang.masuk.data') }}"
                     , method: "GET",
-                    data: function(d) {
-                        d.startDate = startDate;
-                        d.endDate = endDate;
-                    }
+                    // data: function(d) {
+                    //     d.startDate = startDate;
+                    //     d.endDate = endDate;
+                    // }
                 }
                 , columns: [{
                         data: 'DT_RowIndex'
@@ -122,31 +104,26 @@
                         , orderable: false
                     }
                     , {
-                        data: 'harga'
-                        , name: 'harga'
+                        data: 'stock_awal'
+                        , name: 'stock_awal'
                         , orderable: false
                     }
                     , {
-                        data: 'satuan'
-                        , name: 'satuan'
+                        data: 'jumlah_diambil'
+                        , name: 'jumlah_diambil'
                         , orderable: false
                     }
                     , {
-                        data: 'keterangan'
-                        , name: 'keterangan'
+                        data: 'lokasi'
+                        , name: 'lokasi'
                         , orderable: false
                     }
                     , {
-                        data: 'created_at'
-                        , name: 'created_at'
+                        data: 'penerima'
+                        , name: 'penerima'
                         , orderable: false
-                    }
-                    , {
-                        data: 'status'
-                        , name: 'status'
-                        , orderable: false
-                    }
-                , ]
+                    },
+                ]
             });
         }
     });

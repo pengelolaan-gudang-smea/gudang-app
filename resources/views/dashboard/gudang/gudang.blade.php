@@ -7,10 +7,10 @@
         @endif
         <div class="card">
             <div class="card-body">
-                <div class="d-flex gap-3 align-items-center">
-                    <a href="{{ route('barang-gudang.create') }}" class="btn btn-primary my-3 "><i class="bi bi-box2-fill"></i>
+                <div class="gap-3 d-flex align-items-center">
+                    <a href="{{ route('barang-gudang.create') }}" class="my-3 btn btn-primary "><i class="bi bi-box2-fill"></i>
                         Tambah Barang Gudang</a>
-                    <button class="btn btn-md btn-success" data-bs-toggle="modal" data-bs-target="#modal-import-excel">Import
+                    <button class="btn btn-md btn-success" data-bs-toggle="modal" data-bs-target="#modal-import-excel"><i class="bi bi-file-earmark-excel"></i> Import
                         Excel</button>
                 </div>
                 <!-- Default Table -->
@@ -32,12 +32,12 @@
                                     <th scope="row">{{ $loop->iteration }}</th>
                                     <td>{{ $item->name }}</td>
                                     <td class="satuan">{{ $item->stock_akhir }}</td>
-                                    <td class="keterangan">{!! $item->penerima ? '<i class="bi bi-check text-success fs-2 m-0"></i>' : '-' !!}</td>
+                                    <td class="keterangan">{!! $item->penerima ? '<i class="m-0 bi bi-check text-success fs-2"></i>' : '-' !!}</td>
                                     <td class="keterangan">
                                         <img src="{{ asset('storage/' . $item->qr_code) }}" alt="" width="50">
                                     </td>
                                     <td>
-                                        <div class="d-flex gap-3">
+                                        <div class="gap-3 d-flex">
                                             @if ($item->satuan != 0)
                                                 @if ($item->keterangan)
                                                     <div>
@@ -73,7 +73,7 @@
                                                     @else
                                                         <div>
                                                             <button type="button"
-                                                                class="bi bi bi bi-qr-code fw-bold btn btn-sm bg-success link-light qr-barang-btn"
+                                                                class="bi bi-qr-code fw-bold btn btn-sm bg-success link-light qr-barang-btn"
                                                                 data-bs-toggle="modal" data-bs-target="#ModalQr"
                                                                 data-bs-trigger="click" data-bs-title="Generate QR Code"
                                                                 data-slug={{ $item->slug }}>
@@ -201,7 +201,7 @@
                             @csrf
                             <input type="hidden" name="barang" value="" id="barang-modal">
 
-                            <div class="row mb-3">
+                            <div class="mb-3 row">
                                 <label for="pengambilan" class="mb-3">Lokasi Barang<span
                                         class="text-danger">*</span></label>
                                 <div class="col-sm-10">
@@ -216,7 +216,7 @@
                                 </div>
                             </div>
 
-                            <div class="row mb-3">
+                            <div class="mb-3 row">
                                 <img src="" alt="" id="#qrcodebarang">
                             </div>
 
@@ -271,15 +271,21 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="exampleModalLabel">Import Excel</h1>
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Import from XLSX, CSV.</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
+                        <div class="gap-2 d-grid">
+                            <button class="mb-3 btn btn-primary">
+                                <i class="bi bi-file-earmark-spreadsheet"></i> Download File Format Excel
+                            </button>
+                        </div>
+                        <hr>
                         <form action="{{ route('import.barang') }}" method="post" enctype="multipart/form-data">
                             @csrf
                             <input type="file" name="import-excel" id="" class="form-control mb-3 @error('import-excel') is-invalid @enderror">
                             @error('import-excel')
-                                <div class="invalid-feedback mb-3">
+                                <div class="mb-3 invalid-feedback">
                                     {{ $message }}
                                 </div>
                             @enderror

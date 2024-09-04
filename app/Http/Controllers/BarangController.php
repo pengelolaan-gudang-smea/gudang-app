@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Models\Limit;
 use App\Models\Barang;
+use App\Models\BarangGudang;
 use App\Models\Jenis_barang;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -261,7 +262,7 @@ class BarangController extends Controller
     public function setuju()
     {
         $title = 'Barang Disetujui';
-        return view('dashboard.kkk.setuju', compact('title'));        
+        return view('dashboard.kkk.setuju', compact('title'));
     }
 
 
@@ -280,7 +281,7 @@ class BarangController extends Controller
         $data = $query->where('status', 'Disetujui')->whereHas('jurusan', function($query) use ($userJurusan) {
             $query->where('slug', $userJurusan);
         })->get();
-        
+
         if($request->ajax()) {
             return DataTables::of($data)
                     ->addIndexColumn()
@@ -297,6 +298,44 @@ class BarangController extends Controller
                         return Carbon::parse($q->created_at)->format('H:i') . ', ' . Carbon::parse($q->created_at)->format('d/m/y');
                     })
                     ->rawColumns(['status'])
+                    ->make(true);
+        }
+    }
+
+    public function masuk()
+    {
+        $title = 'Barang Masuk ke ' . Auth::user()->jurusan->name;
+        return view('dashboard.kkk.masuk', compact('title'));
+    }
+
+    public function masukData(Request $request)
+    {
+        $query = BarangGudang::where('barang_diambil', '!=', null)
+                            ->where('jurusan_id', Auth::user()->jurusan->id)
+                            ->where('jenis_barang', 'Aset')->get();
+
+
+        if ($request->ajax()) {
+            return DataTables::of($query)
+                    ->addIndexColumn()
+                    ->addColumn('id', function ($row) {
+                        return encrypt($row->id);
+                    })
+                    ->addColumn('name', function ($q) {
+                        return $q->barang->name;
+                    })
+                    ->addColumn('stock_awal', function ($q) {
+                        return $q->stock_awal;
+                    })
+                    ->addColumn('jumlah_diambil', function ($q) {
+                        return $q->stock_awal - $q->stock_akhir;
+                    })
+                    ->addColumn('lokasi', function ($q) {
+                        return $q->lokasi;
+                    })
+                    ->addColumn('penerima', function ($q) {
+                        return $q->penerima;
+                    })
                     ->make(true);
         }
     }
