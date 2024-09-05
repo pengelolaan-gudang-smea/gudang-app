@@ -13,7 +13,7 @@
                         <div class="row mb-3">
                             <label for="anggaran" class="col-sm-2 col-form-label">Nominal Anggaran <span class="text-danger">*</span></label>
                             <div class="col-sm-10">
-                                <input type="text" id="anggaran" class="form-control @error('anggaran') is-invalid @enderror" name="anggaran" required>
+                                <input type="text" id="anggaran" class="form-control @error('anggaran') is-invalid @enderror" name="anggaran" required placeholder="Masukkan nominal anggaran...">
                                 @error('anggaran')
                                 <div class="invalid-feedback">
                                     {{ $message }}
@@ -24,17 +24,18 @@
                         <div class="row mb-3">
                             <label for="Jenis" class="col-sm-2 col-form-label">Jenis <span class="text-danger">*</span></label>
                             <div class="col-sm-10">
-                                <select class="form-select" aria-label="Default select example" id="jenis" name="jenis_anggaran">
+                                <select class="form-select" aria-label="JenisAnggaran" id="jenis" name="jenis_anggaran">
                                     <option selected disabled>-- Pilih jenis anggaran --</option>
-                                    <option value="APBD">APBD</option>
-                                    <option value="BOS">BOS</option>
+                                        @foreach ($jenis_anggaran as $ja)
+                                            <option value="{{ $ja->name }}" data-tahun="{{ $ja->tahun }}">{{ $ja->name }} - {{ $ja->tahun }}</option>
+                                        @endforeach
                                 </select>
                             </div>
                         </div>
                         <div class="row mb-3">
                             <label for="tahun" class="col-sm-2 col-form-label">Tahun <span class="text-danger">*</span></label>
                             <div class="col-sm-10">
-                                <input type="number" id="tahun" class="form-control @error('tahun') is-invalid @enderror" name="tahun" required min="1999">
+                                <input type="number" id="tahun" class="form-control @error('tahun') is-invalid @enderror" name="tahun" required min="1999" placeholder="Pilih jenis anggaran terlebih dahulu..." readonly style="cursor:not-allowed;">
                                 @error('tahun')
                                 <div class="invalid-feedback">
                                     {{ $message }}
@@ -70,6 +71,12 @@
 
         $('#jenis').select2({
             theme: "bootstrap-5"
+        });
+
+        $('select[name=jenis_anggaran]').change(function() {
+            let jenisAnggaran = this.value;
+            let tahun = $(this).find(':selected').data('tahun');
+            $('#tahun').val(tahun);
         });
     });
 </script>

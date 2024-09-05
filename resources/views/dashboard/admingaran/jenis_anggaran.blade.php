@@ -9,15 +9,15 @@
         <div class="card-body">
 
             <a href="#" class="btn btn-primary my-3" id="btnAdd"> <i class="bi bi-plus"></i>
-                Tambah Jurusan</a>
+                Tambah Jenis Anggaran</a>
 
             <div class="table-responsive">
-                <table class="table mt-2 table-hover table-bordered" id="jurusanTable">
+                <table class="table mt-2 table-hover table-bordered" id="jenisAnggaranTable">
                     <thead>
                         <tr>
                             <th scope="col">No</th>
-                            <th scope="col">Nama Jurusan</th>
-                            <th scope="col">Slug</th>
+                            <th scope="col">Jenis Anggaran</th>
+                            <th scope="col">Tahun Anggaran</th>
                             <th scope="col">Waktu Dibuat</th>
                             <th scope="col">Aksi</th>
                         </tr>
@@ -31,22 +31,27 @@
     </div>
 
     <!-- Modal for Adding Jurusan -->
-    <div class="modal fade" id="jurusanModal" tabindex="-1" aria-labelledby="jurusanModalLabel" aria-hidden="true">
+    <div class="modal fade" id="jenisAnggaranModal" tabindex="-1" aria-labelledby="jenisAnggaranModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="jurusanModalLabel">Tambah Jurusan</h5>
+                    <h5 class="modal-title" id="jenisAnggaranModalLabel">Tambah Jenis Anggaran</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="jurusanForm">
+                    <form id="jenisAnggaranForm">
                         @csrf
                         <div class="mb-3">
-                            <label for="jurusanName" class="form-label">Nama Jurusan:<span class="text-danger">*</span></label>
-                            <input type="text" id="jurusanName" name="name" placeholder="Masukkan Nama Jurusan" class="form-control" required>
+                            <label for="jenisAnggaranName" class="form-label">Nama Jenis Anggaran:<span class="text-danger">*</span></label>
+                            <input type="text" id="jenisAnggaranName" name="name" placeholder="Masukkan Jenis Anggaran" class="form-control" required>
                             <div class="invalid-feedback">
-                                Nama Jurusan tidak boleh kosong.
+                                Nama jenis anggaran tidak boleh kosong.
                             </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="tahunJenisAnggaran" class="form-label">Tahun Jenis Anggaran:<span class="text-danger">*</span></label>
+                            <input type="text" inputmode="numeric" id="tahunJenisAnggaran" name="tahun" placeholder="Masukkan Tahun" class="form-control" required oninput="this.value = this.value.replace(/[^0-9]/g, '');" maxlength="4" minlength="4">
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
@@ -58,21 +63,21 @@
         </div>
     </div>
 
-    <!-- Edit Jurusan Modal -->
-    <div class="modal fade" id="editJurusanModal" tabindex="-1" role="dialog" aria-labelledby="editJurusanModalLabel" aria-hidden="true">
+    <!-- Edit JenisAnggaran Modal -->
+    <div class="modal fade" id="editJenisAnggaranModal" tabindex="-1" role="dialog" aria-labelledby="editJenisAnggaranModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editJurusanModalLabel">Edit Jurusan</h5>
+                    <h5 class="modal-title" id="editJenisAnggaranModalLabel">Edit Jenis Anggaran</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="editJurusanForm" method="post">
+                <form id="editJenisAnggaranForm" method="post">
                     @csrf
                     @method('PUT')
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="editJurusanName" class="form-label">Nama Jurusan:<span class="text-danger">*</span></label>
-                            <input type="text" id="editJurusanName" placeholder="Masukkan nama jurusan" class="form-control" name="name" required>
+                            <label for="editJenisAnggaranName" class="form-label">Nama Jenis Anggaran:<span class="text-danger">*</span></label>
+                            <input type="text" id="editJenisAnggaranName" placeholder="Masukkan nama jenis anggaran" class="form-control" name="name" required>
                             <div class="invalid-feedback"></div>
                         </div>
                     </div>
@@ -90,31 +95,31 @@
 @endsection
 @section('script')
 <script>
-    let jurusanTable
+    let jenisAnggaranTable
     $(document).ready(function() {
         $(function() {
             loadData();
 
-            // add new jurusan
+            // add new jenisAnggaran
             $('#btnAdd').on('click', function(e) {
                 e.preventDefault();
-                $('#jurusanModal').modal('show');
+                $('#jenisAnggaranModal').modal('show');
             });
 
-            // submit form new jurusan
-            $('#jurusanForm').on('submit', function(e) {
+            // submit form new jenisAnggaran
+            $('#jenisAnggaranForm').on('submit', function(e) {
                 e.preventDefault();
                 add();
             });
         });
 
         function loadData() {
-            if (jurusanTable !== undefined) {
-                jurusanTable.destroy();
-                jurusanTable.clear().draw();
+            if (jenisAnggaranTable !== undefined) {
+                jenisAnggaranTable.destroy();
+                jenisAnggaranTable.clear().draw();
             }
 
-            jurusanTable = $('#jurusanTable').DataTable({
+            jenisAnggaranTable = $('#jenisAnggaranTable').DataTable({
                 responsive: true
                 , searching: true
                 , autoWidth: false
@@ -127,20 +132,20 @@
                 ]
                 , pageLength: 10
                 , ajax: {
-                    url: "{{ route('data-master.jurusan.data') }}"
+                    url: "{{ route('data-master.jenis-anggaran.data') }}"
                     , method: "GET"
                 }
                 , drawCallback: function(settings) {
-                    $('table#jurusanTable tr').on('click', '#ubah', function(e) {
+                    $('table#jenisAnggaranTable tr').on('click', '#ubah', function(e) {
                         e.preventDefault();
                         let url = $(this).data('url');
-                        let data = jurusanTable.row($(this).parents('tr')).data();
+                        let data = jenisAnggaranTable.row($(this).parents('tr')).data();
                         edit(data, url);
                     });
 
-                    $('table#jurusanTable tr').on('click', '#hapus', function(e) {
+                    $('table#jenisAnggaranTable tr').on('click', '#hapus', function(e) {
                         e.preventDefault();
-                        let data = jurusanTable.row($(this).parents('tr')).data();
+                        let data = jenisAnggaranTable.row($(this).parents('tr')).data();
                         let url = $(this).data('url');
                         destroy(data, url);
                     });
@@ -160,8 +165,8 @@
                         , class: 'fixed-side text-center'
                     }
                     , {
-                        data: 'slug'
-                        , name: 'slug'
+                        data: 'tahun'
+                        , name: 'tahun'
                         , orderable: false
                         , class: 'fixed-side text-center'
                     }
@@ -180,22 +185,22 @@
                 , ]
             });
 
-            jurusanTable.on('draw', function() {
+            jenisAnggaranTable.on('draw', function() {
                 $('[data-toggle="tooltip"]').tooltip();
             });
         }
 
         add = function() {
-            let formData = $('#jurusanForm').serialize();
-            let url = "{{ route('data-master.jurusan.store') }}";
+            let formData = $('#jenisAnggaranForm').serialize();
+            let url = "{{ route('data-master.jenis-anggaran.store') }}";
 
             $.ajax({
                 url: url
                 , method: 'POST'
                 , data: formData
                 , success: function(response) {
-                    $('#jurusanModal').modal('hide');
-                    $('#jurusanForm')[0].reset();
+                    $('#jenisAnggaranModal').modal('hide');
+                    $('#jenisAnggaranForm')[0].reset();
                     if (response.status == 'success') {
                         Swal.fire({
                             icon: 'success'
@@ -205,13 +210,13 @@
                             , timer: 1500
                         });
                     }
-                    jurusanTable.ajax.reload(null, false);
+                    jenisAnggaranTable.ajax.reload(null, false);
                 }
                 , error: function(xhr) {
                     let errors = xhr.responseJSON.errors;
                     if (errors.name) {
-                        $('#jurusanName').addClass('is-invalid');
-                        $('#jurusanName').siblings('.invalid-feedback').text(errors.name[0]);
+                        $('#jenisAnggaranName').addClass('is-invalid');
+                        $('#jenisAnggaranName').siblings('.invalid-feedback').text(errors.name[0]);
                     }
                     Swal.fire({
                         icon: 'error'
@@ -225,11 +230,11 @@
         }
 
         edit = function(data, url) {
-            $('#editJurusanName').val(data.name);
-            $('#editJurusanForm').attr('action', url);
-            $('#editJurusanModal').modal('show');
+            $('#editJenisAnggaranName').val(data.name);
+            $('#editJenisAnggaranForm').attr('action', url);
+            $('#editJenisAnggaranModal').modal('show');
 
-            $('#editJurusanForm').on('submit', function(e) {
+            $('#editJenisAnggaranForm').on('submit', function(e) {
                 e.preventDefault();
                 let url = $(this).attr('action');
                 let formData = $(this).serialize();
@@ -239,7 +244,7 @@
                     , method: 'POST'
                     , data: formData
                     , success: function(response) {
-                        $('#editJurusanModal').modal('hide');
+                        $('#editJenisAnggaranModal').modal('hide');
                         if (response.status == 'success') {
                             Swal.fire({
                                 icon: 'success'
@@ -249,13 +254,13 @@
                                 , timer: 1500
                             });
                         }
-                        jurusanTable.ajax.reload(null, false);
+                        jenisAnggaranTable.ajax.reload(null, false);
                     }
                     , error: function(xhr) {
                         let errors = xhr.responseJSON.errors;
                         if (errors.name) {
-                            $('#editJurusanName').addClass('is-invalid');
-                            $('#editJurusanName').siblings('.invalid-feedback').text(errors.name[0]);
+                            $('#editjenisAnggaranName').addClass('is-invalid');
+                            $('#editjenisAnggaranName').siblings('.invalid-feedback').text(errors.name[0]);
                         }
                         Swal.fire({
                             icon: 'error'
@@ -297,7 +302,7 @@
                                     , timer: 1500
                                 })
                             }
-                            jurusanTable.ajax.reload(null, false)
+                            jenisAnggaranTable.ajax.reload(null, false)
                         }
                         , error: function(err) {
                             Swal.fire({

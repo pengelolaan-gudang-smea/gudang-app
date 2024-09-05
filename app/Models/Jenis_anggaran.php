@@ -10,4 +10,6 @@ class Jenis_anggaran extends Model
     use HasFactory;
 
     protected $table = 'jenis_anggaran';
+
+    protected $guarded = ['id'];
 }

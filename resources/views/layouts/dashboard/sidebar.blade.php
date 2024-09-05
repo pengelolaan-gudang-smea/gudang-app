@@ -79,9 +79,16 @@
 
         <li class="nav-heading">Data Master</li>
         <li class="nav-item">
-            <a class="{{ request()->routeIs('data-master.*') ? 'nav-link' : 'nav-link collapsed' }}" href="{{ route('data-master.jurusan.index') }}">
+            <a class="{{ request()->routeIs('data-master.jurusan.*') ? 'nav-link' : 'nav-link collapsed' }}" href="{{ route('data-master.jurusan.index') }}">
                 <i class="bi bi-list-stars"></i>
                 <span>Master Jurusan</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a class="{{ request()->routeIs('data-master.jenis-anggaran.*') ? 'nav-link' : 'nav-link collapsed' }}" href="{{ route('data-master.jenis-anggaran.index') }}">
+                <i class="bi bi-list-stars"></i>
+                <span>Master Jenis Anggaran</span>
             </a>
         </li>
         @endcan

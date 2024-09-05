@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GudangController;
+use App\Http\Controllers\JenisAnggaranController;
 use App\Http\Controllers\JurusanController;
 use App\Http\Controllers\LaporanAsetController;
 use App\Http\Controllers\LaporanController;
@@ -99,6 +100,9 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
         Route::prefix('/data-master')->name('data-master.')->group(function () {
             Route::get('/jurusan/data', [JurusanController::class, 'data'])->name('jurusan.data');
             Route::resource('jurusan', JurusanController::class);
+
+            Route::get('/jenis-anggaran/data', [JenisAnggaranController::class, 'data'])->name('jenis-anggaran.data');
+            Route::resource('jenis-anggaran', JenisAnggaranController::class);
         });
     });
 
