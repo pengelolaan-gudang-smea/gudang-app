@@ -102,9 +102,19 @@ class JenisAnggaranController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Jenis_anggaran $jenis_anggaran)
+    public function update(Request $request, $id)
     {
-        //
+        $decryptedId = decrypt($id);
+        $data = Jenis_anggaran::findOrFail($decryptedId);
+        $data->update([
+            'name' => $request->name,
+            'tahun' => $request->tahun,
+        ]);
+        
+        return response()->json([
+            'status' => 'success',
+            'msg' => 'Berhasil mengubah jenis anggaran.',
+        ]);
     }
 
     /**

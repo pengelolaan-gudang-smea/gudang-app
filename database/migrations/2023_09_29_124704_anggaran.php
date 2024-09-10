@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('anggaran', function (Blueprint $table) {
             $table->id();
             $table->double('anggaran');
-            $table->enum('jenis_anggaran', ['APBD', 'BOS']);
+            $table->string('jenis_anggaran');
             $table->year('tahun');
             $table->timestamps();
         });

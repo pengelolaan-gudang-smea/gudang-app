@@ -46,7 +46,7 @@
         <thead>
             <tr>
                 <th width="5%" style="text-align: center">No</th>
-                <th>Kode</th>
+                <th>No Inventaris</th>
                 <th>Nama</th>
                 <th>Harga</th>
                 <th>Stok</th>
@@ -64,7 +64,7 @@
                 <td>{{ 'Rp ' . number_format($item->harga, 0, ',', '.') }}</td>
                 <td>{{ $item->stock }}</td>
                 <td>{{ 'Rp ' . number_format($item->sub_total, 0, ',', '.') }}</td>
-                <td>{{ $item->anggaran->jenis_anggaran }} - {{ $item->anggaran->tahun }}</td>
+                <td>{{ $item->anggaran ? $item->anggaran->jenis_anggaran . ' - ' . $item->anggaran->tahun : 'Anggaran belum dialokasikan' }}</td>
                 <td>{{ $item->status }}</td>
             </tr>
             @endforeach

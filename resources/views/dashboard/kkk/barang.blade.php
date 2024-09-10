@@ -301,8 +301,16 @@
                 let tableContent = `
                     <table class="table table-bordered">
                         <tr>
-                            <th>Kode</th>
+                            <th>No Inventaris</th>
                             <td>${data.no_inventaris}</td>
+                        </tr>
+                        <tr>
+                            <th>Kode Barang</th>
+                            <td>${data.kode_barang ?? '-'}</td>
+                        </tr>
+                        <tr>
+                            <th>Kode Rekening</th>
+                            <td>${data.kode_rekening ?? '-'}</td>
                         </tr>
                         <tr>
                             <th>Barang</th>

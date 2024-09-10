@@ -47,10 +47,16 @@ class BarangAccExport implements FromCollection, WithMapping, WithHeadings, Shou
         $keterangan = $barang->status === 'Ditolak' ? $barang->keterangan : '-';
         $approvedKeterangan = $barang->status === 'Disetujui' ? $barang->keterangan : '-';
 
+        $jenisAnggaran = $barang->anggaran
+            ? $barang->anggaran->jenis_anggaran . ' - ' . $barang->anggaran->tahun
+            : 'Anggaran belum dialokasikan';
+
         return [
             'No' => $this->iteration,
             'name' => $barang->name,
             'no_inventaris' => $barang->no_inventaris,
+            'kode_barang' => $barang->kode_barang ?? '-',
+            'kode_rekening' => $barang->kode_rekening ?? '-',
             'stock' => $barang->stock,
             'satuan' => $barang->satuan,
             'harga' => "Rp" . number_format($barang->harga, 0, ',', '.'),
@@ -62,12 +68,13 @@ class BarangAccExport implements FromCollection, WithMapping, WithHeadings, Shou
             'spek' => $barang->spek,
             'expired' => Carbon::parse($barang->expired)->translatedFormat('d F Y'),
             'jenis_barang' => $barang->jenis_barang,
-            'jenis_anggaran' => $barang->anggaran->jenis_anggaran . ' - ' . $barang->anggaran->tahun,
+            'jenis_anggaran' => $jenisAnggaran,
             'user' => $barang->user->name,
             'jurusan' => $barang->jurusan->name,
             'created_at' => Carbon::parse($barang->created_at)->translatedFormat('H:i, d M Y')
         ];
     }
+
 
     public function headings(): array
     {
@@ -75,6 +82,8 @@ class BarangAccExport implements FromCollection, WithMapping, WithHeadings, Shou
             'No',
             'Nama Barang',
             'Nomor Inventaris',
+            'Kode Barang',
+            'Kode Rekening',
             'Stock Barang',
             'Satuan Barang',
             'Harga Barang',
@@ -95,7 +104,7 @@ class BarangAccExport implements FromCollection, WithMapping, WithHeadings, Shou
 
     public function styles(Worksheet $sheet)
     {
-        $sheet->getStyle('A1:R1')->applyFromArray([
+        $sheet->getStyle('A1:T1')->applyFromArray([
             'font' => [
                 'bold' => true,
                 'color' => ['rgb' => 'FFFFFF'], // Warna teks judul kolom
@@ -107,6 +116,20 @@ class BarangAccExport implements FromCollection, WithMapping, WithHeadings, Shou
         ]);
 
         $sheet->getStyle('A2:A' . ($sheet->getHighestRow()))->getFont()->setBold(true);
+
+        foreach ($sheet->getRowIterator(2) as $row) {
+            $cellValue = $sheet->getCell('Q' . $row->getRowIndex())->getValue(); // Kolom 'P' untuk jenis_anggaran
+
+            if ($cellValue === 'Anggaran belum dialokasikan') {
+                // Menambahkan background warna kuning untuk sel di kolom 'jenis_anggaran'
+                $sheet->getStyle('Q' . $row->getRowIndex())->applyFromArray([
+                    'fill' => [
+                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                        'startColor' => ['rgb' => 'FFFF00'], // Warna kuning
+                    ],
+                ]);
+            }
+        }
 
         return [];
     }

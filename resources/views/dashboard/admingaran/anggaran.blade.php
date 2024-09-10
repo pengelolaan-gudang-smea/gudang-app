@@ -71,7 +71,7 @@
                     </tbody>
                 </table>
                 <div class="modal fade" id="detailBarangModal" tabindex="-1" aria-labelledby="detailBarangModalLabel" aria-hidden="true" data-bs-backdrop="static">
-                    <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-dialog modal-dialog-centered modal-md">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h1 class="modal-title fs-5" id="detailBarangModalLabel">Modal title</h1>
@@ -393,8 +393,16 @@
                 let tableContent = `
                     <table class="table table-bordered">
                         <tr>
-                            <th>Kode</th>
+                            <th>No Inventaris</th>
                             <td>${data.no_inventaris}</td>
+                        </tr>
+                        <tr>
+                            <th>Kode Barang</th>
+                            <td>${data.kode_barang ?? '-'}</td>
+                        </tr>
+                        <tr>
+                            <th>Kode Rekening</th>
+                            <td>${data.kode_rekening ?? '-'}</td>
                         </tr>
                         <tr>
                             <th>Barang</th>

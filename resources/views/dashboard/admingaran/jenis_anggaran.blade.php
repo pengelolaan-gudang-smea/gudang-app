@@ -80,6 +80,11 @@
                             <input type="text" id="editJenisAnggaranName" placeholder="Masukkan nama jenis anggaran" class="form-control" name="name" required>
                             <div class="invalid-feedback"></div>
                         </div>
+
+                        <div class="mb-3">
+                            <label for="editTahunJenisAnggaran" class="form-label">Tahun Jenis Anggaran:<span class="text-danger">*</span></label>
+                            <input type="text" inputmode="numeric" id="editTahunJenisAnggaran" name="tahun" placeholder="Masukkan Tahun" class="form-control" required oninput="this.value = this.value.replace(/[^0-9]/g, '');" maxlength="4" minlength="4">
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
@@ -233,6 +238,8 @@
             $('#editJenisAnggaranName').val(data.name);
             $('#editJenisAnggaranForm').attr('action', url);
             $('#editJenisAnggaranModal').modal('show');
+
+            $('#editTahunJenisAnggaran').val(data.tahun);
 
             $('#editJenisAnggaranForm').on('submit', function(e) {
                 e.preventDefault();
