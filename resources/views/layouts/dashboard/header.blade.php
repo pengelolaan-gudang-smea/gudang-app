@@ -11,13 +11,13 @@
 
     <nav class="header-nav ms-auto">
         <ul class="d-flex align-items-center">
-
-
             <li class="nav-item dropdown pe-3">
 
                 <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-                    @if (!auth()->user()->jurusan_id && auth()->user()->hasPermissionTo('Mengajukan barang'))
-                    <i class="bi bi-exclamation-circle text-danger"></i>
+                    @if (Auth::user()->getRoleNames()->implode(', ') == 'Super Admin')
+                        <i class="bi bi-shield-exclamation text-success"></i>
+                    @elseif (!auth()->user()->jurusan_id && auth()->user()->hasPermissionTo('Mengajukan barang'))
+                        <i class="bi bi-exclamation-circle text-danger"></i>
                     @endif
                     <span class="d-none d-md-block dropdown-toggle ps-2">{{ Auth::user()->username }}</span>
                 </a><!-- End Profile Iamge Icon -->
@@ -26,11 +26,17 @@
                     <li class="dropdown-header">
                         <h6>{{ Auth::user()->name }}</h6>
                         <p class="mb-0">{{ Auth::user()->getRoleNames()->implode(', ') }}</p>
-                        @if(Auth::user()->getRoleNames()->implode(', ') == 'KKK')
+                        @if(Auth::user()->getRoleNames()->implode(', ') == 'Pengajuan barang')
                         <p class="mb-3">{{ Auth::user()->jurusan->name }}</p>
                         @endif
-                        @if (!auth()->user()->jurusan_id && auth()->user()->hasPermissionTo('Mengajukan barang'))
-                            <p class="badge bg-danger">Tidak ada jurusan yang di miliki</p>
+                        @if(Auth::user()->getRoleNames()->implode(', ') == 'Super Admin')
+                            <p class="mb-3">
+                                <span class="badge bg-success">Anda adalah Super Admin!</span>
+                            </p>
+                        @else
+                            @if (!auth()->user()->jurusan_id && auth()->user()->hasPermissionTo('Mengajukan barang'))
+                                <p class="badge bg-danger">Tidak ada jurusan yang di miliki</p>
+                            @endif
                         @endif
                     </li>
                     <li>

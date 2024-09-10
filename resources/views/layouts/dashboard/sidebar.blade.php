@@ -1,8 +1,6 @@
-<!-- ======= Sidebar ======= -->
 <aside id="sidebar" class="sidebar">
-
     <ul class="sidebar-nav" id="sidebar-nav">
-
+        <!-- Dashboard Section -->
         <li class="nav-heading">Dashboard</li>
         <li class="nav-item">
             <a class="{{ request()->routeIs('dashboard') ? 'nav-link' : 'nav-link collapsed' }}" href="{{ route('dashboard') }}">
@@ -11,7 +9,7 @@
             </a>
         </li><!-- End Dashboard Nav -->
 
-
+        <!-- Kelola User Section -->
         @can('Edit akun')
         <li class="nav-heading">Kelola User</li>
         <li class="nav-item">
@@ -33,6 +31,8 @@
             </a>
         </li>
         @endcan
+
+        <!-- Kelola Barang Section -->
         @can('Mengajukan barang')
         <li class="nav-heading">Kelola Barang</li>
         <li class="nav-item">
@@ -54,6 +54,8 @@
             </a>
         </li>
         @endcan
+
+        <!-- Kelola Anggaran Section -->
         @can('Menyetujui barang')
         <li class="nav-heading">Kelola Anggaran</li>
         <li class="nav-item">
@@ -69,6 +71,7 @@
             </a>
         </li>
 
+        <!-- Kelola Barang Section for Admin -->
         <li class="nav-heading">Kelola Barang</li>
         <li class="nav-item">
             <a class="{{ request()->routeIs('barang-acc.index') ? 'nav-link' : 'nav-link collapsed' }}" href="{{ route('barang-acc.index') }}">
@@ -77,6 +80,7 @@
             </a>
         </li>
 
+        <!-- Data Master Section -->
         <li class="nav-heading">Data Master</li>
         <li class="nav-item">
             <a class="{{ request()->routeIs('data-master.jurusan.*') ? 'nav-link' : 'nav-link collapsed' }}" href="{{ route('data-master.jurusan.index') }}">
@@ -84,7 +88,6 @@
                 <span>Master Jurusan</span>
             </a>
         </li>
-
         <li class="nav-item">
             <a class="{{ request()->routeIs('data-master.jenis-anggaran.*') ? 'nav-link' : 'nav-link collapsed' }}" href="{{ route('data-master.jenis-anggaran.index') }}">
                 <i class="bi bi-list-stars"></i>
@@ -92,6 +95,8 @@
             </a>
         </li>
         @endcan
+
+        <!-- Kelola Barang Gudang Section -->
         @can('Barang gudang')
         <li class="nav-heading">Kelola Barang</li>
         <li class="nav-item">
@@ -116,7 +121,6 @@
             <a class="{{ request()->routeIs('laporan.jurusan') ? 'nav-link' : 'nav-link collapsed' }}" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
                 <i class="bi bi-pie-chart-fill"></i>
                 <span>Laporan Aset</span>
-
             </a>
             <ul id="forms-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
                 <li>
@@ -129,14 +133,12 @@
                         <i class="bi bi-circle"></i><span>Lab / Ruang</span>
                     </a>
                 </li>
-
-
             </ul>
         </li>
         @endcan
+
+        <!-- Lainnya Section -->
         <li class="nav-heading">Lainnya</li>
-
-
         <li class="nav-item">
             <a class="{{ request()->routeIs('dashboard.profile') ? 'nav-link' : 'nav-link collapsed' }}" href="{{ route('dashboard.profile',['user'=>Auth::user()->username]) }}">
                 <i class="bi bi-person"></i>
@@ -144,7 +146,5 @@
             </a>
         </li><!-- End Profile Page Nav -->
 
-
     </ul>
-
 </aside><!-- End Sidebar-->

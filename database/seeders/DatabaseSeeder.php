@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             'Manajemen Perkantoran',
             'Bisnis Ritel',
             'Bisnis Daring',
+            'Normada',
          ];
          for ($i=0; $i < count($jurusan) ; $i++) {
             Jurusan::create([

@@ -13,7 +13,7 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-    $waka = User::create([
+        $waka = User::create([
             'name' => 'Wakil Kepala Sekolah',
             'username' => 'waka',
             'email' => 'waka@gmail.com',
@@ -21,9 +21,9 @@ class UserSeeder extends Seeder
         ]);
         // Create users
         $user1 = User::create([
-            'name' => 'roshit',
-            'username' => 'roshit',
-            'email' => 'auliarasyidalzahrawi@gmail.com',
+            'name' => 'Super Admin',
+            'username' => 'root',
+            'email' => 'root@gmail.com',
             'password' => Hash::make('rosyid07'),
         ]);
 
@@ -32,7 +32,7 @@ class UserSeeder extends Seeder
             'username' => 'rpl',
             'email' => 'rpl@gmail.com',
             'password' => Hash::make('rpl123'),
-            'jurusan_id'=>'1'
+            'jurusan_id' => '1'
         ]);
         $user3 = User::create([
             'name' => 'Admin Anggaran 1',
@@ -46,22 +46,18 @@ class UserSeeder extends Seeder
             'email' => 'admingudang@gmail.com',
             'password' => Hash::make('rosyid07'),
         ]);
-        // $user5 = User::create([
-        //     'name' => 'bu dar',
-        //     'username' => 'tkj',
-        //     'email' => 'tkj@gmail.com',
-        //     'password' => Hash::make('tkj123'),
-        //     'jurusan_id'=>'2'
-        // ]);
 
         // Assign roles and permissions to users
         $waka->assignRole('WAKA');
         $waka->givePermissionTo('Edit akun');
 
-        $user1->assignRole('WAKA');
+        $user1->assignRole('Super Admin');
         $user1->givePermissionTo('Edit akun');
+        $user1->givePermissionTo('Mengajukan barang');
+        $user1->givePermissionTo('Menyetujui barang');
+        $user1->givePermissionTo('Barang gudang');
 
-        $user2->assignRole('KKK');
+        $user2->assignRole('Pengajuan barang');
         $user2->givePermissionTo('Mengajukan barang');
 
         $user3->assignRole('Admin anggaran');

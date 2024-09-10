@@ -17,7 +17,7 @@ class JenisAnggaranSeeder extends Seeder
             'name' => 'APBD'
         ]);
         Jenis_anggaran::create([
-            'name' => 'BOS'
+            'name' => 'APBN'
         ]);
     }
 }
