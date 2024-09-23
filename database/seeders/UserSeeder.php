@@ -38,13 +38,13 @@ class UserSeeder extends Seeder
             'name' => 'Admin Anggaran 1',
             'username' => 'adminanggaran',
             'email' => 'adminanggaran@gmail.com',
-            'password' => Hash::make('rosyid07'),
+            'password' => Hash::make('passaja123'),
         ]);
         $user4 = User::create([
             'name' => 'Admin Gudang',
             'username' => 'admingudang',
             'email' => 'admingudang@gmail.com',
-            'password' => Hash::make('rosyid07'),
+            'password' => Hash::make('passaja123'),
         ]);
 
         // Assign roles and permissions to users

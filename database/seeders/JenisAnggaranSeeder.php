@@ -14,10 +14,12 @@ class JenisAnggaranSeeder extends Seeder
     public function run(): void
     {
         Jenis_anggaran::create([
-            'name' => 'APBD'
+            'name' => 'APBD',
+            'tahun' => 2024
         ]);
         Jenis_anggaran::create([
-            'name' => 'APBN'
+            'name' => 'APBN',
+            'tahun' => 2024
         ]);
     }
 }

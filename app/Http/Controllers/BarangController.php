@@ -17,16 +17,13 @@ class BarangController extends Controller
 {
     /**
      * Display a listing of the resource.
+     *
+     * This method calculates the grand total of all approved and pending items for the authenticated user,
+     * determines the limit based on the user's department, calculates the remaining limit, and then
+     * returns the view with these calculated values.
      */
-    // public function __construct()
-    // {
-    //      if (!Auth::user()->jurusan_id) {
-    //         return back();
-    //     }
-    // }
     public function index()
     {
-
         $grand_total = Barang::where('user_id', Auth::user()->id)->where('status', '<>', 'Ditolak')->sum('sub_total');
         $limit = Limit::where('jurusan_id', Auth::user()->jurusan->id)->sum('limit');
         $sisa = $limit - $grand_total;
