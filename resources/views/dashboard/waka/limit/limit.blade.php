@@ -7,11 +7,11 @@
         @endif
         <div class="card">
             <div class="card-body">
-                <a href="{{ route('limit-anggaran.create') }}" class="btn btn-primary my-3"> <i class="bi bi-coin"></i></i>
+                <a href="{{ route('limit-anggaran.create') }}" class="my-3 btn btn-primary"> <i class="bi bi-coin"></i></i>
                    Atur Limit Anggaran</a>
                 <!-- Default Table -->
                 <div class="table-responsive">
-                    <table class="table table-hover table-bordered mt-2" id="limitAnggaranTable">
+                    <table class="table mt-2 table-hover table-bordered" id="limitAnggaranTable">
                         <thead>
                             <tr>
                                 <th scope="col">#</th>
@@ -19,11 +19,12 @@
                                 <th scope="col">Jurusan</th>
                                 <th scope="col">Jenis</th>
                                 <th scope="col">Tahun</th>
+                                <th scope="col">Dibuat</th>
                                 <th scope="col">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <td colspan="6" class="text-center">Tabel tidak memiliki data</td>
+                            <td colspan="7" class="text-center">Tabel tidak memiliki data</td>
                         </tbody>
                     </table>
                 </div>
@@ -83,6 +84,7 @@
                     { data: 'jurusan', name: 'jurusan', orderable: false, searchable: false },
                     { data: 'jenis_anggaran', name: 'jenis_anggaran', orderable: false, searchable: false },
                     { data: 'tahun', name: 'tahun', orderable: true },
+                    { data: 'created_at', name: 'created_at', orderable: true },
                     { data: 'action', name: 'action', orderable: false, searchable: false },
                 ]
             });

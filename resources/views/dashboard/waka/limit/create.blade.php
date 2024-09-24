@@ -11,11 +11,11 @@
                         <form action="{{ route('limit-anggaran.store') }}" method="POST">
                             @csrf
 
-                            <div class="row mb-3">
-                                <label for="Jenis" class="col-sm-2 col-form-label">Anggaran <span
+                            <div class="mb-3 row">
+                                <label for="jenis-anggaran" class="col-sm-2 col-form-label">Anggaran <span
                                         class="text-danger">*</span></label>
                                 <div class="col-sm-10">
-                                    <select class="form-select" aria-label="Default select example" id="jenis-anggaran"
+                                    <select class="form-select select2" aria-label="Default select example" id="jenis-anggaran"
                                         name="anggaran_id">
                                         <option selected disabled>-- Pilih anggaran --</option>
                                         @foreach ($anggaran as $item)
@@ -27,7 +27,7 @@
                                 </div>
                             </div>
 
-                            <div class="row mb-3">
+                            <div class="mb-3 row">
                                 <label for="anggaran" class="col-sm-2 col-form-label">Nominal Limit Anggaran <span
                                         class="text-danger">*</span></label>
                                 <div class="col-sm-10">
@@ -46,11 +46,11 @@
 
                             </div>
 
-                            <div class="row mb-3">
-                                <label for="Jenis" class="col-sm-2 col-form-label">Jurusan <span
+                            <div class="mb-3 row">
+                                <label for="jenis-jurusan" class="col-sm-2 col-form-label">Jurusan <span
                                         class="text-danger">*</span></label>
                                 <div class="col-sm-10">
-                                    <select class="form-select" aria-label="Default select example" id="jenis-jurusan"
+                                    <select class="form-select select2" aria-label="Default select example" id="jenis-jurusan"
                                         name="jurusan_id">
                                         <option selected disabled>-- Pilih jurusan --</option>
                                         @foreach ($jurusan as $item)
@@ -62,12 +62,12 @@
 
 
 
-                            <div class="row mb-3">
+                            <div class="mb-3 row">
                                 <small class="text-secondary"><span class="text-danger">* </span>Field wajid diisi</small>
                             </div>
 
-                            <div class="row mb-3">
-                                <div class="col-sm-12 d-flex justify-content-end gap-2">
+                            <div class="mb-3 row">
+                                <div class="gap-2 col-sm-12 d-flex justify-content-end">
                                     <a href="{{ route('limit-anggaran.index') }}" class="btn btn-secondary">Kembali</a>
                                     <button type="submit" class="btn btn-primary" id="simpan-limit">Simpan</button>
                                 </div>
