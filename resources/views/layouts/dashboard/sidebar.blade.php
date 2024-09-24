@@ -41,6 +41,8 @@
                 <span>Pengajuan Barang</span>
             </a>
         </li>
+        @if (Auth::user()->hasRole('KKK'))
+
         <li class="nav-item">
             <a class="{{ request()->routeIs('barang.setuju') ? 'nav-link' : 'nav-link collapsed' }}" href="{{ route('barang.setuju') }}">
                 <i class="bi bi-check2-circle"></i>
@@ -53,6 +55,8 @@
                 <span>Barang Masuk</span>
             </a>
         </li>
+        @endif
+
         @endcan
 
         <!-- Kelola Anggaran Section -->
@@ -99,6 +103,7 @@
         <!-- Kelola Barang Gudang Section -->
         @can('Barang gudang')
         <li class="nav-heading">Kelola Barang</li>
+       
         <li class="nav-item">
             <a class="{{ request()->routeIs('barang-gudang.*') ? 'nav-link' : 'nav-link collapsed' }}" href="{{ route('barang-gudang.index') }}">
                 <i class="bi bi-box-seam-fill"></i>

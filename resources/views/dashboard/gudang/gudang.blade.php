@@ -343,6 +343,8 @@
                                     <button class="btn btn-sm bg-warning text-light" type="button" id="buttonPrintQr"><i class="bi bi-printer-fill"></i></button>`
                                 );
                                 const listGroup = $(`<ul class="list-group">
+                                                    <li class="list-group-item"><small>Nama Barang :</small><br> ${response.barang.kode_barang}</li>
+                                                    <li class="list-group-item"><small>Nama Barang :</small><br> ${response.barang.kode_rekening}</li>
                                                     <li class="list-group-item"><small>Nama Barang :</small><br> ${response.barang.name}</li>
                                                     <li class="list-group-item"><small>Spek Teknis :</small><br> ${response.barang.spek}</li>
                                                     <li class="list-group-item"><small>Diambil oleh :</small><br>${response.barang.penerima ? response.barang.penerima : '-'}</li>

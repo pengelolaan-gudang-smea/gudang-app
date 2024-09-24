@@ -25,7 +25,7 @@ class UserManagementController extends Controller
     }
 
     public function data(Request $request)
-    {  
+    {
         $users = User::whereDoesntHave('roles', function ($q) {
             $q->where('name', 'WAKA');
         })->get();
@@ -93,7 +93,7 @@ class UserManagementController extends Controller
                 'email' => $validate['email'],
             ]])
             ->log('Menambahkan user');
-
+            // dd($validate);
         $user = User::create($validate);
         $user->assignRole($role);
         $user->givepermissionTo($akses);
@@ -186,7 +186,7 @@ class UserManagementController extends Controller
 
         $validate = $request->validate($validateRules);
 
-        if ($request->has('password')) {
+        if ($request->input('password') != $user->pasword) {
             $validateRules['password'] = ['required', 'min:8'];
             $validate['password'] = Hash::make($request->input('password'));
         }

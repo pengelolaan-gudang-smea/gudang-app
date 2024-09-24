@@ -119,7 +119,7 @@ class BarangController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'kode_barang' => 'required|unique:barang,kode_barang,' . $request->user()->jurusan_id,
+            'kode_barang' => 'required',
             'kode_rekening' => 'required',
             'name' => 'required|max:120',
             'spek' => 'required',
@@ -133,6 +133,7 @@ class BarangController extends Controller
             'expired' => 'required'
         ]);
 
+
         try {
             $harga = str_replace('.', '', $request->harga);
             $subtotal = $harga * $request->stock;
@@ -142,7 +143,6 @@ class BarangController extends Controller
             $data['harga'] = $harga;
             $data['sub_total'] = $subtotal;
             $data['expired'] = $expired;
-
             DB::beginTransaction();
 
             activity()
@@ -205,7 +205,7 @@ class BarangController extends Controller
     {
         try {
             $validate = $request->validate([
-                'kode_barang' => 'required|unique:barang,kode_barang,' . $barang->id,
+                'kode_barang' => 'required',
                 'kode_rekening' => 'required',
                 'name' => 'required',
                 'spek' => 'required',

@@ -36,7 +36,7 @@ class GudangController extends Controller
     {
         return view('dashboard.gudang.create', [
             'title' => 'Tambah Barang Gudang',
-           'jenis_anggaran'=>Anggaran::all()
+            'jenis_anggaran' => Anggaran::all()
         ]);
     }
 
@@ -46,6 +46,8 @@ class GudangController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
+            'kode_barang' => 'required|string',
+            'kode_rekening' => 'required|string',
             'name' => 'required|string',
             'stock_awal' => 'required|required',
             'satuan' => 'required',
@@ -61,8 +63,16 @@ class GudangController extends Controller
             'spek' => 'required|string',
         ]);
         $validatedData['stock_akhir'] = $validatedData['stock_awal'];
-        // dd($validatedData);
 
+        $kode_barang = BarangGudang::where('kode_barang',$validatedData['kode_barang'])->first();
+        if($kode_barang){
+            $kode_barang->stock_awal += $validatedData['stock_awal'];
+            $kode_barang->stock_akhir += $validatedData['stock_awal'];
+            // dd($kode_barang->stock_awal);
+            $kode_barang->save();
+        return redirect()->route('barang-gudang.index')->with('success', 'Berhasil menambah barang');
+
+        }else{
         $slug = $validatedData['slug'] = Str::slug($validatedData['name']);
         $counter = 2;
         while (BarangGudang::where('slug', $slug)->exists()) {
@@ -70,6 +80,7 @@ class GudangController extends Controller
             $counter++;
         }
         $validatedData['slug'] = $slug;
+        $kode_barang = $request->input('kode_barang');
 
         activity()->performedOn(new BarangGudang())->event('created')
             ->withProperties(['attributes' => [
@@ -83,6 +94,7 @@ class GudangController extends Controller
         BarangGudang::create($validatedData);
 
         return redirect()->route('barang-gudang.index')->with('success', 'Berhasil menambah barang');
+            }
     }
 
     /**
@@ -120,7 +132,7 @@ class GudangController extends Controller
             $gudang->update(['penerima' => $penerima, 'tgl_faktur' => Carbon::now('Asia/Jakarta')]);
             activity()->performedOn(new BarangGudang())->event('edited')
                 ->withProperties(['attributes' => [
-                'penerima' => $gudang->penerima,
+                    'penerima' => $gudang->penerima,
                 ]])
                 ->log('Barang diterima oleh ' . $gudang->penerima);
             return redirect()->route('barang-gudang.index')->with('success', 'Berhasil  Menerima Barang');
@@ -133,9 +145,9 @@ class GudangController extends Controller
             $gudang->stock_akhir -= $pengambilan;
             $gudang->save();
             $barangKeluar = Barang_keluar::where('nama_barang', $gudang->name)
-            ->where('nama_pengambil', $diambil)
-            ->where('tujuan', $tujuan)
-            ->first();
+                ->where('nama_pengambil', $diambil)
+                ->where('tujuan', $tujuan)
+                ->first();
             if ($barangKeluar) {
                 $barangKeluar->jumlah_pengambilan += $pengambilan;
                 $barangKeluar->save();
@@ -161,16 +173,16 @@ class GudangController extends Controller
     public function destroy(BarangGudang $gudang)
     {
         activity()->performedOn(new BarangGudang())->event('deleted')
-        ->withProperties(['old' => [
-            'name' => $gudang->name,
-            'satuan' => $gudang->satuan,
-            'spek' => $gudang->spek,
-            'tahun' => $gudang->tahun,
-        ]])
-        ->log('Mengubah data barang gudang');
+            ->withProperties(['old' => [
+                'name' => $gudang->name,
+                'satuan' => $gudang->satuan,
+                'spek' => $gudang->spek,
+                'tahun' => $gudang->tahun,
+            ]])
+            ->log('Mengubah data barang gudang');
 
         $gudang->delete();
-        return back()->with('success','Berhasil menghapus barang gudang');
+        return back()->with('success', 'Berhasil menghapus barang gudang');
     }
 
     public function barangMasuk(Request $request)
@@ -186,8 +198,8 @@ class GudangController extends Controller
             'uuid' => $barang->uuid,
             'nama_barang' => $barang->name,
             'lokasi' => $request->input('lokasi'),
-            'jenis_barang'=>$barang->jenis_barang,
-            'jurusan'=>$barang->barang->jurusan->name ?? '-'
+            'jenis_barang' => $barang->jenis_barang,
+            'jurusan' => $barang->barang->jurusan->name ?? '-'
         ];
 
         $anggaran  = Anggaran::where('id', $barang->anggaran_id)->first();
@@ -240,5 +252,12 @@ class GudangController extends Controller
         $filePath = $excel->storeAs('import-excel', $fileName);
         // dd(Storage::path($filePath));
         Excel::import(new BarangImport, Storage::path($filePath));
+    }
+
+    public function pengajuanBarang()
+    {
+        return view("dashboard.gudang.pengajuan-barang", [
+            'title' => "Pengajuan Barang"
+        ]);
     }
 }

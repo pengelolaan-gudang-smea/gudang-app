@@ -114,6 +114,7 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
             Route::post('barang-gudang/qr-generate/{slug}', 'generateQr');
             Route::get('/barang-gudang/print/{slug}', 'printQr')->name('print-qr');
             Route::post('/import-barang',  'ImportBarangGudang')->name('import.barang');
+            // Route::get('/pengajuan-barang','pengajuanBarang')->name('PengajuanBarang');
         });
     });
     Route::controller(LaporanController::class)->group(function () {
