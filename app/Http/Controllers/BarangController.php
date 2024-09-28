@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\PengajuanImport;
 use Carbon\Carbon;
 use App\Models\Limit;
 use App\Models\Barang;
@@ -11,6 +12,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class BarangController extends Controller
@@ -343,6 +345,19 @@ class BarangController extends Controller
                     return $q->penerima;
                 })
                 ->make(true);
+        }
+    }
+
+    public function import(Request $request)
+    {
+        $file = $request->file('file');
+
+        try {
+            Excel::import(new PengajuanImport, $file);
+            return redirect()->back()->with('success', 'Data berhasil diimpor.');
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat mengimpor data.')->withErrors($failures);
         }
     }
 }

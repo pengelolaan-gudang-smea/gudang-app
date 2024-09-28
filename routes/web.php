@@ -1,5 +1,6 @@
 <?php
 
+use App\Exports\BarangExport;
 use App\Http\Controllers\AdminAngaranController;
 use App\Http\Controllers\AnggaranController;
 use App\Http\Controllers\AuthController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\UserManagementController;
 use App\Models\Barang_keluar;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
+use Maatwebsite\Excel\Facades\Excel;
 use Spatie\Permission\Models\Role;
 
 /*
@@ -142,6 +144,14 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
         Route::prefix('/anggaran')->name('anggaran.')->group(function () {
             Route::get('/export-pdf', [AdminAngaranController::class, 'exportPdf'])->name('export-pdf');
             Route::get('/export-xlsx', [AdminAngaranController::class, 'exportExcel'])->name('export-excel');
+        });
+
+        Route::prefix('/pengajuan-barang')->name('pengajuan-barang.')->group(function () {
+            Route::get('/download-barang-format', function () {
+                return Excel::download(new BarangExport, 'format-pengajuan-barang.xlsx');
+            })->name('download-format');
+
+            Route::post('/import-barang', [BarangController::class, 'import'])->name('import');
         });
     });
 });

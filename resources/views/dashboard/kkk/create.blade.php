@@ -184,7 +184,7 @@
                 const info2 = document.querySelector('#info-limit-2');
                 const satuanInput = document.querySelector('#stock');
 
-                const limit ={{ $sisa }};
+                const limit = {{ $sisa }};
 
                 if (priceFormatted > limit) {
                     btn.classList.add('disabled');

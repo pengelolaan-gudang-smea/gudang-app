@@ -54,7 +54,7 @@
             <small class="text-danger">Limit telah tercapai</small>
             @endif
 
-            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importExcelModal"><i class="bi bi-file-earmark-arrow-up"></i> Import</button>
+            <button class="btn btn-success" id="btnImportExcel"><i class="bi bi-file-earmark-arrow-up"></i> Import</button>
             <div class="table-responsive">
                 <table class="table mt-2 table-hover table-bordered" id="barangsTable">
                     <thead>
@@ -112,19 +112,19 @@
                 </div>
                 <div class="modal-body">
                     <div class="gap-2 d-grid">
-                        <button class="mb-3 btn btn-primary">
+                        <button class="mb-3 btn btn-primary" id="downloadFormat">
                             <i class="bi bi-file-earmark-spreadsheet"></i> Download File Format Excel
                         </button>
                     </div>
 
                     <!-- Upload form for importing file -->
-                    <form action="" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('export.pengajuan-barang.import') }}" method="POST" enctype="multipart/form-data" class="mt-5">
                         @csrf
                         <div class="mb-3">
                             <label for="importFile" class="form-label">Pilih File untuk diimport:</label>
                             <input type="file" name="file" class="form-control" id="importFile" accept=".xlsx, .csv" required>
                         </div>
-                        <button type="submit" class="btn btn-success w-100">Upload dan Import</button>
+                        <button type="submit" class="btn btn-success w-100" disabled>Upload dan Import</button>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -142,6 +142,23 @@
     let startDate = ''
     let endDate = ''
     $(document).ready(function() {
+        $('#importFile').on('change', function() {
+            // Check if a file is selected
+            if ($(this).val()) {
+                $('button[type="submit"]').prop('disabled', false);
+            } else {
+                $('button[type="submit"]').prop('disabled', true);
+            }
+        });
+
+        $('#btnImportExcel').click(function() {
+            $('#importExcelModal').modal('show');
+        });
+
+        $('#downloadFormat').click(function() {
+            window.location.href = '{{ route("export.pengajuan-barang.download-format") }}';
+        });
+
         let total = "{{ number_format($grand_total, 0, ',', '.') }}";
         let limit = "{{ number_format($limit, 0, ',', '.') }}";
         let sisa = "{{ number_format($sisa, 0, ',', '.') }}";
@@ -289,7 +306,7 @@
         show = function(data, url) {
             if (data) {
                 $('#detailBarangModalLabel').text(`Detail Barang ${data.name}`);
-                $('.modal-body').empty();
+                $('#detailBarangModal .modal-body').empty();
 
                 let expiredDate = new Date(data.expired);
                 let formattedExpiredDate = expiredDate.toLocaleDateString('id-ID', {
@@ -326,7 +343,7 @@
                         </tr>
                         <tr>
                             <th>Tujuan Barang</th>
-                            <td>${data.tujuan}</td>
+                            <td>${data.tujuan ?? '-'}</td>
                         </tr>
                         <tr>
                             <th>Jenis Barang</th>
@@ -358,7 +375,7 @@
                         </tr>
                     </table>`;
 
-                $('.modal-body').append(tableContent);
+                $('#detailBarangModal .modal-body').append(tableContent);
                 $('#detailBarangModal').modal('show');
             }
         }

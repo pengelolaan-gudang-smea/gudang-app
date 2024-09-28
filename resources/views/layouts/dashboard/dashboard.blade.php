@@ -62,7 +62,7 @@
         <section class="section dashboard">
             @yield('content')
         </section>
-
+        
     </main><!-- End #main -->
 
     @include('layouts.dashboard.footer')
