@@ -241,17 +241,21 @@ class GudangController extends Controller
     }
 
 
-    public function importBarangGudang(Request $request)
+    public function import(Request $request)
     {
-        // dd($request->file('import-excel'));
-        $request->validate([
-            'import-excel' => 'mimes:xlsx'
+        $file = $request->validate([
+            'file' => 'mimes:xlsx,csv'
         ]);
-        $excel = $request->file('import-excel');
-        $fileName = $excel->getClientOriginalName();
-        $filePath = $excel->storeAs('import-excel', $fileName);
-        // dd(Storage::path($filePath));
-        Excel::import(new BarangImport, Storage::path($filePath));
+
+        $excel = $file['file'];
+
+        try {
+            Excel::import(new BarangImport, $excel);
+            return redirect()->back()->with('success', 'Data berhasil diimport.');
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat mengimport data.')->withErrors($failures);
+        }
     }
 
     public function pengajuanBarang()

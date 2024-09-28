@@ -1,6 +1,7 @@
 <?php
 
 use App\Exports\BarangExport;
+use App\Exports\BarangGudangExport;
 use App\Http\Controllers\AdminAngaranController;
 use App\Http\Controllers\AnggaranController;
 use App\Http\Controllers\AuthController;
@@ -152,6 +153,14 @@ Route::middleware('auth')->prefix('/dashboard')->group(function () {
             })->name('download-format');
 
             Route::post('/import-barang', [BarangController::class, 'import'])->name('import');
+        });
+
+        Route::prefix('/gudang')->name('gudang.')->group(function () {
+            Route::get('/download-barang-format', function () {
+                return Excel::download(new BarangGudangExport, 'format-barang-gudang.xlsx');
+            })->name('download-format');
+
+            Route::post('/import-barang-gudang', [GudangController::class, 'import'])->name('import');
         });
     });
 });

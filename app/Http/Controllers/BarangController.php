@@ -350,8 +350,11 @@ class BarangController extends Controller
 
     public function import(Request $request)
     {
-        $file = $request->file('file');
+        $request->validate([
+            'file' => 'mimes:xlsx,csv'
+        ]);
 
+        $file = $request->file('file');
         try {
             Excel::import(new PengajuanImport, $file);
             return redirect()->back()->with('success', 'Data berhasil diimpor.');

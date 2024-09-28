@@ -32,7 +32,7 @@
                                 @enderror
                             </div>
                         </div>
-                        <div class="row mb-3">
+                        <div class="mb-3 row">
                             <label for="name" class="col-sm-2 col-form-label">Nama <span
                                     class="text-danger">*</span></label>
                             <div class="col-sm-10">
@@ -46,7 +46,7 @@
                             </div>
                         </div>
 
-                        <div class="row mb-3">
+                        <div class="mb-3 row">
                             <label for="stock_awal" class="col-sm-2 col-form-label">Kuantitas (Qty) <span
                                     class="text-danger">*</span></label>
                             <div class="col-sm-10">
@@ -83,7 +83,7 @@
                                 @enderror
                             </div>
                         </div>
-                         <div class="row mb-3">
+                         <div class="mb-3 row">
                             <label for="tahun" class="col-sm-2 col-form-label">Tahun <span
                                     class="text-danger">*</span></label>
                             <div class="col-sm-10">
@@ -96,7 +96,7 @@
                                 @enderror
                             </div>
                         </div>
-                        <div class="row mb-3">
+                        <div class="mb-3 row">
                             <label for="satuan" class="col-sm-2 col-form-label">Tanggal Faktur <span
                                     class="text-danger">*</span></label>
                             <div class="col-sm-10">
@@ -110,7 +110,7 @@
                             </div>
                         </div>
 
-                        <div class="row mb-3">
+                        <div class="mb-3 row">
                             <label for="Jenis" class="col-sm-2 col-form-label">Jenis Barang <span
                                     class="text-danger">*</span></label>
                             <div class="col-sm-10">
@@ -122,7 +122,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="row mb-3">
+                        <div class="mb-3 row">
                             <label for="Jenis" class="col-sm-2 col-form-label">Jenis Anggaran <span
                                     class="text-danger">*</span></label>
                             <div class="col-sm-10">
@@ -135,7 +135,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="row mb-3">
+                        <div class="mb-3 row">
                             <label for="lokasi" class="col-sm-2 col-form-label">Lokasi <span
                                     class="text-danger">*</span></label>
                             <div class="col-sm-10">
@@ -148,7 +148,7 @@
                                 @enderror
                             </div>
                         </div>
-                        <div class="row mb-3">
+                        <div class="mb-3 row">
                             <label for="penerima" class="col-sm-2 col-form-label">Penerima <span
                                     class="text-danger">*</span></label>
                             <div class="col-sm-10">
@@ -161,7 +161,7 @@
                                 @enderror
                             </div>
                         </div>
-                        <div class="row mb-3">
+                        <div class="mb-3 row">
                             <label for="satuan" class="col-sm-2 col-form-label">Tanggal Masuk <span
                                     class="text-danger">*</span></label>
                             <div class="col-sm-10">
@@ -174,8 +174,8 @@
                                 @enderror
                             </div>
                         </div>
-                        <div class="row mb-3 d-none" id="tujuan-barang">
-                            <label for="tujuan" class="col-sm-2 col-form-label mb-3">Prodi <span
+                        <div class="mb-3 row d-none" id="tujuan-barang">
+                            <label for="tujuan" class="mb-3 col-sm-2 col-form-label">Prodi <span
                                     class="text-danger">*</span></label>
                             <div class="col-sm-10">
                                 <select class="form-control" name="jurusan_id">
@@ -197,7 +197,7 @@
                                 @enderror
                             </div>
                         </div>
-                        <div class="row mb-3">
+                        <div class="mb-3 row">
                             <label for="spek" class="col-sm-2 col-form-label">Spek <span
                                     class="text-danger">*</span></label>
                             <div class="col-sm-10">
@@ -211,13 +211,13 @@
                             </div>
                         </div>
 
-                        <div class="row mb-3">
+                        <div class="mb-3 row">
                             <small class="text-secondary"><span class="text-danger">* </span>Field wajid diisi</small>
                         </div>
 
-                        <div class="row mb-3">
-                            <div class="col-sm-12 d-flex justify-content-end gap-2">
-                                <a href="{{ route('pengajuan-barang.index') }}" class="btn btn-secondary">Kembali</a>
+                        <div class="mb-3 row">
+                            <div class="gap-2 col-sm-12 d-flex justify-content-end">
+                                <a href="{{ route('barang-gudang.index') }}" class="btn btn-secondary">Kembali</a>
                                 <button id='ajukan-barang' type="submit" class="btn btn-primary">Tambahkan
                                     Barang</button>
                             </div>
