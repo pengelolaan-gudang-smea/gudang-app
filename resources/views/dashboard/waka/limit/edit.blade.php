@@ -11,10 +11,10 @@
                     <form action="{{ route('limit-anggaran.update',['limit'=>$limit->id]) }}" method="POST">
                         @csrf
                         @method('PUT')
-                        <div class="row mb-3">
-                            <label for="Jenis" class="col-sm-2 col-form-label">Anggaran <span class="text-danger">*</span></label>
+                        <div class="mb-3 row">
+                            <label for="jenis-anggaran" class="col-sm-2 col-form-label">Anggaran <span class="text-danger">*</span></label>
                             <div class="col-sm-10">
-                                <select class="form-select" aria-label="Default select example" id="jenis-anggaran" name="anggaran_id">
+                                <select class="form-select select2" aria-label="Default select example" id="jenis-anggaran" name="anggaran_id">
                                     <option disabled>-- Pilih anggaran --</option>
                                     @foreach ($anggaran as $item)
                                     <option value="{{ $item->id }}" {{ ($item->id == old('anggaran_id',$limit->anggaran->id)) ? 'selected' : '' }}>{{ 'Rp ' . number_format($item->anggaran, 0, ',', '.') }} - {{ $item->tahun }}</option>
@@ -24,7 +24,7 @@
                             </div>
                         </div>
 
-                        <div class="row mb-3">
+                        <div class="mb-3 row">
                             <label for="anggaran" class="col-sm-2 col-form-label">Nominal Limit Anggaran <span class="text-danger">*</span></label>
                             <div class="col-sm-10">
                                 <input type="text" id="anggaran" class="form-control @error('anggaran') is-invalid @enderror" name="limit" required value="{{ old('limit',$limit->limit) }}">
@@ -36,10 +36,10 @@
                             </div>
                         </div>
 
-                        <div class="row mb-3">
-                            <label for="Jenis" class="col-sm-2 col-form-label">Jurusan <span class="text-danger">*</span></label>
+                        <div class="mb-3 row">
+                            <label for="jurusan" class="col-sm-2 col-form-label">Jurusan <span class="text-danger">*</span></label>
                             <div class="col-sm-10">
-                                <select class="form-select" aria-label="Default select example" id="jurusan" name="jurusan_id">
+                                <select class="form-select select2" aria-label="Default select example" id="jurusan" name="jurusan_id">
                                     <option disabled>-- Pilih jurusan --</option>
                                     @foreach ($jurusan as $item)
                                     <option value="{{ $item->id }}" {{ ($item->id == old('jurusan_id',$limit->jurusan->id)) ? 'selected' : ''}}>{{ $item->name}}</option>
@@ -51,12 +51,12 @@
 
 
 
-                        <div class="row mb-3">
+                        <div class="mb-3 row">
                             <small class="text-secondary"><span class="text-danger">* </span>Field wajid diisi</small>
                         </div>
 
-                        <div class="row mb-3">
-                            <div class="col-sm-12 d-flex justify-content-end gap-2">
+                        <div class="mb-3 row">
+                            <div class="gap-2 col-sm-12 d-flex justify-content-end">
                                 <a href="{{ route('limit-anggaran.index') }}" class="btn btn-secondary">Kembali</a>
                                 <button type="submit" class="btn btn-primary">Simpan</button>
                             </div>

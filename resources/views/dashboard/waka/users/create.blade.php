@@ -120,7 +120,7 @@
                 const roleSelect = $('#role');
                 const jurusanInput = $('#jurusanInput');
 
-                if (roleSelect.val() === '2') {
+                if (roleSelect.val() === '3' || roleSelect.val() === '5') {
                     jurusanInput.show();
                     $('#jurusan_id').select2({
                         theme: "bootstrap-5"

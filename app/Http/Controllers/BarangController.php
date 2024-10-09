@@ -2,31 +2,32 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\PengajuanImport;
 use Carbon\Carbon;
 use App\Models\Limit;
 use App\Models\Barang;
+use App\Models\BarangGudang;
 use App\Models\Jenis_barang;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class BarangController extends Controller
 {
     /**
      * Display a listing of the resource.
+     *
+     * This method calculates the grand total of all approved and pending items for the authenticated user,
+     * determines the limit based on the user's department, calculates the remaining limit, and then
+     * returns the view with these calculated values.
      */
-    // public function __construct()
-    // {
-    //      if (!Auth::user()->jurusan_id) {
-    //         return back();
-    //     }
-    // }
     public function index()
     {
-
-        $grand_total = Barang::where('user_id', Auth::user()->id)->where('status','<>','Ditolak')->sum('sub_total');
-        $limit = Limit::where('jurusan_id',Auth::user()->jurusan->id)->sum('limit');
+        $grand_total = Barang::where('user_id', Auth::user()->id)->where('status', '<>', 'Ditolak')->sum('sub_total');
+        $limit = Limit::where('jurusan_id', Auth::user()->jurusan->id)->sum('limit');
         $sisa = $limit - $grand_total;
         $title = 'Pengajuan Barang';
         return view('dashboard.kkk.barang', compact('title', 'grand_total', 'limit', 'sisa'));
@@ -101,12 +102,12 @@ class BarangController extends Controller
     public function create()
     {
         $grand_total = Barang::where('user_id', Auth::user()->id)->sum('sub_total');
-        $limit = Limit::where('jurusan_id',Auth::user()->jurusan->id)->sum('limit');
+        $limit = Limit::where('jurusan_id', Auth::user()->jurusan->id)->sum('limit');
         $sisa = $limit - $grand_total;
         return view('dashboard.kkk.create', [
             'title' => 'Ajukan Barang',
             'grand_total' => $grand_total,
-            'limit'=>$limit,
+            'limit' => $limit,
             'sisa' => $sisa,
         ]);
     }
@@ -116,8 +117,10 @@ class BarangController extends Controller
      */
     public function store(Request $request)
     {
-        $validate = $request->validate([
-            'name' => 'required',
+        $request->validate([
+            'kode_barang' => 'required',
+            'kode_rekening' => 'required',
+            'name' => 'required|max:120',
             'spek' => 'required',
             'harga' => 'required',
             'stock' => 'required|numeric',
@@ -128,34 +131,40 @@ class BarangController extends Controller
             'jurusan_id' => 'required',
             'expired' => 'required'
         ]);
-        $harga = str_replace('.', '', $validate['harga']);
-        $validate['harga'] = $harga;
-        $subtotal = $harga * $validate['stock'];
-        $validate['expired'] = $validate['expired'] . '-01';
 
-        $slug = $validate['slug'] = Str::slug($validate['name']);
-        $counter = 2;
-        while (Barang::where('slug', $slug)->exists()) {
-            $slug = Str::slug($validate['name']) . '-' . $counter;
-            $counter++;
+
+        try {
+            $harga = str_replace('.', '', $request->harga);
+            $subtotal = $harga * $request->stock;
+            $expired = $request->expired . '-01';
+
+            $data = $request->all();
+            $data['harga'] = $harga;
+            $data['sub_total'] = $subtotal;
+            $data['expired'] = $expired;
+            DB::beginTransaction();
+
+            activity()
+                ->causedBy(Auth::user())
+                ->performedOn(new Barang())
+                ->event('created')
+                ->withProperties(['attributes' => [
+                    'name' => $data['name'],
+                    'harga' => $data['harga'],
+                    'stock' => $data['stock'],
+                    'spek' => $data['spek'],
+                ]])
+                ->log('Mengajukan barang');
+
+            Barang::create($data);
+
+            DB::commit();
+
+            return redirect()->route('pengajuan-barang.index')->with('success', 'Berhasil mengajukan barang');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', $e->getMessage());
         }
-        $validate['slug'] = $slug;
-        $validate['sub_total'] = $subtotal;
-
-        activity()
-        ->causedBy(Auth::user())
-        ->performedOn(new Barang())->event('created')
-        ->withProperties(['attributes' => [
-            'name' => $validate['name'],
-            'harga' => $validate['harga'],
-            'stock' => $validate['stock'],
-            'spek' => $validate['spek'],
-        ]])
-        ->log('Mengajukan barang');
-        // dd($validate);
-
-        Barang::create($validate);
-        return redirect()->route('pengajuan-barang.index')->with('success', 'Berhasil mengajukan barang');
     }
 
     /**
@@ -193,45 +202,45 @@ class BarangController extends Controller
      */
     public function update(Request $request, Barang $barang)
     {
-        $validate = $request->validate([
-            'name' => 'required',
-            'spek' => 'required',
-            'harga' => 'required|numeric',
-            'stock' => 'required|numeric',
-            'jenis_barang_id' => 'required',
-            'tujuan' => 'nullable',
-            'satuan' => 'required',
-            'expired' => 'required'
-        ]);
+        try {
+            $validate = $request->validate([
+                'kode_barang' => 'required',
+                'kode_rekening' => 'required',
+                'name' => 'required',
+                'spek' => 'required',
+                'harga' => 'required|numeric',
+                'stock' => 'required|numeric',
+                'jenis_barang_id' => 'required',
+                'tujuan' => 'nullable',
+                'satuan' => 'required',
+                'expired' => 'required'
+            ]);
 
-        $harga = str_replace('.', '', $validate['harga']);
-        $validate['harga'] = $harga;
-        $subtotal = $harga * $validate['stock'];
-        $validate['expired'] = $validate['expired'] . '-01';
+            $harga = str_replace('.', '', $validate['harga']);
+            $validate['harga'] = $harga;
+            $subtotal = $harga * $validate['stock'];
+            $validate['expired'] = $validate['expired'] . '-01';
 
-        if ($validate['name'] !== $barang->name) {
-            $slug = $validate['slug'] = Str::slug($validate['name']);
-            $counter = 2;
-            while (Barang::where('slug', $slug)->exists()) {
-                $slug = Str::slug($validate['name']) . '-' . $counter;
-                $counter++;
-            }
-            $validate['slug'] = $slug;
+            $validate['sub_total'] = $subtotal;
+
+            DB::beginTransaction();
+            activity()->performedOn(new Barang())->event('edited')
+                ->withProperties(['old' => [
+                    'name' => $barang->name,
+                    'harga' => $barang->harga,
+                    'stock' => $barang->stock,
+                    'spek' => $barang->spek,
+                ]])
+                ->log('Mengubah data barang');
+
+
+            $barang->update($validate);
+            DB::commit();
+            return redirect()->route('pengajuan-barang.index')->with('success', 'Berhasil mengubah data barang');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', $e->getMessage());
         }
-        $validate['sub_total'] = $subtotal;
-
-        activity()->performedOn(new Barang())->event('edited')
-        ->withProperties(['old' => [
-            'name' => $barang->name,
-            'harga' => $barang->harga,
-            'stock' => $barang->stock,
-            'spek' => $barang->spek,
-        ]])
-        ->log('Mengubah data barang');
-
-        $barang->update($validate);
-
-        return redirect()->route('pengajuan-barang.index')->with('success', 'Berhasil mengubah data barang');
     }
 
     /**
@@ -241,14 +250,14 @@ class BarangController extends Controller
     {
         $barang = Barang::findOrFail(decrypt($id));
         activity()->performedOn(new Barang())->event('deleted')
-        ->withProperties(['old' => [
-            'name' => $barang->name,
-            'harga' => $barang->harga,
-            'satuan' => $barang->satuan,
-            'spek' => $barang->spek,
-            'stock' => $barang->stock
-        ]])
-        ->log('Menghapus barang');
+            ->withProperties(['old' => [
+                'name' => $barang->name,
+                'harga' => $barang->harga,
+                'satuan' => $barang->satuan,
+                'spek' => $barang->spek,
+                'stock' => $barang->stock
+            ]])
+            ->log('Menghapus barang');
 
         $barang->delete();
 
@@ -258,16 +267,100 @@ class BarangController extends Controller
         ]);
     }
 
-
     public function setuju()
     {
+        $title = 'Barang Disetujui';
+        return view('dashboard.kkk.setuju', compact('title'));
+    }
+
+
+    public function setujuData(Request $request)
+    {
         $userJurusan = Auth::user()->jurusan->slug;
-        $barang = Barang::where('status', 'Disetujui')->whereHas('jurusan', function($query) use ($userJurusan) {
+        $query = Barang::query();
+
+        if (!empty($request->startDate) && !empty($request->endDate)) {
+            $startDate = Carbon::createFromFormat('Y-m-d', $request->startDate)->startOfDay();
+            $endDate = Carbon::createFromFormat('Y-m-d', $request->endDate)->endOfDay();
+
+            $query->whereBetween('created_at', [$startDate, $endDate]);
+        }
+
+        $data = $query->where('status', 'Disetujui')->whereHas('jurusan', function ($query) use ($userJurusan) {
             $query->where('slug', $userJurusan);
         })->get();
-        return view('dashboard.kkk.setuju', [
-            'title' => 'Barang disetujui',
-            'barang' => $barang
+
+        if ($request->ajax()) {
+            return DataTables::of($data)
+                ->addIndexColumn()
+                ->addColumn('id', function ($row) {
+                    return encrypt($row->id);
+                })
+                ->addColumn('harga', function ($q) {
+                    return 'Rp ' . number_format($q->harga, 0, ',', '.');
+                })
+                ->addColumn('status', function ($q) {
+                    return '<span class="badge bg-success">' . $q->status . '</span>';
+                })
+                ->addColumn('created_at', function ($q) {
+                    return Carbon::parse($q->created_at)->format('H:i') . ', ' . Carbon::parse($q->created_at)->format('d/m/y');
+                })
+                ->rawColumns(['status'])
+                ->make(true);
+        }
+    }
+
+    public function masuk()
+    {
+        $title = 'Barang Masuk ke ' . Auth::user()->jurusan->name;
+        return view('dashboard.kkk.masuk', compact('title'));
+    }
+
+    public function masukData(Request $request)
+    {
+        $query = BarangGudang::where('barang_diambil', '!=', null)
+            ->where('jurusan_id', Auth::user()->jurusan->id)
+            ->where('jenis_barang', 'Aset')->get();
+
+
+        if ($request->ajax()) {
+            return DataTables::of($query)
+                ->addIndexColumn()
+                ->addColumn('id', function ($row) {
+                    return encrypt($row->id);
+                })
+                ->addColumn('name', function ($q) {
+                    return $q->barang->name;
+                })
+                ->addColumn('stock_awal', function ($q) {
+                    return $q->stock_awal;
+                })
+                ->addColumn('jumlah_diambil', function ($q) {
+                    return $q->stock_awal - $q->stock_akhir;
+                })
+                ->addColumn('lokasi', function ($q) {
+                    return $q->lokasi;
+                })
+                ->addColumn('penerima', function ($q) {
+                    return $q->penerima;
+                })
+                ->make(true);
+        }
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'mimes:xlsx,csv'
         ]);
+
+        $file = $request->file('file');
+        try {
+            Excel::import(new PengajuanImport, $file);
+            return redirect()->back()->with('success', 'Data berhasil diimpor.');
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat mengimpor data.')->withErrors($failures);
+        }
     }
 }

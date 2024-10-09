@@ -13,41 +13,33 @@ class PermissionSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create roles and permissions
-        Role::create([
-            'name' => 'WAKA',
-            'guard_name' => 'web'
-        ]);
+        $roles = [
+            'Super Admin',
+            'WAKA',
+            'Pengajuan barang',
+            'Admin anggaran',
+            'Admin gudang'
+        ];
 
-        Role::create([
-            'name' => 'KKK',
-            'guard_name' => 'web'
-        ]);
-        Role::create([
-            'name' => 'Admin anggaran',
-            'guard_name' => 'web'
-        ]);
-        Role::create([
-            'name' => 'Admin gudang ',
-            'guard_name' => 'web'
-        ]);
+        $permissions = [
+            'Edit akun',
+            'Mengajukan barang',
+            'Menyetujui barang',
+            'Barang gudang'
+        ];
 
-        Permission::create([
-            'name' => 'Edit akun',
-            'guard_name' => 'web'
-        ]);
+        foreach ($roles as $role) {
+            Role::create([
+                'name' => $role,
+                'guard_name' => 'web'
+            ]);
+        }
 
-        Permission::create([
-            'name' => 'Mengajukan barang',
-            'guard_name' => 'web'
-        ]);
-        Permission::create([
-            'name' => 'Menyetujui barang',
-            'guard_name' => 'web'
-        ]);
-        Permission::create([
-            'name' => 'Barang gudang',
-            'guard_name' => 'web'
-        ]);
+        foreach ($permissions as $permission) {
+            Permission::create([
+                'name' => $permission,
+                'guard_name' => 'web'
+            ]);
+        }
     }
 }

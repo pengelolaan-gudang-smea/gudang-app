@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug');
             $table->string('no_inventaris');
+            $table->string('kode_barang');
+            $table->string('kode_rekening');
             $table->text('spek');
             $table->double('harga');
             $table->integer('stock');

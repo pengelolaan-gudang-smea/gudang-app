@@ -38,10 +38,10 @@ class RekapController extends Controller
                     return $row->user->username;
                 })
                 ->addColumn('login', function($row){
-                    return Carbon::parse($row->login)->format('H:i') . ' WIB, ' . Carbon::parse($row->login)->format('d M Y');
+                    return Carbon::parse($row->login)->format('H:i') . ' WIB, ' . Carbon::parse($row->login)->translatedFormat('d M Y');
                 })
                 ->addColumn('logout', function($row){
-                    return $row->logout ? Carbon::parse($row->logout)->format('H:i') . ' WIB, ' . Carbon::parse($row->logout)->format('d M Y') : '-';
+                    return $row->logout ? Carbon::parse($row->logout)->format('H:i') . ' WIB, ' . Carbon::parse($row->logout)->translatedFormat('d M Y') : '-';
                 })
                 ->make(true);
         }
@@ -62,7 +62,7 @@ class RekapController extends Controller
                     return optional($row->causer)->name ? $row->causer->name : '-';
                 })
                 ->addColumn('created_at', function($row){
-                    return Carbon::parse($row->created_at)->format('H:i') . ' WIB, ' . Carbon::parse($row->created_at)->format('d M Y');
+                    return Carbon::parse($row->created_at)->format('H:i') . ' WIB, ' . Carbon::parse($row->created_at)->translatedFormat('d M Y');
                 })
                 ->make(true);
         }

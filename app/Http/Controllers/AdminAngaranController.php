@@ -174,10 +174,10 @@ class AdminAngaranController extends Controller
                     'keterangan' => $validated['persetujuan'],
                     'anggaran_id' => $validated['jenis_anggaran']
                 ]);
-                $message = 'Disetujui';
 
                 // ? Masukan Barang yang sudah disetujui ke Barang_Gudang
-                $barangGudang = BarangGudang::where('name', $acc->name)->where('jenis_barang', $acc->jenis_barang)->get();
+
+                $barangGudang = BarangGudang::where('kode_barang', $acc->kode_barang)->get();
                 if ($barangGudang->isNotEmpty()) {
                     foreach ($barangGudang as $barang_gudang) {
                         $barang_gudang->increment('stock_awal', $request->input('persetujuan'));
@@ -186,6 +186,8 @@ class AdminAngaranController extends Controller
                 } else {
                     BarangGudang::create([
                         'name' => $acc->name,
+                        'kode_barang'=> $acc->kode_barang,
+                        'kode_rekening'=> $acc->kode_rekening,
                         'spek' => $acc->spek,
                         'no_inventaris' => $acc->no_inventaris,
                         'slug' => $acc->slug,

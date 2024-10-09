@@ -7,10 +7,10 @@
         @endif
         <div class="card">
             <div class="card-body">
-                <div class="d-flex gap-3 align-items-center">
-                    <a href="{{ route('barang-gudang.create') }}" class="btn btn-primary my-3 "><i class="bi bi-box2-fill"></i>
-                        Tambah Barang Gudang</a>
-                    <button class="btn btn-md btn-success" data-bs-toggle="modal" data-bs-target="#modal-import-excel">Import
+                <div class="gap-3 d-flex align-items-center">
+                    <a href="{{ route('barang-gudang.create') }}" class="my-3 btn btn-primary "><i class="bi bi-box2-fill"></i>
+                    Tambah Barang Gudang</a>
+                    <button class="btn btn-md btn-success" data-bs-toggle="modal" data-bs-target="#importExcelModal"><i class="bi bi-file-earmark-excel"></i> Import
                         Excel</button>
                 </div>
                 <!-- Default Table -->
@@ -32,12 +32,12 @@
                                     <th scope="row">{{ $loop->iteration }}</th>
                                     <td>{{ $item->name }}</td>
                                     <td class="satuan">{{ $item->stock_akhir }}</td>
-                                    <td class="keterangan">{!! $item->penerima ? '<i class="bi bi-check text-success fs-2 m-0"></i>' : '-' !!}</td>
+                                    <td class="keterangan">{!! $item->penerima ? '<i class="m-0 bi bi-check text-success fs-2"></i>' : '-' !!}</td>
                                     <td class="keterangan">
                                         <img src="{{ asset('storage/' . $item->qr_code) }}" alt="" width="50">
                                     </td>
                                     <td>
-                                        <div class="d-flex gap-3">
+                                        <div class="gap-3 d-flex">
                                             @if ($item->satuan != 0)
                                                 @if ($item->keterangan)
                                                     <div>
@@ -73,7 +73,7 @@
                                                     @else
                                                         <div>
                                                             <button type="button"
-                                                                class="bi bi bi bi-qr-code fw-bold btn btn-sm bg-success link-light qr-barang-btn"
+                                                                class="bi bi-qr-code fw-bold btn btn-sm bg-success link-light qr-barang-btn"
                                                                 data-bs-toggle="modal" data-bs-target="#ModalQr"
                                                                 data-bs-trigger="click" data-bs-title="Generate QR Code"
                                                                 data-slug={{ $item->slug }}>
@@ -201,7 +201,7 @@
                             @csrf
                             <input type="hidden" name="barang" value="" id="barang-modal">
 
-                            <div class="row mb-3">
+                            <div class="mb-3 row">
                                 <label for="pengambilan" class="mb-3">Lokasi Barang<span
                                         class="text-danger">*</span></label>
                                 <div class="col-sm-10">
@@ -216,7 +216,7 @@
                                 </div>
                             </div>
 
-                            <div class="row mb-3">
+                            <div class="mb-3 row">
                                 <img src="" alt="" id="#qrcodebarang">
                             </div>
 
@@ -266,187 +266,209 @@
             </div>
         </div>
 
-        <div class="modal fade" id="modal-import-excel" tabindex="-1" aria-labelledby="exampleModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog">
+        <div class="modal fade" id="importExcelModal" tabindex="-1" aria-labelledby="importExcelModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="exampleModalLabel">Import Excel</h1>
+                        <h1 class="modal-title fs-5" id="importExcelModalLabel">Import from XLSX, CSV.</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form action="{{ route('import.barang') }}" method="post" enctype="multipart/form-data">
-                            @csrf
-                            <input type="file" name="import-excel" id="" class="form-control mb-3 @error('import-excel') is-invalid @enderror">
-                            @error('import-excel')
-                                <div class="invalid-feedback mb-3">
-                                    {{ $message }}
-                                </div>
-                            @enderror
+                        <div class="gap-2 d-grid">
+                            <button class="mb-3 btn btn-primary" id="downloadFormat">
+                                <i class="bi bi-file-earmark-spreadsheet"></i> Download File Format Excel
+                            </button>
+                        </div>
 
-                            <button class="btn btn-primary">Import Excel</button>
+                        <!-- Upload form for importing file -->
+                        <form action="{{ route('export.gudang.import') }}" method="POST" enctype="multipart/form-data" class="mt-5">
+                            @csrf
+                            <div class="mb-3">
+                                <label for="importFile" class="form-label">Pilih File untuk diimport:</label>
+                                <input type="file" name="file" class="form-control" id="importFile" accept=".xlsx, .csv" required>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100" disabled>Upload dan Import</button>
                         </form>
                     </div>
-
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
                 </div>
             </div>
         </div>
+    </section>
+@endsection
+@section('script')
+<script>
 
-        <script>
-            let table = new DataTable('#barangsTable');
+    $('#importFile').on('change', function() {
+        // Check if a file is selected
+        if ($(this).val()) {
+            $('button[type="submit"]').prop('disabled', false);
+        } else {
+            $('button[type="submit"]').prop('disabled', true);
+        }
+    });
 
-            $(document).ready(function() {
-                $('[data-bs-trigger="click"]').popover({
-                    trigger: 'hover',
-                });
-                const qrCreated = {!! json_encode(request('qr_created')) !!};
-                const qrCodePath = {!! json_encode(request('qr_code')) !!}
+    $('#downloadFormat').click(function() {
+            window.location.href = '{{ route("export.gudang.download-format") }}';
+    });
 
-                if (qrCreated) {
-                    $('#ModalQrSuccess').modal('show');
-                    var qrCodeUrl = "{{ asset('storage/') }}" + '/' + qrCodePath;
-                    $('#qrCodeImage').attr('src', qrCodeUrl);
+    let table = new DataTable('#barangsTable');
 
-                    $('#printQrButton').click(function(event) {
-                        event.preventDefault();
-                        printQr(qrCodeUrl);
-                    });
-                }
+    $(document).ready(function() {
+        $('[data-bs-trigger="click"]').popover({
+            trigger: 'hover',
+        });
+        const qrCreated = {!! json_encode(request('qr_created')) !!};
+        const qrCodePath = {!! json_encode(request('qr_code')) !!}
 
-                function printQr(qrCodeUrl) {
-                    var printWindow = window.open(qrCodeUrl, '_blank');
+        if (qrCreated) {
+            $('#ModalQrSuccess').modal('show');
+            var qrCodeUrl = "{{ asset('storage/') }}" + '/' + qrCodePath;
+            $('#qrCodeImage').attr('src', qrCodeUrl);
 
-                    printWindow.onload = function() {
-                        printWindow.print();
-                    };
-                }
+            $('#printQrButton').click(function(event) {
+                event.preventDefault();
+                printQr(qrCodeUrl);
+            });
+        }
 
-                $('.detailBarangBtn').click(function() {
-                    const barangSlug = $(this).data('barang');
-                    $.ajax({
-                        type: 'GET',
-                        url: '/dashboard/barang-gudang/' + barangSlug,
-                        success: function(response) {
-                            if (response.status == 'success') {
-                                let qrCodePath = response.barang.qr_code;
-                                $('#detailBarangModalLabel').text(
-                                    `Detail Barang ${response.barang.name}`);
-                                $('.showBarang').empty();
-                                const Qr = $(
-                                    `<img src="{{ asset('storage/${response.barang.qr_code}') }}" width="100">
-                                    <button class="btn btn-sm bg-warning text-light" type="button" id="buttonPrintQr"><i class="bi bi-printer-fill"></i></button>`
-                                );
-                                const listGroup = $(`<ul class="list-group">
-                                                    <li class="list-group-item"><small>Nama Barang :</small><br> ${response.barang.name}</li>
-                                                    <li class="list-group-item"><small>Spek Teknis :</small><br> ${response.barang.spek}</li>
-                                                    <li class="list-group-item"><small>Diambil oleh :</small><br>${response.barang.penerima ? response.barang.penerima : '-'}</li>
-                                                    <li class="list-group-item"><small>Kuantitas (Qty) :</small><br> ${response.barang.satuan}</li>
-                                                    <li class="list-group-item"><small>Tanggal Masuk :</small><br> ${response.barang.tgl_masuk}</li>
-                                                    <li class="list-group-item"><small>Kode Qr :</small><br></li>
-                                                </ul>`);
-                                listGroup.find('li:contains("Kode Qr :")').append(Qr);
-                                $('.showBarang').append(listGroup);
+        function printQr(qrCodeUrl) {
+            var printWindow = window.open(qrCodeUrl, '_blank');
 
-                                // Tampilkan modal
-                                $('#detailBarangModal').modal('show');
-                                $('#buttonPrintQr').click(function() {
-                                    if (qrCodePath) {
-                                        const printWindow = window.open(
-                                            "{{ asset('storage/') }}" + '/' +
-                                            qrCodePath, '_blank');
+            printWindow.onload = function() {
+                printWindow.print();
+            };
+        }
 
-                                        printWindow.onload = function() {
-                                            printWindow.print();
-                                        };
-                                    } else {
-                                        console.error('Path gambar QR tidak tersedia.');
-                                    }
-                                });
+        $('.detailBarangBtn').click(function() {
+            const barangSlug = $(this).data('barang');
+            $.ajax({
+                type: 'GET',
+                url: '/dashboard/barang-gudang/' + barangSlug,
+                success: function(response) {
+                    if (response.status == 'success') {
+                        let qrCodePath = response.barang.qr_code;
+                        $('#detailBarangModalLabel').text(
+                            `Detail Barang ${response.barang.name}`);
+                        $('.showBarang').empty();
+                        const Qr = $(
+                            `<img src="{{ asset('storage/${response.barang.qr_code}') }}" width="100">
+                            <button class="btn btn-sm bg-warning text-light" type="button" id="buttonPrintQr"><i class="bi bi-printer-fill"></i></button>`
+                        );
+                        const listGroup = $(`<ul class="list-group">
+                                            <li class="list-group-item"><small>Nama Barang :</small><br> ${response.barang.kode_barang}</li>
+                                            <li class="list-group-item"><small>Nama Barang :</small><br> ${response.barang.kode_rekening}</li>
+                                            <li class="list-group-item"><small>Nama Barang :</small><br> ${response.barang.name}</li>
+                                            <li class="list-group-item"><small>Spek Teknis :</small><br> ${response.barang.spek}</li>
+                                            <li class="list-group-item"><small>Diambil oleh :</small><br>${response.barang.penerima ? response.barang.penerima : '-'}</li>
+                                            <li class="list-group-item"><small>Kuantitas (Qty) :</small><br> ${response.barang.satuan}</li>
+                                            <li class="list-group-item"><small>Tanggal Masuk :</small><br> ${response.barang.tgl_masuk}</li>
+                                            <li class="list-group-item"><small>Kode Qr :</small><br></li>
+                                        </ul>`);
+                        listGroup.find('li:contains("Kode Qr :")').append(Qr);
+                        $('.showBarang').append(listGroup);
+
+                        // Tampilkan modal
+                        $('#detailBarangModal').modal('show');
+                        $('#buttonPrintQr').click(function() {
+                            if (qrCodePath) {
+                                const printWindow = window.open(
+                                    "{{ asset('storage/') }}" + '/' +
+                                    qrCodePath, '_blank');
+
+                                printWindow.onload = function() {
+                                    printWindow.print();
+                                };
                             } else {
-                                // Handle other cases
+                                console.error('Path gambar QR tidak tersedia.');
                             }
+                        });
+                    } else {
+                        // Handle other cases
+                    }
 
 
-                        },
-                    });
-                });
+                },
+            });
+        });
 
-                $('.deleteBarangBtn').click(function() {
-                    const barang = $(this).data('barang');
-                    console.log(barang);
-                    Swal.fire({
-                        title: 'Anda yakin?',
-                        text: "Anda tidak bisa mengembalikan data ini!",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Ya, hapus!'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            const deleteBarangForm = $(`.deleteBarangForm[data-barang="${barang}"]`);
-                            deleteBarangForm.submit();
-                        }
-                    });
-                });
+        $('.deleteBarangBtn').click(function() {
+            const barang = $(this).data('barang');
+            console.log(barang);
+            Swal.fire({
+                title: 'Anda yakin?',
+                text: "Anda tidak bisa mengembalikan data ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, hapus!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const deleteBarangForm = $(`.deleteBarangForm[data-barang="${barang}"]`);
+                    deleteBarangForm.submit();
+                }
+            });
+        });
 
-                $('#ModalKeterangan').on('show.bs.modal', function(event) {
-                    const button = $(event.relatedTarget);
-                    const slug = button.data('slug');
-                    const form = $(this).find('form#keteranganForm');
-                    const actionUrl = `/dashboard/barang-gudang/${slug}`;
-                    form.attr('action', actionUrl);
-                });
+        $('#ModalKeterangan').on('show.bs.modal', function(event) {
+            const button = $(event.relatedTarget);
+            const slug = button.data('slug');
+            const form = $(this).find('form#keteranganForm');
+            const actionUrl = `/dashboard/barang-gudang/${slug}`;
+            form.attr('action', actionUrl);
+        });
 
-                $('#submitKeterangan').on('click', function() {
-                    // Lakukan sesuatu jika tombol 'Simpan' diklik
-                    $('#keteranganForm').submit(); // Submit form
-                });
+        $('#submitKeterangan').on('click', function() {
+            // Lakukan sesuatu jika tombol 'Simpan' diklik
+            $('#keteranganForm').submit(); // Submit form
+        });
 
-                $('#ModalPengambilan').on('show.bs.modal', function(event) {
-                    const button = $(event.relatedTarget);
-                    const slug = button.data('slug');
-                    const qty = button.data('qty');
-                    console.log(qty);
-                    const form = $(this).find('form#pengambilanForm');
-                    const actionUrl = `/dashboard/barang-gudang/${slug}`;
-                    $('#pengambilan').attr('max', qty);
+        $('#ModalPengambilan').on('show.bs.modal', function(event) {
+            const button = $(event.relatedTarget);
+            const slug = button.data('slug');
+            const qty = button.data('qty');
+            console.log(qty);
+            const form = $(this).find('form#pengambilanForm');
+            const actionUrl = `/dashboard/barang-gudang/${slug}`;
+            $('#pengambilan').attr('max', qty);
 
-                    form.attr('action', actionUrl);
+            form.attr('action', actionUrl);
 
-                    $('#pengambilan').on('input', function() {
-                        const nilaiSatuan = parseFloat($(this).attr('max'));
-                        const nilaiInput = parseFloat($(this).val());
+            $('#pengambilan').on('input', function() {
+                const nilaiSatuan = parseFloat($(this).attr('max'));
+                const nilaiInput = parseFloat($(this).val());
 
-                        if (nilaiInput > nilaiSatuan) {
-                            $(this).val(nilaiSatuan);
-                        }
-                    });
-
-                });
-
-                $('#submitPengambilan').on('click', function() {
-                    $('#pengambilanForm').submit();
-                });
-
-                $('#ModalQr').on('show.bs.modal', function(event) {
-                    const button = $(event.relatedTarget);
-                    const slug = button.data('slug');
-                    console.log(slug);
-                    const barang = $('#barang-modal').val(slug)
-                    const form = $(this).find('form#Qr');
-                    const actionUrl = `/dashboard/barang-gudang/${slug}/qrcode`;
-
-                    form.attr('action', actionUrl);
-                    $('#qrGenerate').data('slug', slug);
-                });
-                $('#simpanQr').on('click', function() {
-                    $('#Qr').submit();
-                });
+                if (nilaiInput > nilaiSatuan) {
+                    $(this).val(nilaiSatuan);
+                }
             });
 
-            const harga = document.querySelectorAll('.harga');
-            const sub_total = document.querySelectorAll('.sub-total');
-        </script>
-    </section>
+        });
+
+        $('#submitPengambilan').on('click', function() {
+            $('#pengambilanForm').submit();
+        });
+
+        $('#ModalQr').on('show.bs.modal', function(event) {
+            const button = $(event.relatedTarget);
+            const slug = button.data('slug');
+            console.log(slug);
+            const barang = $('#barang-modal').val(slug)
+            const form = $(this).find('form#Qr');
+            const actionUrl = `/dashboard/barang-gudang/${slug}/qrcode`;
+
+            form.attr('action', actionUrl);
+            $('#qrGenerate').data('slug', slug);
+        });
+        $('#simpanQr').on('click', function() {
+            $('#Qr').submit();
+        });
+    });
+
+    const harga = document.querySelectorAll('.harga');
+    const sub_total = document.querySelectorAll('.sub-total');
+</script>
 @endsection

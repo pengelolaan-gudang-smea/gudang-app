@@ -14,18 +14,22 @@ return new class extends Migration
         Schema::create('barang_gudang', function (Blueprint $table) {
             $table->id();
             $table->uuid();
-        $table->foreignId('barang_id')->nullable()->constrained('barang')->onDelete('cascade');
+            $table->foreignId('barang_id')->nullable()->constrained('barang')->onDelete('cascade');
             $table->string('name');
             $table->string('no_inventaris')->nullable();
             $table->string('slug');
+            $table->string('kode_barang');
+            $table->string('kode_rekening');
             $table->text('spek');
             $table->string('stock_awal');
             $table->string('stock_akhir');
             $table->string('satuan');
             $table->string('barang_diambil')->nullable();
-        $table->foreignId('jurusan_id')->nullable()->constrained(table:'jurusan');
+            $table->foreignId('jurusan_id')->nullable()->constrained(table:'jurusan');
             $table->string('tujuan')->nullable();
             $table->enum('jenis_barang', ['Aset', 'Persediaan']);
+            $table->string('keterangan')->nullable();
+
             $table->foreignId('anggaran_id')->nullable()->constrained(table: 'anggaran');
             $table->string('qr_code')->nullable();
             $table->string('tahun')->nullable();

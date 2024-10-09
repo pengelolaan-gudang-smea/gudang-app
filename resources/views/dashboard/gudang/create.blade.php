@@ -10,7 +10,29 @@
                     <!-- General Form Elements -->
                     <form action="{{ route('barang-gudang.store') }}" method="POST">
                         @csrf
-                        <div class="row mb-3">
+                        <div class="mb-3 row">
+                            <label for="kode_barang" class="col-sm-2 col-form-label">Kode Barang <span class="text-danger">*</span></label>
+                            <div class="col-sm-10">
+                                <input type="text" id="kode_barang" placeholder="Masukan kode barang" class=" form-control @error('kode_barang') is-invalid @enderror" name="kode_barang" required value="{{ old('kode_barang') }}">
+                                @error('kode_barang')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="kode_rekening" class="col-sm-2 col-form-label">Kode Rekening <span class="text-danger">*</span></label>
+                            <div class="col-sm-10">
+                                <input type="text" id="kode_rekening" placeholder="Masukan kode barang" class=" form-control @error('kode_rekening') is-invalid @enderror" name="kode_rekening" required value="{{ old('kode_rekening') }}">
+                                @error('kode_rekening')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
                             <label for="name" class="col-sm-2 col-form-label">Nama <span
                                     class="text-danger">*</span></label>
                             <div class="col-sm-10">
@@ -24,12 +46,12 @@
                             </div>
                         </div>
 
-                        <div class="row mb-3">
+                        <div class="mb-3 row">
                             <label for="stock_awal" class="col-sm-2 col-form-label">Kuantitas (Qty) <span
                                     class="text-danger">*</span></label>
                             <div class="col-sm-10">
                                 <input type="number" id="stock_awal" placeholder="Masukan kuantitas barang"
-                                    class="form-control @error('stock_awal') is-invalid @enderror" name="stock_awal" required value="{{ old('stock_awal') }}">
+                                    class="form-control @error('stock_awal') is-invalid @enderror" name="stock_awal" required value="{{ old('stock_awal') }}" inputmode="numeric">
                                 @error('stock_awal')
                                     <div class="invalid-feedback">
                                         {{ $message }}
@@ -37,20 +59,31 @@
                                 @enderror
                             </div>
                         </div>
-                         <div class="row mb-3">
-                            <label for="satuan" class="col-sm-2 col-form-label">Satuan <span
-                                    class="text-danger">*</span></label>
+                        <div class="mb-3 row">
+                            <label for="satuan" class="col-sm-2 col-form-label">Satuan <span class="text-danger">*</span></label>
                             <div class="col-sm-10">
-                                <input type="text" id="satuan" placeholder="Masukan satuan barang"
-                                    class=" form-control @error('satuan') is-invalid @enderror" name="satuan" required value="{{ old('satuan') }}">
+                                <select name="satuan" class="form-select @error('satuan') is-invalid @enderror select2" aria-label="Default select example" id="satuan" required>
+                                    <option selected disabled>-- Pilih satuan --</option>
+                                    <option value="Buah">Buah</option>
+                                    <option value="Pcs">Pcs</option>
+                                    <option value="Dus">Dus</option>
+                                    <option value="Box">Box</option>
+                                    <option value="Lusin">Lusin</option>
+                                    <option value="Gram">Gram</option>
+                                    <option value="Kg">Kilogram</option>
+                                    <option value="Liter">Liter</option>
+                                    <option value="Meter">Meter</option>
+                                    <option value="Cm">Centimeter</option>
+                                    <option value="Inch">Inch</option>
+                                </select>
                                 @error('satuan')
-                                    <div class="invalid-feedback">
-                                        {{ $message }}
-                                    </div>
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
                                 @enderror
                             </div>
                         </div>
-                         <div class="row mb-3">
+                         <div class="mb-3 row">
                             <label for="tahun" class="col-sm-2 col-form-label">Tahun <span
                                     class="text-danger">*</span></label>
                             <div class="col-sm-10">
@@ -63,7 +96,7 @@
                                 @enderror
                             </div>
                         </div>
-                        <div class="row mb-3">
+                        <div class="mb-3 row">
                             <label for="satuan" class="col-sm-2 col-form-label">Tanggal Faktur <span
                                     class="text-danger">*</span></label>
                             <div class="col-sm-10">
@@ -77,7 +110,7 @@
                             </div>
                         </div>
 
-                        <div class="row mb-3">
+                        <div class="mb-3 row">
                             <label for="Jenis" class="col-sm-2 col-form-label">Jenis Barang <span
                                     class="text-danger">*</span></label>
                             <div class="col-sm-10">
@@ -89,7 +122,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="row mb-3">
+                        <div class="mb-3 row">
                             <label for="Jenis" class="col-sm-2 col-form-label">Jenis Anggaran <span
                                     class="text-danger">*</span></label>
                             <div class="col-sm-10">
@@ -102,7 +135,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="row mb-3">
+                        <div class="mb-3 row">
                             <label for="lokasi" class="col-sm-2 col-form-label">Lokasi <span
                                     class="text-danger">*</span></label>
                             <div class="col-sm-10">
@@ -115,7 +148,7 @@
                                 @enderror
                             </div>
                         </div>
-                        <div class="row mb-3">
+                        <div class="mb-3 row">
                             <label for="penerima" class="col-sm-2 col-form-label">Penerima <span
                                     class="text-danger">*</span></label>
                             <div class="col-sm-10">
@@ -128,7 +161,7 @@
                                 @enderror
                             </div>
                         </div>
-                        <div class="row mb-3">
+                        <div class="mb-3 row">
                             <label for="satuan" class="col-sm-2 col-form-label">Tanggal Masuk <span
                                     class="text-danger">*</span></label>
                             <div class="col-sm-10">
@@ -141,8 +174,8 @@
                                 @enderror
                             </div>
                         </div>
-                        <div class="row mb-3 d-none" id="tujuan-barang">
-                            <label for="tujuan" class="col-sm-2 col-form-label mb-3">Prodi <span
+                        <div class="mb-3 row d-none" id="tujuan-barang">
+                            <label for="tujuan" class="mb-3 col-sm-2 col-form-label">Prodi <span
                                     class="text-danger">*</span></label>
                             <div class="col-sm-10">
                                 <select class="form-control" name="jurusan_id">
@@ -164,7 +197,7 @@
                                 @enderror
                             </div>
                         </div>
-                        <div class="row mb-3">
+                        <div class="mb-3 row">
                             <label for="spek" class="col-sm-2 col-form-label">Spek <span
                                     class="text-danger">*</span></label>
                             <div class="col-sm-10">
@@ -178,14 +211,14 @@
                             </div>
                         </div>
 
-                        <div class="row mb-3">
+                        <div class="mb-3 row">
                             <small class="text-secondary"><span class="text-danger">* </span>Field wajid diisi</small>
                         </div>
 
-                        <div class="row mb-3">
-                            <div class="col-sm-12 d-flex justify-content-end gap-2">
-                                <a href="{{ route('pengajuan-barang.index') }}" class="btn btn-secondary">Kembali</a>
-                                <button id='ajukan-barang' type="submit" class="btn btn-primary">Ajukan
+                        <div class="mb-3 row">
+                            <div class="gap-2 col-sm-12 d-flex justify-content-end">
+                                <a href="{{ route('barang-gudang.index') }}" class="btn btn-secondary">Kembali</a>
+                                <button id='ajukan-barang' type="submit" class="btn btn-primary">Tambahkan
                                     Barang</button>
                             </div>
                         </div>

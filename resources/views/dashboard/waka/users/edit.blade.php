@@ -96,7 +96,7 @@
                 const roleSelect = $('#role');
                 const jurusanInput = $('#jurusanInput');
 
-                if (roleSelect.val() === '2') {
+                if (roleSelect.val() === '2' || roleSelect.val() === '5') {
                     jurusanInput.show();
                 } else {
                     jurusanInput.val('0');

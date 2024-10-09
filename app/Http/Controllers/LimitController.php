@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Anggaran;
 use App\Models\Jurusan;
 use App\Models\Limit;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -36,6 +37,9 @@ class LimitController extends Controller
                 })
                 ->addColumn('tahun', function ($q) {
                     return $q->anggaran->tahun;
+                })
+                ->addColumn('created_at', function ($q) {
+                    return Carbon::parse($q->created_at)->format('H:i') . ', ' . Carbon::parse($q->created_at)->format('d M Y');
                 })
                 ->addColumn('action', function ($row) {
                     $route_edit = route('limit-anggaran.edit', encrypt($row->id));
