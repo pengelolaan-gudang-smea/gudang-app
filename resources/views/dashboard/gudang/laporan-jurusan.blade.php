@@ -15,7 +15,7 @@
                         <div class="col-md-6">
                             <select class="form-control" name="jurusan">
                                 <option selected disabled>-- Pilih Jurusan --</option>
-                                <option value="">All</option>
+                                <option value="all">All</option>
                                 @foreach (App\Models\Jurusan::get() as $item)
                                 <option value="{{ $item->id }}">{{ $item->name }}</option>
                                 @endforeach
@@ -30,7 +30,7 @@
                         <div class="col-md-6">
                             <select class="form-control" name="tahun" disabled>
                                 <option selected disabled>-Pilih Tahun-</option>
-                                <option value="">All</option>
+                                <option value="all">All</option>
                             </select>
                         </div>
                     </div>
@@ -98,13 +98,13 @@
                     , success: function(data) {
                         const filterTahun = $('select[name=tahun]');
                         filterTahun.html('');
-
                         // Reset tombol export jika data tidak ada
                         btnExport.prop('disabled', true);
 
-                        if (data.length > 0) {
+                        if (data.length >= 0) {
                             var options = '';
                             options += '<option selected disabled>-- Pilih Tahun --</option>';
+                            options += '<option value="all"> All </option>';
                             $.each(data, function(index, tahun) {
                                 options += '<option value="' + tahun + '">' + tahun + '</option>';
                             });
@@ -125,7 +125,7 @@
                                 } else {
                                     btnExport.prop('disabled', true);
                                 }
-
+console.log(selectedTahun);
                                 updateTabel(jurusan, selectedTahun);
                             });
                         }
