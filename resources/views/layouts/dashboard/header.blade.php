@@ -43,7 +43,7 @@
                         <hr class="dropdown-divider">
                     </li>
                     <li class="dropdown-header">
-                       {{-- {{ Carbon\Carbon::now()->translatedFormat('l, d F Y') }} --}}
+                       {{ Carbon\Carbon::now()->translatedFormat('l, d F Y') }}
                     </li>
                     <li>
                         <hr class="dropdown-divider">
