@@ -15,7 +15,7 @@
                             <div class="col-md-6">
                                 <select class="form-control" name="lab_ruang">
                                     <option selected disabled>-- Pilih lab/ruang --</option>
-                                    <option value=" ">All</option>
+                                    <option value="all">All</option>
                                     @foreach (App\Models\BarangGudang::pluck('tujuan') as $item)
                                         <option value="{{ $item }}">{{ $item }}</option>
                                     @endforeach
@@ -30,7 +30,8 @@
                             <div class="col-md-6">
                                 <select class="form-control" name="tahun" disabled>
                                     <option selected disabled>-Pilih Tahun-</option>
-                                    <option value="" >All</option>
+                                <option value="all">All</option>
+
                                 </select>
                             </div>
                         </div>
@@ -41,7 +42,7 @@
                     @csrf
                     <input type="hidden" name="lab_ruang" id="exportLabRuang">
                     <input type="hidden" name="tahun" id="exportTahun">
-                    <button class="btn btn-md btn-outline-success my-3">Export Excel</button>
+                    <button class="btn btn-md btn-outline-success my-3" disabled name="export">Export Excel</button>
                 </form>
                 <div class="table-responsive" id="viewTable">
                     <table class="table mt-2" id="barangsTable">
@@ -79,6 +80,10 @@
                 $('select[name=lab_ruang]').select2({
                     theme: "bootstrap-5"
                 })
+                 // Disable tombol Export saat pertama kali load
+            let btnExport = $('button[name=export]');
+            btnExport.prop('disabled', true);
+
                 $('select[name=lab_ruang]').change(function() {
                     let lab_ruang = $(this).val();
                     $.ajax({
@@ -89,11 +94,15 @@
                             lab_ruang: lab_ruang
                         },
                         success: function(data) {
+
                             const filterTahun = $('select[name=tahun]');
+
                             filterTahun.html('');
+                            btnExport.prop('disabled', false);
                             if (data.length > 0) {
                                 var options = '';
                                 options += '<option selected disabled>-- Pilih Tahun --</option>';
+                                options += '<option value="all">All</option>';
                                 $.each(data, function(index, tahun) {
                                     options += '<option value="' + tahun + '">' + tahun +
                                         '</option>';
