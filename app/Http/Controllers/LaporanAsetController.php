@@ -17,7 +17,7 @@ class LaporanAsetController extends Controller
     {
         return view('dashboard.gudang.laporan-jurusan', [
             'title' => 'Laporan gudang',
-            'gudang' => BarangGudang::with('jurusan')->where('jenis_barang', 'aset')->get()
+            'gudang' => BarangGudang::with('jurusan')->where('jenis_barang', 'Aset')->get()
         ]);
     }
 
@@ -41,7 +41,7 @@ class LaporanAsetController extends Controller
         if ($request->ajax()) {
 
             if ($request->tahun == 'all' && $request->jurusan == 'all') {
-                $data = BarangGudang::all();
+                $data = BarangGudang::where('jenis_barang','Aset')->get();
             } else if ($request->jurusan == 'all') {
                 $data = BarangGudang::where('tahun', $request->tahun)->get();
             } else if ($request->tahun == 'all') {

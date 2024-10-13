@@ -61,7 +61,7 @@
                             <th scope="row">{{ $loop->iteration }}</th>
                             <td>{{ $item->no_inventaris }}</td>
                             <td>{{ $item->name }}</td>
-                            <td>{{ $item->stock_awal }}</td>
+                            <td>{{ $item->stock_akhir }}</td>
                             <td>{{ $item->jurusan->name ?? '-'}}</td>
                         </tr>
                         @endforeach
