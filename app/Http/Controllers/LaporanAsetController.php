@@ -99,7 +99,7 @@ class LaporanAsetController extends Controller
     {
         if ($request->ajax()) {
             if ($request->tahun == 'all' && $request->lab_ruang == 'all') {
-                $data = BarangGudang::all();
+                $data = BarangGudang::where('jenis_barang','Persediaan');
             } else if ($request->lab_ruang == 'all') {
                 $data = BarangGudang::where('tahun', $request->tahun)->get();
             } else if ($request->tahun == 'all') {
